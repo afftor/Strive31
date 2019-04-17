@@ -1,0 +1,960 @@
+[gd_scene load_steps=45 format=2]
+
+[ext_resource path="res://mainfont.tres" type="DynamicFont" id=1]
+[ext_resource path="res://files/buttons/chek-Active.png" type="Texture" id=2]
+[ext_resource path="res://files/buttons/chek-noactive.png" type="Texture" id=3]
+[ext_resource path="res://files/buttons/tex-wind.png" type="Texture" id=4]
+[ext_resource path="res://files/buttons/img-kurs.png" type="Texture" id=5]
+[ext_resource path="res://files/buttons/img-kurs-act.png" type="Texture" id=6]
+[ext_resource path="res://files/buttons/img-scr.png" type="Texture" id=7]
+[ext_resource path="res://files/scripts/combat.gd" type="Script" id=8]
+[ext_resource path="res://files/buttons/combat/4.png" type="Texture" id=9]
+[ext_resource path="res://files/buttons/combat/16.png" type="Texture" id=10]
+[ext_resource path="res://mainfont.font" type="BitmapFont" id=11]
+[ext_resource path="res://files/buttons/combat/3.png" type="Texture" id=12]
+[ext_resource path="res://files/buttons/combat/8.png" type="Texture" id=13]
+[ext_resource path="res://files/buttons/combat/9.png" type="Texture" id=14]
+[ext_resource path="res://files/buttons/combat/12.png" type="Texture" id=15]
+[ext_resource path="res://files/buttons/combat/13.png" type="Texture" id=16]
+[ext_resource path="res://files/buttons/combat/14.png" type="Texture" id=17]
+[ext_resource path="res://files/buttons/combat/15.png" type="Texture" id=18]
+[ext_resource path="res://files/buttons/combat/5.png" type="Texture" id=19]
+[ext_resource path="res://files/buttons/abils/Attack.png" type="Texture" id=20]
+[ext_resource path="res://files/buttons/outside/33.png" type="Texture" id=21]
+[ext_resource path="res://files/buttons/outside/35.png" type="Texture" id=22]
+[ext_resource path="res://files/buttons/outside/36.png" type="Texture" id=23]
+[ext_resource path="res://files/buttons/outside/34.png" type="Texture" id=24]
+[ext_resource path="res://files/buttons/combat/2.png" type="Texture" id=25]
+[ext_resource path="res://files/buttons/combat/6.png" type="Texture" id=26]
+[ext_resource path="res://files/buttons/combat/10.png" type="Texture" id=27]
+[ext_resource path="res://files/buttons/combat/11.png" type="Texture" id=28]
+[ext_resource path="res://Roundo-Medium.otf" type="DynamicFontData" id=29]
+[ext_resource path="res://files/theme.tres" type="Theme" id=30]
+[ext_resource path="res://files/paneltexturebland.tres" type="StyleBox" id=31]
+[ext_resource path="res://files/floattext.gd" type="Script" id=32]
+[ext_resource path="res://files/buttons/mana2.png" type="Texture" id=33]
+[ext_resource path="res://files/buttons/sexicons/time.png" type="Texture" id=34]
+
+[sub_resource type="StyleBoxTexture" id=1]
+texture = ExtResource( 4 )
+region_rect = Rect2( 0, 0, 50, 50 )
+margin_left = 10.0
+margin_right = 10.0
+margin_top = 10.0
+margin_bottom = 10.0
+
+[sub_resource type="StyleBoxTexture" id=2]
+texture = ExtResource( 5 )
+region_rect = Rect2( 0, 0, 34, 26 )
+margin_left = 21.0
+margin_right = 21.0
+margin_top = 21.0
+margin_bottom = 21.0
+
+[sub_resource type="StyleBoxTexture" id=3]
+texture = ExtResource( 6 )
+region_rect = Rect2( 0, 0, 34, 26 )
+margin_left = 21.0
+margin_right = 21.0
+margin_top = 21.0
+margin_bottom = 21.0
+
+[sub_resource type="StyleBoxTexture" id=4]
+texture = ExtResource( 7 )
+region_rect = Rect2( 0, 0, 34, 58 )
+margin_left = 9.0
+margin_right = 9.0
+margin_top = 20.0
+margin_bottom = 20.0
+
+[sub_resource type="Theme" id=5]
+default_font = ExtResource( 1 )
+CheckBox/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
+CheckBox/colors/font_color_disabled = Color( 0.9, 0.9, 0.9, 0.2 )
+CheckBox/colors/font_color_hover = Color( 0.941176, 0.941176, 0.941176, 1 )
+CheckBox/colors/font_color_pressed = Color( 1, 1, 1, 1 )
+CheckBox/constants/check_vadjust = 0
+CheckBox/constants/hseparation = 4
+CheckBox/fonts/font = ExtResource( 1 )
+CheckBox/icons/checked = ExtResource( 2 )
+CheckBox/icons/radio_checked = null
+CheckBox/icons/radio_unchecked = null
+CheckBox/icons/unchecked = ExtResource( 3 )
+CheckBox/styles/disabled = null
+CheckBox/styles/focus = null
+CheckBox/styles/hover = null
+CheckBox/styles/normal = null
+CheckBox/styles/pressed = null
+Panel/styles/panel = SubResource( 1 )
+Panel/styles/panelf = null
+Panel/styles/panelnc = null
+ProgressBar/colors/font_color = Color( 0.941176, 0.941176, 0.941176, 1 )
+ProgressBar/colors/font_color_shadow = Color( 0, 0, 0, 1 )
+ProgressBar/fonts/font = null
+ProgressBar/styles/bg = null
+ProgressBar/styles/fg = null
+VScrollBar/icons/decrement = null
+VScrollBar/icons/decrement_hilite = null
+VScrollBar/icons/increment = null
+VScrollBar/icons/increment_hilite = null
+VScrollBar/styles/grabber = SubResource( 2 )
+VScrollBar/styles/grabber_hilite = SubResource( 3 )
+VScrollBar/styles/scroll = SubResource( 4 )
+VScrollBar/styles/scroll_focus = null
+
+[sub_resource type="StyleBoxTexture" id=6]
+texture = ExtResource( 12 )
+region_rect = Rect2( 0, 0, 1487, 157 )
+
+[sub_resource type="Animation" id=7]
+resource_name = "attack"
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rect_position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+
+[sub_resource type="StyleBoxTexture" id=8]
+texture = ExtResource( 25 )
+region_rect = Rect2( 0, 0, 1784, 228 )
+
+[sub_resource type="DynamicFont" id=9]
+size = 30
+use_filter = true
+extra_spacing_top = 3
+font_data = ExtResource( 29 )
+
+[sub_resource type="DynamicFont" id=10]
+size = 30
+use_filter = true
+extra_spacing_top = 3
+font_data = ExtResource( 29 )
+
+[node name="combat" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 2
+size_flags_vertical = 2
+theme = SubResource( 5 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_left = 94.0
+margin_top = 400.0
+margin_right = 1264.0
+margin_bottom = 513.0
+texture = ExtResource( 9 )
+expand = true
+stretch_mode = 6
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+editor/display_folded = true
+margin_left = 233.0
+margin_top = 211.0
+margin_right = 1135.0
+margin_bottom = 389.0
+texture = ExtResource( 10 )
+expand = true
+
+[node name="combatlog" type="RichTextLabel" parent="TextureRect2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 12.0
+margin_top = 11.0
+margin_right = -13.0
+margin_bottom = -10.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/normal_font = ExtResource( 11 )
+bbcode_enabled = true
+
+[node name="grouppanel" type="Panel" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -234.0
+margin_right = -2.0
+margin_bottom = -74.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_styles/panel = SubResource( 6 )
+
+[node name="skilline" type="HBoxContainer" parent="grouppanel"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 217.0
+margin_top = -267.0
+margin_right = 1133.0
+margin_bottom = -192.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+custom_constants/separation = 8
+alignment = 1
+
+[node name="skill" type="TextureButton" parent="grouppanel/skilline"]
+visible = false
+margin_left = 420.0
+margin_right = 495.0
+margin_bottom = 75.0
+rect_min_size = Vector2( 75, 75 )
+size_flags_horizontal = 0
+size_flags_vertical = 0
+toggle_mode = true
+texture_normal = ExtResource( 4 )
+expand = true
+
+[node name="number" type="Label" parent="grouppanel/skilline/skill"]
+margin_left = 4.0
+margin_top = 3.0
+margin_right = 14.0
+margin_bottom = 19.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+custom_colors/font_color = Color( 0.945313, 1, 0, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "0"
+align = 1
+
+[node name="cooldown" type="Label" parent="grouppanel/skilline/skill"]
+visible = false
+margin_left = 51.0
+margin_top = 51.0
+margin_right = 70.0
+margin_bottom = 71.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+custom_colors/font_color = Color( 0, 0.648438, 1, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "2"
+align = 1
+
+[node name="Panel" type="Panel" parent="grouppanel/skilline/skill/cooldown"]
+show_behind_parent = true
+margin_left = -6.0
+margin_top = -2.0
+margin_right = 24.0
+margin_bottom = 24.0
+
+[node name="groupline" type="HBoxContainer" parent="grouppanel"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 152.0
+margin_top = -196.0
+margin_right = -178.0
+margin_bottom = 43.0
+mouse_filter = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+custom_constants/separation = 31
+alignment = 1
+
+[node name="character" type="TextureButton" parent="grouppanel/groupline"]
+pause_mode = 1
+visible = false
+margin_left = 425.0
+margin_right = 602.0
+margin_bottom = 239.0
+rect_min_size = Vector2( 177, 239 )
+rect_pivot_offset = Vector2( 90.4192, 121.112 )
+size_flags_horizontal = 6
+size_flags_vertical = 0
+toggle_mode = true
+texture_normal = ExtResource( 13 )
+texture_pressed = ExtResource( 14 )
+texture_hover = ExtResource( 14 )
+expand = true
+stretch_mode = 5
+
+[node name="portrait" type="TextureRect" parent="grouppanel/groupline/character"]
+margin_left = 37.0
+margin_top = 50.0
+margin_right = 142.0
+margin_bottom = 155.0
+mouse_filter = 2
+size_flags_horizontal = 2
+size_flags_vertical = 2
+expand = true
+stretch_mode = 6
+
+[node name="name" type="Label" parent="grouppanel/groupline/character"]
+margin_left = 26.0
+margin_top = 26.0
+margin_right = 152.0
+margin_bottom = 46.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+text = "Name"
+align = 1
+
+[node name="hp" type="TextureProgress" parent="grouppanel/groupline/character"]
+editor/display_folded = true
+margin_left = 28.0
+margin_top = 159.0
+margin_right = 150.0
+margin_bottom = 169.0
+hint_tooltip = "Health"
+value = 50.0
+texture_under = ExtResource( 15 )
+texture_progress = ExtResource( 16 )
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/hp"]
+margin_left = 19.0
+margin_right = 105.0
+margin_bottom = 20.0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "100/100"
+align = 1
+
+[node name="en" type="TextureProgress" parent="grouppanel/groupline/character"]
+editor/display_folded = true
+margin_left = 28.0
+margin_top = 177.0
+margin_right = 150.0
+margin_bottom = 195.0
+hint_tooltip = "Energy"
+value = 50.0
+texture_under = ExtResource( 15 )
+texture_progress = ExtResource( 17 )
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/en"]
+margin_left = 19.0
+margin_right = 105.0
+margin_bottom = 20.0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "100/100"
+align = 1
+
+[node name="stress" type="TextureProgress" parent="grouppanel/groupline/character"]
+editor/display_folded = true
+visible = false
+margin_left = 28.0
+margin_top = 195.0
+margin_right = 150.0
+margin_bottom = 213.0
+hint_tooltip = "Stress"
+value = 50.0
+texture_under = ExtResource( 15 )
+texture_progress = ExtResource( 18 )
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/stress"]
+margin_left = 19.0
+margin_top = -1.0
+margin_right = 105.0
+margin_bottom = 19.0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "100/100"
+align = 1
+
+[node name="info" type="TextureButton" parent="grouppanel/groupline/character"]
+margin_left = 114.0
+margin_top = 117.0
+margin_right = 150.0
+margin_bottom = 153.0
+texture_normal = ExtResource( 19 )
+expand = true
+
+[node name="buffscontainer" type="GridContainer" parent="grouppanel/groupline/character"]
+margin_left = 15.0
+margin_top = 222.0
+margin_right = 163.0
+margin_bottom = 255.0
+columns = 8
+
+[node name="TextureRect" type="TextureRect" parent="grouppanel/groupline/character/buffscontainer"]
+visible = false
+margin_right = 30.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 30, 30 )
+texture = ExtResource( 20 )
+expand = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="grouppanel/groupline/character"]
+anims/attack = SubResource( 7 )
+
+[node name="Panel" type="Panel" parent="grouppanel/groupline/character"]
+visible = false
+margin_left = 160.0
+margin_top = 19.0
+margin_right = 236.0
+margin_bottom = 156.0
+
+[node name="attack" type="TextureRect" parent="grouppanel/groupline/character/Panel"]
+margin_left = 6.0
+margin_top = 6.0
+margin_right = 35.0
+margin_bottom = 32.0
+texture = ExtResource( 21 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/Panel/attack"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="speed" type="TextureRect" parent="grouppanel/groupline/character/Panel"]
+margin_left = 6.0
+margin_top = 38.0
+margin_right = 35.0
+margin_bottom = 64.0
+texture = ExtResource( 22 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/Panel/speed"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="protection" type="TextureRect" parent="grouppanel/groupline/character/Panel"]
+margin_left = 6.0
+margin_top = 70.0
+margin_right = 35.0
+margin_bottom = 96.0
+texture = ExtResource( 23 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/Panel/protection"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="armor" type="TextureRect" parent="grouppanel/groupline/character/Panel"]
+margin_left = 6.0
+margin_top = 103.0
+margin_right = 35.0
+margin_bottom = 129.0
+texture = ExtResource( 24 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="grouppanel/groupline/character/Panel/armor"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="enemypanel" type="Panel" parent="."]
+anchor_right = 1.0
+margin_left = 4.0
+margin_top = 52.0
+margin_bottom = 203.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_styles/panel = SubResource( 8 )
+
+[node name="enemyline" type="HBoxContainer" parent="enemypanel"]
+margin_left = 92.0
+margin_top = 10.0
+margin_right = 1257.0
+margin_bottom = 156.0
+size_flags_horizontal = 6
+size_flags_vertical = 0
+alignment = 1
+
+[node name="character" type="TextureButton" parent="enemypanel/enemyline"]
+visible = false
+margin_left = 527.0
+margin_right = 637.0
+margin_bottom = 146.0
+rect_min_size = Vector2( 110, 146 )
+rect_pivot_offset = Vector2( 54.6864, 72.7106 )
+focus_mode = 0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+enabled_focus_mode = 0
+texture_normal = ExtResource( 26 )
+expand = true
+stretch_mode = 6
+
+[node name="portrait" type="TextureRect" parent="enemypanel/enemyline/character"]
+margin_left = 10.0
+margin_top = 23.0
+margin_right = 100.0
+margin_bottom = 113.0
+rect_min_size = Vector2( 90, 90 )
+mouse_filter = 2
+size_flags_horizontal = 2
+size_flags_vertical = 2
+expand = true
+
+[node name="hp" type="TextureProgress" parent="enemypanel/enemyline/character"]
+margin_left = 16.0
+margin_top = 118.0
+margin_right = 94.0
+margin_bottom = 127.0
+mouse_filter = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+value = 100.0
+texture_under = ExtResource( 27 )
+texture_progress = ExtResource( 28 )
+
+[node name="Label" type="Label" parent="enemypanel/enemyline/character/hp"]
+visible = false
+margin_left = -9.0
+margin_top = -19.0
+margin_right = 88.0
+margin_bottom = 1.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+text = "100/100"
+align = 1
+
+[node name="name" type="Label" parent="enemypanel/enemyline/character"]
+margin_left = 8.0
+margin_top = 1.0
+margin_right = 103.0
+margin_bottom = 44.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "Name Surname"
+align = 1
+valign = 1
+autowrap = true
+
+[node name="buffscontainer" type="HBoxContainer" parent="enemypanel/enemyline/character"]
+margin_left = 1.0
+margin_top = 138.0
+margin_right = 120.0
+margin_bottom = 168.0
+
+[node name="TextureRect" type="TextureRect" parent="enemypanel/enemyline/character/buffscontainer"]
+visible = false
+margin_right = 20.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 30, 30 )
+texture = ExtResource( 20 )
+expand = true
+
+[node name="Panel" type="Panel" parent="enemypanel/enemyline/character"]
+visible = false
+margin_left = 108.0
+margin_top = 5.0
+margin_right = 184.0
+margin_bottom = 142.0
+
+[node name="attack" type="TextureRect" parent="enemypanel/enemyline/character/Panel"]
+margin_left = 6.0
+margin_top = 6.0
+margin_right = 35.0
+margin_bottom = 32.0
+texture = ExtResource( 21 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="enemypanel/enemyline/character/Panel/attack"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="speed" type="TextureRect" parent="enemypanel/enemyline/character/Panel"]
+margin_left = 6.0
+margin_top = 38.0
+margin_right = 35.0
+margin_bottom = 64.0
+texture = ExtResource( 22 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="enemypanel/enemyline/character/Panel/speed"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="protection" type="TextureRect" parent="enemypanel/enemyline/character/Panel"]
+margin_left = 6.0
+margin_top = 70.0
+margin_right = 35.0
+margin_bottom = 96.0
+texture = ExtResource( 23 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="enemypanel/enemyline/character/Panel/protection"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="armor" type="TextureRect" parent="enemypanel/enemyline/character/Panel"]
+margin_left = 6.0
+margin_top = 103.0
+margin_right = 35.0
+margin_bottom = 129.0
+texture = ExtResource( 24 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="enemypanel/enemyline/character/Panel/armor"]
+margin_left = 35.0
+margin_top = 4.0
+margin_right = 75.0
+margin_bottom = 24.0
+text = "1"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="enemypanel"]
+visible = false
+margin_left = 61.0
+margin_right = 1303.0
+margin_bottom = 159.0
+scroll_vertical_enabled = false
+
+[node name="warning" type="Label" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -1001.0
+margin_top = -460.0
+margin_right = -392.0
+margin_bottom = -369.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+custom_fonts/font = SubResource( 9 )
+text = "Cant"
+align = 1
+
+[node name="confirm" type="Button" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -141.0
+margin_top = -121.0
+margin_right = -12.0
+margin_bottom = -80.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+theme = ExtResource( 30 )
+custom_fonts/font = ExtResource( 1 )
+text = "End Turn (F)"
+
+[node name="autowin" type="Button" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -274.0
+margin_top = -147.0
+margin_right = -167.0
+margin_bottom = -112.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/font = ExtResource( 1 )
+text = "autowin"
+
+[node name="abilitites" type="Button" parent="."]
+editor/display_folded = true
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -141.0
+margin_top = -220.0
+margin_right = -12.0
+margin_bottom = -179.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+theme = ExtResource( 30 )
+custom_fonts/font = ExtResource( 1 )
+text = "Abilities"
+
+[node name="Panel" type="Panel" parent="abilitites"]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -1038.0
+margin_top = -488.0
+margin_right = -442.0
+margin_bottom = -23.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_styles/panel = ExtResource( 31 )
+
+[node name="inactivecontainer" type="ScrollContainer" parent="abilitites/Panel"]
+editor/display_folded = true
+margin_left = 40.0
+margin_top = 54.0
+margin_right = 257.0
+margin_bottom = 366.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+scroll_horizontal_enabled = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="abilitites/Panel/inactivecontainer"]
+editor/display_folded = true
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Button" type="Button" parent="abilitites/Panel/inactivecontainer/VBoxContainer"]
+visible = false
+margin_right = 150.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 150, 30 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/font = ExtResource( 1 )
+toggle_mode = true
+
+[node name="CheckBox" type="CheckBox" parent="abilitites/Panel/inactivecontainer/VBoxContainer/Button"]
+margin_left = 156.0
+margin_top = 5.0
+margin_right = 182.0
+margin_bottom = 28.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="label" type="Label" parent="abilitites/Panel"]
+margin_left = 46.0
+margin_top = 25.0
+margin_right = 182.0
+margin_bottom = 44.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+custom_fonts/font = ExtResource( 1 )
+text = "Ability List"
+align = 1
+
+[node name="abilitydescript" type="RichTextLabel" parent="abilitites/Panel"]
+margin_left = 293.0
+margin_top = 60.0
+margin_right = 559.0
+margin_bottom = 371.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/normal_font = ExtResource( 1 )
+bbcode_enabled = true
+
+[node name="use" type="Button" parent="abilitites/Panel"]
+margin_left = 134.0
+margin_top = 400.0
+margin_right = 244.0
+margin_bottom = 434.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/font = ExtResource( 1 )
+text = "Use"
+
+[node name="close" type="Button" parent="abilitites/Panel"]
+margin_left = 362.0
+margin_top = 400.0
+margin_right = 472.0
+margin_bottom = 434.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/font = ExtResource( 1 )
+text = "Close"
+
+[node name="win" type="Panel" parent="."]
+editor/display_folded = true
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -863.0
+margin_top = -475.0
+margin_right = -448.0
+margin_bottom = -278.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Control" type="Control" parent="win"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -500.0
+margin_top = -302.0
+margin_right = 459.0
+margin_bottom = 275.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="windescript" type="RichTextLabel" parent="win"]
+margin_left = 28.0
+margin_top = 24.0
+margin_right = 387.0
+margin_bottom = 83.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/normal_font = ExtResource( 1 )
+bbcode_enabled = true
+bbcode_text = "[center]You have defeated all opponents.[/center]"
+text = "You have defeated all opponents."
+
+[node name="winconfirm" type="Button" parent="win"]
+margin_left = 144.0
+margin_top = 136.0
+margin_right = 277.0
+margin_bottom = 176.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "Confirm"
+
+[node name="selectedskill" type="RichTextLabel" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -897.0
+margin_top = -480.0
+margin_right = -412.0
+margin_bottom = -301.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/normal_font = SubResource( 10 )
+bbcode_enabled = true
+bbcode_text = "[center]Choose target: [/center]
+[center][color=yellow]Ability: [/color][/center]"
+text = "Choose target: 
+Ability: "
+
+[node name="bufftooltip" type="Panel" parent="."]
+editor/display_folded = true
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -1211.0
+margin_top = -405.0
+margin_right = -969.0
+margin_bottom = -279.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="bufftooltip"]
+margin_right = 240.0
+margin_bottom = 71.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="tooltipbase" type="RichTextLabel" parent="bufftooltip/VBoxContainer"]
+visible = false
+margin_right = 240.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 240, 24 )
+size_flags_horizontal = 0
+size_flags_vertical = 0
+bbcode_enabled = true
+bbcode_text = "l;ulalulfujaljlfdj"
+text = "l;ulalulfujaljlfdj"
+
+[node name="autoattack" type="CheckBox" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -141.0
+margin_top = -166.0
+margin_right = -10.0
+margin_bottom = -138.0
+hint_tooltip = "When toggled, will make active characters to attack first enemy.  "
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "Autoattack"
+
+[node name="floattext" type="Label" parent="."]
+visible = false
+margin_right = 147.0
+margin_bottom = 20.0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+text = "-50"
+align = 1
+script = ExtResource( 32 )
+
+[node name="resources" type="Panel" parent="."]
+margin_left = 25.0
+margin_top = 211.0
+margin_right = 203.0
+margin_bottom = 389.0
+
+[node name="mana" type="TextureRect" parent="resources"]
+margin_left = 7.0
+margin_top = 66.0
+margin_right = 37.0
+margin_bottom = 106.0
+hint_tooltip = "Mana"
+texture = ExtResource( 33 )
+
+[node name="Label" type="Label" parent="resources/mana"]
+margin_left = 110.0
+margin_top = 7.0
+margin_right = 150.0
+margin_bottom = 27.0
+
+[node name="turns" type="TextureRect" parent="resources"]
+margin_left = 1.0
+margin_top = 10.0
+margin_right = 43.0
+margin_bottom = 50.0
+hint_tooltip = "Turns"
+texture = ExtResource( 34 )
+expand = true
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="resources/turns"]
+margin_left = 117.0
+margin_top = 12.0
+margin_right = 157.0
+margin_bottom = 32.0
+
+[node name="tooltip" type="Panel" parent="."]
+visible = false
+margin_right = 304.0
+margin_bottom = 179.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="tooltip"]
+margin_left = 11.0
+margin_top = 12.0
+margin_right = 287.0
+margin_bottom = 156.0
+bbcode_enabled = true
+
+[node name="Tween" type="Tween" parent="."]
+
+[node name="period" type="Label" parent="."]
+visible = false
+margin_left = 959.0
+margin_top = 366.0
+margin_right = 1122.0
+margin_bottom = 386.0
+
+[connection signal="pressed" from="confirm" to="." method="_on_confirm_pressed"]
+[connection signal="pressed" from="autowin" to="." method="_on_autowin_pressed"]
+[connection signal="pressed" from="abilitites" to="." method="_on_abilitites_pressed"]
+[connection signal="pressed" from="abilitites/Panel/use" to="." method="_on_use_pressed"]
+[connection signal="pressed" from="abilitites/Panel/close" to="." method="_on_close_pressed"]
+[connection signal="pressed" from="win/winconfirm" to="." method="_on_winconfirm_pressed"]

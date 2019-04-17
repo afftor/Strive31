@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/book.wav-1cf08141c7fdad84baa95dc2e054a88b.sample"
+
+[deps]
+
+source_file="res://files/sounds/book.wav"
+dest_files=[ "res://.import/book.wav-1cf08141c7fdad84baa95dc2e054a88b.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

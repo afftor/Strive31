@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/intimate.ogg-ca0932b82cd7b2402cda513182d745f5.oggstr"
+
+[deps]
+
+source_file="res://files/music/intimate.ogg"
+dest_files=[ "res://.import/intimate.ogg-ca0932b82cd7b2402cda513182d745f5.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

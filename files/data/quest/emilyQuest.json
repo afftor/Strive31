@@ -1,0 +1,864 @@
+{
+    "uid": "emily",
+    "state": {
+        "stage": 0,
+        "branch": -1
+    },
+    "events": {
+        "wimborn": {
+            "meetEmily": {
+                "name": "meetEmily",
+                "startType": "hook",
+                "activateChance": 100,
+                "place": {
+                    "region": "wimborn",
+                    "area": "wimbornCity",
+                    "location": "backstreets"
+                },
+                "state": "start",
+                "requirements": {
+                    "sidequests": {
+                        "emily": {
+                            "state": {
+                                "stage": 0,
+                                "branch": -1
+                            }
+                        }
+                    }
+                },
+                "actions": {
+                    "start": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "You see an urchin girl trying to draw your attention",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Respond to the urchin girl",
+                                "eventState": "1.meet",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "1.meet": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "In the corner of the street you spot a young girl dressed in ragged clothes. Poverty is widespread around the kingdom, but seeing it first hand still raises some discomfort in you. It does not look like there's many people around, nor anyone paying attention to you, so you decide to start a conversation with her. \n\n[color=yellow]— I'm sorry if I bother you, $sir, but I'm very hungry! Could you spare some food?[/color]",
+                        "image": "",
+                        "sprites": [
+                            [
+                                "emilynormal",
+                                "pos1",
+                                "opac"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Give her food",
+                                "eventState": "2.foodGiven",
+                                "meta": {
+                                    "requirements": {
+                                        "resources": {
+                                            "food": 10
+                                        }
+                                    },
+                                    "result": {
+                                        "resources": {
+                                            "food": -10
+                                        },
+                                        "progress": {
+                                            "gallery": {
+                                                "emily": {
+                                                    "unlock": "basic"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Shoo her away",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "sidequests": {
+                                            "emily": {
+                                                "state": {
+                                                    "stage": 5,
+                                                    "branch": -1
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Make an excuse and tell her you'll bring some later",
+                                "eventState": "reset",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.foodGiven": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "After going through your belongings you finally find some bread and meat you had leftover from breakfast, which you pass to her. Emily takes your offering with an excited look and quickly expresses her gratitude. While she eats, you decide to spend some time with her and ask about her life, deciding it could be useful to get a better understanding of the city. \n\n[color=yellow]— I've been living in the orphanage since before I can remember... I have a sister but she left a few years ago. She now tries to earn some money for us to live on so we rarely see each other anymore. Oh, m-my name is Emily... [/color]",
+                        "image": "",
+                        "sprites": [
+                            [
+                                "emilynormal",
+                                "pos1"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Offer to take her as a servant",
+                                "eventState": "3.emilyTake",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "sidequests": {
+                                            "emily": {
+                                                "state": {
+                                                    "stage": 3,
+                                                    "branch": -1
+                                                }
+                                            }
+                                        },
+                                        "world": {
+                                            "addSlaves": [
+                                                {
+                                                    "id": {
+                                                        "unique": "Emily"
+                                                    }
+                                                }
+                                            ],
+                                            "scheduleEvent": {
+                                                "tishaappearance": 7
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Leave her alone",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "sidequests": {
+                                            "emily": {
+                                                "state": {
+                                                    "stage": 5,
+                                                    "branch": -1
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "3.emilyTake": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "You explain to Emily how you recently moved in and could use some help around the mansion. You can provide her with food and shelter if she won't mind following your orders. Not quite believing your words, she looks at you with wide open eyes. After few moments she responds.\n\n[color=yellow]— You would allow me? Thank you $sir... $master! I'll do my best![/color]\n\nSealing an agreement, you give Emily directions to your mansion and she leaves. ",
+                        "image": "",
+                        "sprites": [
+                            [
+                                "emilyhappy",
+                                "pos1"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "any": {
+            "emilyMansion": {
+                "name": "emilyMansion",
+                "startType": "trigger",
+                "activateChance": 100,
+                "place": {
+                    "region": "any",
+                    "area": "mansion",
+                    "location": "foyer"
+                },
+                "state": "start",
+                "requirements": {
+                    "sidequests": {
+                        "emily": {
+                            "state": {
+                                "stage": 3,
+                                "branch": -1
+                            }
+                        }
+                    }
+                },
+                "actions": {
+                    "start": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "After returning back you spot Emily seemingly struck in awe over your possession. Deciding her looks are not quite suitable for your establishment, you instruct her to freshen up and find something suitable in the wardrobe. \n\n[color=yellow]— Ah! Yes, $master, I'll do that right now![/color]\n\nEventually, Emily finds new clothes and is ready to take a shower.",
+                        "image": "",
+                        "sprites": [
+                            [
+                                "emilynormal",
+                                "pos1",
+                                "opac"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Spike her with aphrodisiac",
+                                "eventState": "1.aphrodisiac",
+                                "meta": {
+                                    "requirements": {
+                                        "items": {
+                                            "aphrodisiac": 1
+                                        }
+                                    },
+                                    "result": {
+                                        "items": {
+                                            "aphrodisiac": -1
+                                        },
+                                        "progress": {
+                                            "decisions": [
+                                                "emilyseduced"
+                                            ],
+                                            "people": [
+                                                {
+                                                    "id": {
+                                                        "unique": "emily"
+                                                    },
+                                                    "consent": true,
+                                                    "tags": {
+                                                        "nosex": "erase"
+                                                    },
+                                                    "virgin": {
+                                                        "vagina": false
+                                                    },
+                                                    "metrics": {
+                                                        "orgasm": 1,
+                                                        "vag": 1,
+                                                        "partners": [
+                                                            "player"
+                                                        ]
+                                                    },
+                                                    "meters": {
+                                                        "stress": 50,
+                                                        "loyal": 15,
+                                                        "lust": 50
+                                                    }
+                                                }
+                                            ],
+                                            "gallery": {
+                                                "emily": {
+                                                    "unlock": "naked",
+                                                    "scenes": 0
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Assault her after bath",
+                                "eventState": "1.sexAssault",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "progress": {
+                                            "decisions": [
+                                                "emilyseduced"
+                                            ],
+                                            "people": [
+                                                {
+                                                    "id": {
+                                                        "unique": "emily"
+                                                    },
+                                                    "consent": true,
+                                                    "tags": {
+                                                        "nosex": "erase"
+                                                    },
+                                                    "virgin": {
+                                                        "vagina": false
+                                                    },
+                                                    "metrics": {
+                                                        "vag": 1,
+                                                        "partners": [
+                                                            "player"
+                                                        ]
+                                                    },
+                                                    "meters": {
+                                                        "stress": 100,
+                                                        "obedience": -100
+                                                    }
+                                                }
+                                            ],
+                                            "gallery": {
+                                                "emily": {
+                                                    "unlock": "naked",
+                                                    "scenes": 1
+                                                }
+                                            },
+                                            "world": {
+                                                "scheduleEvent": {
+                                                    "emilyEscape": 2
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Wait patiently",
+                                "eventState": "1.wait",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "1.aphrodisiac": {
+                        "actionType": "scene",
+                        "pov": "",
+                        "text": "You pass Emily a glass of water mixed with an aphrodisiac, letting her know that it would be better for her to stay hydrated before leaving. \n\n[color=yellow]— Oh, thank you $master, you are too kind![/color]\n\nAs she gulps it down, you tell her that there's no rush and to enjoy herself while she can. Seemingly unaware of your plans, Emily disappears into the bathroom. \n\nA quarter of an hour later, being sure that the aphrodisiac should've taken effect, you take a small peek. With a grin, you discover Emily sitting naked on the board, red in the face, squeezing her thighs while her fingers explore her privates. Quickly undressing yourself, you slip into the bathroom unnoticed, and approach Emily playing innocent. \n\n[color=yellow]— $master! I'm not…[/color]\n\nThe orphan girl seems to be completely shocked by your unannounced presence, her face getting even redder. Judging by the fact she is not screaming or trying to escape, you sense that she can't make up her mind on how to react, and quickly take things into your own hands. With a gentle, yet accusing voice, you tell her that you appreciate her arousal, but she can't just do what she pleases in her $master's home. Catching Emily in your trap, you make her believe that her behavior is entirely her own will and her lust is based off her desires.\n\nSeeing Emily accepting your manipulative words, you wrap your arm about her in an embrace, meeting no resistance. Despite being overwhelmed by the new situation, the aphrodisiac pumps through her veins and the orphan girl begins to awkwardly respond to your actions. As you greedily suck on her mouth, your hand hastily covers her soaking crotch, joining her own hand. With a small push, Emily shyly spreads her legs apart, giving you easier access. Stimulating her pussy, you slide a finger into her to discover she's clearly still a virgin, although that possibility had  already crossed your mind. \n\nAs she gets wetter and her moans get louder, you lay her on the bench and without further delay push your erect cock inside. The brief look of pain on her face is quickly washed away by pleasure as you begin to move within her. With every push the look on her face becomes more and more blissful, as she leans forward  trying to hug you. A few moments later she orgasms, and feeling her convulsions lead you to your own climax, filling her with hot seed. As you pull out, a stream of semen mixed with blood slowly seeps from her hard-breathing body. \n\nAfter helping her clean up, you leave the bathroom and get dressed once more.A few minutes later, she emerges from the bathroom red faced. She averts her eyes as you look at her, but you don't spot any negative feelings towards you. You leave her to get accustomed with her new role. ",
+                        "image": "emilyshower",
+                        "sprites": [
+                            [
+                                "emilynakedhappy",
+                                "pos1"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "sidequests": {
+                                            "emily": {
+                                                "state": {
+                                                    "stage": 6,
+                                                    "branch": -1
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "1.sexAssault": {
+                        "actionType": "scene",
+                        "pov": "",
+                        "text": "After a few minutes, you noticed that Emily is finished with her shower and is preparing to get dressed. You rush into the dressing room and roughly push her against the wall. Shocked by your entrance, Emily tries to protest, but your hand closes over her mouth. While your other hand lecherously savours her body, you let her know that even if she yells, nobody is going to come to her rescue, and her resistance will only make things worse. Tears begin to swell up in her eyes, but her attitude quickly reveals she understands her position.\n\nWith her acceptance, you decide to make the most of this little affair and grab her small boobs, squeezing them forcefully. Pulling on her nipples with clear intent to cause some pain, you delightedly listen to her small cries and observe her pained expression. Holding her squirming body, you push into her pussy, quickly meeting the resistance of her hymen. Pausing before you break through, you roughly rub her. Despite her pleading she begins to gets mildly wet at your administrations, which makes you grin. \n\nYou bend her over and push her against the wall. Emily sobs, seemingly preparing for what she knows comes next. \n\n[color=yellow]— Please stop, I don’t want this![/color]\n\nGrabbing her ass, you force your hard cock inside her virgin pussy in one thrust making her cry out in pain, as it tears through the slight resistance of her hymen. You pause, giving her barely enough time to recover, before resuming without any further concern for her well-being. Since she's not going to enjoy it anyway, you decide it's only humane to focus on your objective. Accompanied by her sobs and cries, you mercilessly fuck her tight pussy until you finally climax deep inside of her torn privates. \n\nLeaving her sobbing on the floor, your come mixed with blood oozing from her abused pussy, you advise her to take another shower. Satisfied, you make your way out of bathroom.",
+                        "image": "emilyshowerrape",
+                        "sprites": [
+                            [
+                                "emilynakedneutral",
+                                "pos1"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "sidequests": {
+                                            "emily": {
+                                                "state": {
+                                                    "stage": 6,
+                                                    "branch": -1
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "1.wait": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "After an hour a refreshed Emily finds you. It seems she managed to find something right for her size and with some side help even managed to fix her appearance. You give her a contented look and consider her further assignment.\n\n[color=yellow]— Thank you very much for this and everything... I'll do my best![/color]\n\nYou can't help but appreciate her sincere attitude and imagine that you might rely on her in some cases. ",
+                        "image": "",
+                        "sprites": [
+                            [
+                                "emily2happy",
+                                "pos1",
+                                "opac"
+                            ]
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "sidequests": {
+                                            "emily": {
+                                                "state": {
+                                                    "stage": 6,
+                                                    "branch": -1
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "emilyEscape": {
+                "name": "emilyEscape",
+                "startType": "schedule",
+                "activateChance": 100,
+                "place": {
+                    "region": "any",
+                    "area": "mansion",
+                    "location": "foyer"
+                },
+                "state": "start",
+                "requirements": {
+
+                },
+                "actions": {
+                    "start": {
+                        "actionType": "decision",
+                        "pov": "",
+                        "text": "",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "eventState": "1.headslave",
+                                "meta": {
+                                    "requirements": {
+                                        "world": {
+                                            "staff": {
+                                                "hasHeadslave": true
+                                            }
+                                        }
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            },
+                            {
+                                "eventState": "1.noHeadslave",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "1.headslave": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "During the night, you are awakened by the sound of yelling and a light scuffle.  Your Headslave calls out, \"Master!  The new slave Emily is trying to escape!\"\n\nYou see a diminutive figure just rounding the corner and disappearing from sight...",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Activate Emily's brand",
+                                "eventState": "2.brandSuccess",
+                                "meta": {
+                                    "requirements": {
+                                        "resources": {
+                                            "mana": 10
+                                        },
+                                        "people": [
+                                            {
+                                                "id": {
+                                                    "unique": "emily"
+                                                },
+                                                "brand": "any"
+                                            }
+                                        ]
+                                    },
+                                    "result": {
+                                        "resources": {
+                                            "mana": -10
+                                        },
+                                        "people": [
+                                            {
+                                                "id": {
+                                                    "unique": "emily"
+                                                },
+                                                "meters": {
+                                                    "stress": 25,
+                                                    "loyal": 10,
+                                                    "health": -10
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Chase after her",
+                                "eventState": "2.headChase",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.brandSuccess": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "You still your mind and softly murmur a mystical chant.  A dim reddish light rises from the 'Master's Sigil' tattoo-ed on the back of your hand.\n\nThere is a glimmer of fear in the eyes of several nearby slaves as the light flies from your hand - hunting after Emily's tracks.\n\nA moment later pained screams are followed by a loud 'thump' in the direction of the Gardens.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Approach the Gardens",
+                                "eventState": "3.gardenCapture",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "3.gardenCapture": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "You spot a crumple of rags and various knick knacks at the base of the garden wall.  Judging from the occasional twitches and wimpering coming from the pile, Emily must be somewhere underneath.\n\nThere are a few nervous snickers from curious slaves gathering nearby.  You feel a headache coming on as you know the slaves will watch how discipline is enforced after this incident.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.headChase": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "Before you can even take a step, your Headslave takes off sprinting after Emily.  Shouts of \"There's nowhere to run!\" and \"Leave me alone!\" fill the air, easily waking up the entire household.\n\nAs you round the corner, you see the curious faces of the other slaves wondering \"What's going on?\"  A cloak lies partially torn and discarded on the ground.\n\nAn odd trail of broken bread and accompaniments from this evening's servants' meal guides you towards the noisy duo.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Cautiously follow after the duo...",
+                                "eventState": "3.headCapture",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "3.headCapture": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "With a gaggle of sleepy slaves in tow, you cautiously approach the rear Gardens.  By now the commotion has died down and the atmosphere is oddly quiet.\n\nIt becomes clear why as you see your Headslave sitting on Emily, who appears quite distraught facedown in the dirt.\n\n\"Hmph!  Trying to embarrass me by running away while I'm in charge?  You got off easy.\"\n\nThe other slaves turn visibly more pale.  You don't think the other slaves will try misbehaving anytime soon.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "1.noHeadslave": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "During the night, you are awakened by a nagging premonition.  You attempt to reassure yourself by taking a short stroll around the manor grounds.\n\nAs you approach the slave quarters, you find the door ajar.  Checking within, you discover both Emily and her belongings are absent.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Activate Emily's brand [10 mana]",
+                                "eventState": "2.brandEscape",
+                                "meta": {
+                                    "requirements": {
+                                        "resources": {
+                                            "mana": 10
+                                        },
+                                        "people": [
+                                            {
+                                                "id": {
+                                                    "unique": "emily"
+                                                },
+                                                "brand": "any"
+                                            }
+                                        ]
+                                    },
+                                    "result": {
+                                        "resources": {
+                                            "mana": -10
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Search within the Manor",
+                                "eventState": "2.searchManorClue",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Search the Courtyard",
+                                "eventState": "2.searchCourtyard",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            },
+                            {
+                                "name": "Search the Gardens",
+                                "eventState": "2.searchGardens",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.brandEscape": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "You still your mind and softly murmur a mystical chant.  A dim reddish light rises from the 'Master's Sigil' tattoo-ed on the back of your hand.\n\nUnfortunately, the light fades away harmlessly as you are unable to sense Emily nearby.\n\nAfter a search of the manor grounds, all you find are some tracks into the rear Gardens and a some scattered belongings.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "world": {
+                                            "removeSlaves": [
+                                                {
+                                                    "id": {
+                                                        "unique": "Emily"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.searchManorClue": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "You see no immediate signs of Emily, so you decide to start your search within the Manor.\n\nWhile questioning the other slaves, you discover that Emily has been speaking about finding someone by the name of 'Tisha'.\n\nA search of Emily's sleeping area reveals a few additional clues.  While Emily doesn't seem to know where 'Tisha' is currently, she has marked the city of 'Gorn' as a possible location.  There are also a few references to the Slave Guild.  Perhaps there is a potential contact there?",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "world": {
+                                            "removeSlaves": [
+                                                {
+                                                    "id": {
+                                                        "unique": "Emily"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.searchCourtyard": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "Knowing the front gate is often left unlocked, you can only hope that Emily didn't simply walk right out.\n\nRushing to the courtyard, your hope drops as you see no sign of Emily anywhere.  Just as you are about to inquire about town, you hear faint scrabbling noises coming from the rear Gardens.  Perhaps...",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Rush to rear Gardens",
+                                "eventState": "2.searchGardens",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "2.searchGardens": {
+                        "actionType": "dialogue",
+                        "pov": "",
+                        "text": "Making your way to the Gardens, you are confronted by a rather sad sight.  You see a raggedly cloaked figure carrying an over-sized knapsack focused intently on the garden wall.  The figure is desperately trying to scale the rear garden walls... with an embarrassing lack of success.\n\nAfter watching her jump helplessly for the 3rd.. or 10th time, you decide to help her out of her misery.  The contents of her knapsack - mostly day-old bread and meal leftovers - are already scattered on the ground.  Emily herself has already collapsed in a small pile before her nemesis - the Wall.  When she finally notices your approaching footsteps, she meekly surrenders and follows you back inside.",
+                        "image": "",
+                        "sprites": [
+
+                        ],
+                        "nodes": [
+                            {
+                                "name": "Close",
+                                "eventState": "finish",
+                                "meta": {
+                                    "requirements": {
+
+                                    },
+                                    "result": {
+                                        "people": [
+                                            {
+                                                "id": {
+                                                    "unique": "emily"
+                                                },
+                                                "meters": {
+                                                    "obedience": 20
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,75 @@
+[gd_scene format=2]
+
+[node name="SavePanel" type="Panel"]
+margin_left = -211.0
+margin_top = 2.0
+margin_right = 488.0
+margin_bottom = 339.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="savefilebutton" type="Button" parent="."]
+margin_left = 34.0
+margin_top = 249.0
+margin_right = 159.0
+margin_bottom = 296.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "save"
+
+[node name="loadbutton" type="Button" parent="."]
+margin_left = 175.0
+margin_top = 249.0
+margin_right = 300.0
+margin_bottom = 296.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "load"
+
+[node name="cancelsaveload" type="Button" parent="."]
+margin_left = 530.0
+margin_top = 250.0
+margin_right = 655.0
+margin_bottom = 297.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "cancel"
+
+[node name="deletebutton" type="Button" parent="."]
+margin_left = 388.0
+margin_top = 250.0
+margin_right = 513.0
+margin_bottom = 297.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "delete"
+
+[node name="saveline" type="LineEdit" parent="."]
+margin_left = 43.0
+margin_top = 186.0
+margin_right = 658.0
+margin_bottom = 215.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+placeholder_text = "filename"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+margin_left = 36.0
+margin_top = 27.0
+margin_right = 662.0
+margin_bottom = 176.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="savelist" type="VBoxContainer" parent="ScrollContainer"]
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
+[node name="Button" type="Button" parent="ScrollContainer/savelist"]
+visible = false
+margin_right = 620.0
+margin_bottom = 35.0
+rect_min_size = Vector2( 620, 35 )
+size_flags_horizontal = 2
+size_flags_vertical = 2
+
