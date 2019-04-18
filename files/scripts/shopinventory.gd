@@ -380,6 +380,7 @@ func _on_confirm_pressed():
 	if state == 'inventory':
 		itemsinventory()
 	elif state == 'backpack':
+		calculateweight()
 		itemsbackpack()
 	categoryitems()
 	$gold.text = str(globals.resources.gold)

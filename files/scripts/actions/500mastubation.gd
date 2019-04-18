@@ -14,10 +14,10 @@ const givertags = ['noorgasm']
 const takertags = ['vagina','shame']
 
 func getname(state = null):
-	return "Masturbation Show"
+	return "Order Masturbation"
 
 func getongoingname(givers, takers):
-	return "[names1] orders [name2] to masturbate."
+	return "[name2] masturbate[s/2] as [name1] ordered."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -63,7 +63,7 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] orders [names2] to masturbate exposing to anyone willing to see [his2] intimate parts."]
+	temparray += ["[name1] order[s/1] [name2] to masturbate exposing to anyone willing to see [his2] intimate parts."]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()
 	return text

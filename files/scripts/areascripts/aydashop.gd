@@ -10,7 +10,7 @@ func gornayda():
 	var buttons = []
 	if globals.state.mainquest < 37 || globals.state.sandbox == true:
 		globals.main.get_node("outside").setcharacter('aydanormal')
-		if globals.state.mainquest == 15 && !globals.state.sidequests.ivran in ['tobealtered','potionreceived']:
+		if globals.state.mainquest == 15 && !globals.state.sidequests.ivran in ['tobealtered','potionreceived','notaltered']:
 			text = textnode.MainQuestGornAydaIvran
 			state = false
 			buttons = [{name = 'Accept', function = 'gornaydaivran', args = 1}, {name = 'Reject',function = 'gornaydaivran', args = 2}]
@@ -178,6 +178,7 @@ func gornaydaivran(stage = 0):
 		globals.state.sidequests.ivran = 'tobealtered'
 	elif stage == 2:
 		text = textnode.MainQuestGornAydaIvranReject
+		globals.state.sidequests.ivran = 'notaltered'
 	
 	buttons.append({name = "Continue", function = "gornayda"})
 	globals.main.maintext = globals.player.dictionary(text)

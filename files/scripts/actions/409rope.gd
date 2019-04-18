@@ -17,14 +17,14 @@ func getname(state = null):
 	return "Rope"
 
 func getongoingname(givers, takers):
-	return "[name1] bind[s/1] [names2] body with a rope."
+	return "[name1] bind[s/1] [names2] bod[y/ies2] with [a /2]rope[/s2]."
 
 func getongoingdescription(givers, takers):
 	return ""
 	
 func requirements():
 	var valid = true
-	if globals.itemdict.rope.amount <= 0:
+	if globals.state.getCountStackableItem('rope') <= 0:
 		valid = false
 	if takers.size() < 1 || givers.size() < 1:
 		valid = false
@@ -63,7 +63,7 @@ func initiate():
 	temparray += ["[name1] {^wrap:tie}[s/1] a rope around [names2] body to restrict [his2] movements."]
 	text += temparray[randi()%temparray.size()]
 	for i in takers:
-		globals.itemdict.rope.amount -= 1
+		globals.state.removeStackableItem('rope')
 		i.effects.append('tied')
 	temparray.clear()
 	return text

@@ -17,15 +17,10 @@ func _ready():
 	
 	
 	for i in ['costume','weapon','armor','accessory','underwear']:
-#warning-ignore:return_value_discarded
 		get_node("gearpanel/" + i).connect("pressed", self, 'gearinfo', [i])
-#warning-ignore:return_value_discarded
 		get_node("gearpanel/" + i).connect("mouse_entered", self, 'geartooltip', [i])
-#warning-ignore:return_value_discarded
 		get_node("gearpanel/" + i + '/TextureFrame').connect("mouse_entered", self, 'geartooltip', [i])
-#warning-ignore:return_value_discarded
 		get_node("gearpanel/" + i + '/TextureFrame').connect("mouse_exited", globals, 'itemtooltiphide')
-#warning-ignore:return_value_discarded
 		get_node("gearpanel/" + i + "/unequip").connect("pressed", self, 'unequip', [i])
 	
 	for i in get_tree().get_nodes_in_group("invcategory"):
@@ -121,7 +116,6 @@ func itemsinventory():
 	
 	var button
 	var array = []
-#warning-ignore:unused_variable
 	var tempitem
 	
 	for i in globals.itemdict.values():
@@ -140,7 +134,7 @@ func itemsinventory():
 		button.get_node("move").connect("pressed",self,'movetobackpack',[button])
 		button.connect("mouse_entered", globals, 'itemtooltip', [i])
 		button.connect("mouse_exited", globals, 'itemtooltiphide')
-		if i.type != 'potion':
+		if i.type != 'potion' && i.code != 'bandage':
 			button.get_node("use").visible = false
 		else:
 			button.get_node("use").connect("pressed",self,'use',[button])
@@ -202,11 +196,9 @@ func sortgear(first, second):
 		return first
 
 func itemsbackpack():
-#warning-ignore:unused_variable
 	var itemgrid = get_node("ScrollContainer/GridContainer")
 	var button
 	var array = []
-#warning-ignore:unused_variable
 	var items = false
 	var tempitem
 	for i in globals.state.backpack.stackables:
@@ -223,7 +215,7 @@ func itemsbackpack():
 		button.connect("mouse_entered", globals, 'itemtooltip', [tempitem])
 		button.connect("mouse_exited", globals, 'itemtooltiphide')
 		button.get_node("number").set_text(str(globals.state.backpack.stackables[i]))
-		if tempitem.type != 'potion':
+		if tempitem.type != 'potion' && tempitem.code != 'bandage':
 			button.get_node("use").visible = false
 		else:
 			button.get_node("use").connect("pressed",self,'use',[button])
@@ -367,16 +359,21 @@ func use(button):
 		get_tree().get_current_scene().infotext("No person selected")
 		return
 	var item = button.get_meta('item')
-#warning-ignore:unused_variable
 	var tempitem
 	var person = selectedslave
 	globals.items.person = person
 	if item.code in ['aphrodisiac', 'regressionpot', 'miscariagepot','amnesiapot','stimulantpot','deterrentpot'] && person == globals.player:
 		get_parent().popup(person.dictionary(globals.items.call(item.effect)))
 		return
-	if item.type == 'potion':
+	if item.type == 'potion' || item.code == 'bandage':
 		person.metrics.item += 1
-		if !item.code in ['minoruspot', 'majoruspot', 'hairdye', 'amnesiapot','claritypot']:
+		if item.code == 'bandage':
+			globals.items.call(item.effect)
+			if state == 'backpack':
+				globals.state.backpack.stackables[item.code] -= 1
+			else:
+				item.amount -= 1
+		elif !item.code in ['minoruspot', 'majoruspot', 'hairdye', 'amnesiapot','claritypot']:
 			get_tree().get_current_scene().popup(person.dictionary(globals.items.call(item.effect)))
 			person.toxicity += item.toxicity
 			if state == 'backpack':
@@ -386,16 +383,17 @@ func use(button):
 		else:
 			call(item.effect)
 		if state == 'backpack':
-			button.get_node('number').set_text(str(globals.state.backpack.stackables[item.code]))
-			if globals.state.backpack.stackables[item.code] <= 0:
-				globals.state.backpack.stackables.erase(item.code)
+			if !globals.state.backpack.stackables.has(item.code):
 				button.visible = false
 				button.queue_free()
+			else:
+				button.get_node('number').set_text(str(globals.state.backpack.stackables[item.code]))
 		else:
-			button.get_node('number').set_text(str(item.amount))
 			if item.amount <= 0:
 				button.visible = false
 				button.queue_free()
+			else:
+				button.get_node('number').set_text(str(item.amount))
 	else:
 		if state == 'backpack':
 			globals.items.backpack = true
@@ -410,9 +408,11 @@ func use(button):
 			button.visible = false
 			button.queue_free()
 		updateitems()
-		calculateweight()
-		slavegear(person)
-		slavelist()
+		person.health += 0
+	calculateweight()
+	slavegear(person)
+	slavelist()
+	globals.main.updatestats(person)
 
 func info(button):
 	get_node("iteminfo/RichTextLabel").set_bbcode(globals.itemdescription(button.get_meta('item')))
@@ -542,9 +542,7 @@ func _on_hairconfirm_pressed():
 	if state == 'inventory':
 		globals.itemdict.hairdye.amount -= 1
 	elif state == 'backpack':
-		globals.state.backpack.hairdye -= 1
-		if globals.state.backpack.hairdye <= 1:
-			globals.state.backpack.erase('hairdye')
+		globals.state.backpack.stackables.hairdye -= 1
 	selectedslave.haircolor = get_node("hairchange/TextEdit").get_text()
 	updateitems()
 	get_node("hairchange").visible = false
@@ -610,9 +608,7 @@ func applybutt():
 	if state == 'inventory':
 		globals.itemdict[currentpotion].amount -= 1
 	elif state == 'backpack':
-		globals.state.backpack[currentpotion] -= 1
-		if globals.state.backpack[currentpotion] <= 1:
-			globals.state.backpack.erase(currentpotion)
+		globals.state.backpack.stackables[currentpotion] -= 1
 	selectedslave.toxicity += 30
 	globals.main.popup(text)
 	updateitems()
@@ -638,9 +634,7 @@ func applytits():
 	if state == 'inventory':
 		globals.itemdict[currentpotion].amount -= 1
 	elif state == 'backpack':
-		globals.state.backpack[currentpotion] -= 1
-		if globals.state.backpack[currentpotion] <= 1:
-			globals.state.backpack.erase(currentpotion)
+		globals.state.backpack.stackables[currentpotion] -= 1
 	selectedslave.toxicity += 30
 	updateitems()
 	globals.main.popup(text)
@@ -663,9 +657,7 @@ func applypenis():
 	if state == 'inventory':
 		globals.itemdict[currentpotion].amount -= 1
 	elif state == 'backpack':
-		globals.state.backpack[currentpotion] -= 1
-		if globals.state.backpack[currentpotion] <= 1:
-			globals.state.backpack.erase(currentpotion)
+		globals.state.backpack.stackables[currentpotion] -= 1
 	selectedslave.toxicity += 30
 	updateitems()
 	globals.main.popup(text)
@@ -688,9 +680,7 @@ func applytestic():
 	if state == 'inventory':
 		globals.itemdict[currentpotion].amount -= 1
 	elif state == 'backpack':
-		globals.state.backpack[currentpotion] -= 1
-		if globals.state.backpack[currentpotion] <= 1:
-			globals.state.backpack.erase(currentpotion)
+		globals.state.backpack.stackables[currentpotion] -= 1
 	selectedslave.toxicity += 30
 	updateitems()
 	globals.main.popup(text)
@@ -729,9 +719,7 @@ func amnesiapoteffect():
 	if state == 'inventory':
 		globals.itemdict[currentpotion].amount -= 1
 	elif state == 'backpack':
-		globals.state.backpack[currentpotion] -= 1
-		if globals.state.backpack[currentpotion] <= 1:
-			globals.state.backpack.erase(currentpotion)
+		globals.state.backpack.stackables[currentpotion] -= 1
 	updateitems()
 	$amnesia.visible = true
 	$amnesia/name.text = selectedslave.name

@@ -1,6 +1,5 @@
 extends Panel
 
-#warning-ignore:unused_class_variable
 var run_once = false
 
 
@@ -95,13 +94,13 @@ func loadfromconfig():
 	if err == OK:
 		loadorder = config.get_value("Mods", "LoadOrder", [])
 		activemods = config.get_value("Mods", "ActiveMods", []) 
-	for i in loadorder:
+	for i in loadorder.duplicate():
 		if !dir.dir_exists(modfolder + str(i)):
 			loadorder.erase(i)
 	removeduplicates()
 
 func removeduplicates():
-	for i in loadorder:
+	for i in loadorder.duplicate():
 		var counter = 0
 		for k in loadorder:
 			if k == i:
@@ -349,7 +348,6 @@ func apply_next_element_to_dictionary(key, string, offset):
 					var pool_string = nested_match.get_string().split("\n")
 					if param > pool_string.size() :
 						param = -1
-#warning-ignore:unused_variable
 					var new_string = current_match.get_string()
 					if which_operation in ["FUNC",'CLASS']:
 						var param_temp = param
@@ -431,7 +429,6 @@ func _on_modhelp_pressed():
 
 
 func _on_openmodfolder_pressed():
-#warning-ignore:return_value_discarded
 	OS.shell_open(modfolder)
 
 

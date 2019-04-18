@@ -1,7 +1,6 @@
 extends Node
 
 
-#warning-ignore:unused_class_variable
 var chardescript = {
 emily = "Young girl from Wimborn's orphanage. Despite her harsh life she's pretty naive and kind. ",
 tisha = "Emily's older sister. Since an early age she has aimed to work hard to provide for both herself and her sister a better life than what they initially had. Being constantly abused by rich and powerful people, Tisha grew to despise others. She is rather protective towards her sister. ",
@@ -86,8 +85,10 @@ func create(code):
 		if _slave.age == 'child' && globals.rules.children == false:
 			_slave.age = 'teen'
 		for i in characters[code]:
-			if i != 'basics':
+			if i in _slave:
 				_slave[i] = characters[code][i]
+			elif i in _slave.stats:
+				_slave.stats[i] = characters[code][i]
 		return _slave
 	else:
 		return "Character not found: " + code
@@ -257,8 +258,8 @@ conf = 88,
 wit = 51,
 charm = 48,
 level = 2,
-sagi = 2,
-sstr = 1,
+agi_base = 2,
+str_base = 1,
 skillpoints = 2,
 obed = 90,
 traits = ['Nimble']
@@ -286,8 +287,8 @@ wit = 62,
 cour = 33,
 conf = 48,
 imageportait = "res://files/images/yris/yrisportrait.png",
-sagi = 1,
-send = 1,
+agi_base = 1,
+end_base = 1,
 loyal = 25,
 obed = 90,
 traits = ['Grateful', 'Scoundrel']
@@ -342,7 +343,7 @@ furcolor = 'gray',
 obed = 90,
 loyal = 25,
 imageportait = 'res://files/images/zoe/zoeportrait.png',
-smaf = 1,
+maf_base = 1,
 traits = ['Grateful', 'Mentor']
 },
 Ayda = {
@@ -369,13 +370,12 @@ obed = 90,
 loyal = 10,
 imageportait = 'res://files/images/ayda/aydaportrait.png',
 tags = ['nosex'],
-smaf = 2,
-send = 1,
+maf_base = 2,
+end_base = 1,
 traits = ['Experimenter'],
 },
 }
 
-#warning-ignore:unused_class_variable
 var sprites = {
 fairy = load("res://files/images/maple/maple.png"),
 fairynaked = load("res://files/images/maple/maplenaked.png"),
@@ -467,7 +467,6 @@ frostfordtrader = load("res://files/images/frostfordtrader.png"),
 frostfordslaver = load("res://files/images/ffslaver.png"),
 brothelhost = load("res://files/images/brothelhost.png"),
 }
-#warning-ignore:unused_class_variable
 var scenes = {
 finale = load("res://files/images/scene/finale.png"),
 finale2 = load("res://files/images/scene/finale2.png"),
@@ -491,7 +490,6 @@ zoetentacle2 = load("res://files/images/sexscenes/zoetentacle2.png"),
 aydasex1 = load("res://files/images/sexscenes/aydasex1.png"),
 aydasex2 = load("res://files/images/sexscenes/aydasex2.png"),
 }
-#warning-ignore:unused_class_variable
 var backgrounds = {
 mansion = load("res://files/backgrounds/mansion.png"),
 jail = load("res://files/backgrounds/jail.png"),
@@ -533,7 +531,6 @@ cavelake = load("res://files/backgrounds/cavelake.png"),
 darkness = load("res://files/backgrounds/darkness.png"),
 }
 
-#warning-ignore:unused_class_variable
 var nakedsprites = {
 	Cali = {cons = 'calinakedhappy', rape = 'calinakedsad', clothcons = 'calineutral', clothrape = 'calisad'},
 	Tisha = {cons = 'tishanakedhappy', rape = 'tishanakedneutral', clothcons = 'tishahappy', clothrape = 'tishaneutral'},

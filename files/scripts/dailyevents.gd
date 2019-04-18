@@ -345,7 +345,6 @@ func prositutebuyout(stage = 0):
 func abortion(stage = 0):
 	var tempbuttons = null
 	showntext = eventstext[currentevent][stage]
-#warning-ignore:unused_variable
 	var price
 	if stage == 0:
 		if globals.itemdict.miscariagepot.amount >= 1:
@@ -581,7 +580,7 @@ func teenagersflirt(stage = 0):
 		person.metrics.randompartners += round(rand_range(3,5))
 		person.metrics.sex += 1
 		person.lastsexday = globals.resources.day
-		if (person.sexuals.actions.has('pussy') || person.sexuals.actions.has('ass') ) && person.traits.has("Monogamous") == false:
+		if (person.metrics.vag > 0 || person.metrics.anal > 0) && person.traits.has("Monogamous") == false:
 			globals.resources.mana += rand_range(5,10)
 			if person.race == "Drow":
 				globals.resources.mana += 2
@@ -590,7 +589,7 @@ func teenagersflirt(stage = 0):
 			
 			if person.vagina != 'none':
 				person.metrics.vag += round(rand_range(1,3))
-			if person.sexuals.actions.has('ass'):
+			if person.metrics.anal > 0:
 				person.metrics.anal += round(rand_range(1,2))
 		else:
 			showntext += "$name greatly distressed with situation but having no ways out $he only keeps grudge against you. "

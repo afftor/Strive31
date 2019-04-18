@@ -12,17 +12,17 @@ const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
 const givertags = ['pet','noorgasm']
-const takertags = ['penis']
+const takertags = ['pet','penis']
 
 func getname(state = null):
 	return "Footjob"
 
 func getongoingname(givers, takers):
-	return "[name1] give[s/1] [a /1]footjob[/s1] to [name2]."
+	return "[name1] give[s/1] [a /2]footjob[/s2] to [name2]."
 
 func getongoingdescription(givers, takers):
 	var temparray = []
-	temparray += ["[name1] {^steadily :predominantly :aggressively :}{^massage:stroke:rub:jerk}[s/1] [names2] [penis2] with [his1] feet."]
+	temparray += ["[name1] {^steadily :aggressively :}{^massage:stroke:rub:jerk}[s/1] [names2] [penis2] with [his1] feet."]
 	return temparray[randi()%temparray.size()]
 
 func requirements():
@@ -67,7 +67,7 @@ func takereffect(member):
 
 func initiate():
 	var temparray = []
-	temparray += ["[name1] {^steadily :rhythmically :predominantly :} {^massage:stroke:rub:jerk}[s/1] [names2] [penis2] with [his1] feet."]
+	temparray += ["[name1] {^steadily :rhythmically :} {^massage:stroke:rub:jerk}[s/1] [names2] [penis2] with [his1] feet."]
 	return temparray[randi()%temparray.size()]
 
 func reaction(member):

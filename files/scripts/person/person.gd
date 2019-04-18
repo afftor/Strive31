@@ -1,175 +1,124 @@
+var id = 0
+var unique = null
 var name = ''
 var surname = ''
 var nickname = ''
 
-var unique = null
-var id = 0
+var imageportait = null
+var imagefull = null
+
 var race = ''
 var age = ''
-
 var mindage = ''
 var sex = ''
-var spec = null
-
-var imageportait = null
-
-var imagefull = null
-var haircolor = ''
-
-var hairlength = ''
-
-var hairstyle = ''
-var eyecolor = ''
-
-var skin = ''
-
 var height = ''
-
-var titssize = ''
-
-var asssize = ''
-
-var eyeshape = 'normal'
-
-var eyesclera = 'normal'
-
-var arms = 'normal'
-
-var legs = 'normal'
-
 var bodyshape = 'humanoid'
 
-var skincov = 'none'
-
-var furcolor = 'none'
-
+var arms = 'normal'
+var legs = 'normal'
+var horns = 'none'
 var ears = 'human'
-
 var tail = 'none'
-
 var wings = 'none'
 
-var horns = 'none'
+var haircolor = ''
+var hairlength = ''
+var hairstyle = ''
+var pubichair = 'clean'
+
+var eyecolor = ''
+var eyeshape = 'normal'
+var eyesclera = 'normal'
+
+var skin = ''
+var skincov = 'none'
+var furcolor = 'none'
+
+var titssize = ''
+var titsextra = 0
+var titsextradeveloped = false
+var lactation = false
+
+var asssize = ''
+var vagina = 'normal'
+var penis = 'none'
+var penistype = 'human'
+var penisextra = 0
+var balls = 'none'
+
+var piercing = {earlobes = null, eyebrow = null, nose = null, lips = null, tongue = null, navel = null, nipples = null, clit = null, labia = null, penis = null}
+var tattoo = {chest = 'none', face = 'none', ass = 'none', arms = 'none', legs = 'none', waist = 'none'}
+var tattooshow = {chest = true, face = true, ass = true, arms = true, legs = true, waist = true}
+var mods = {}
+var customdesc = ''
+
+var consent = false
+var vagvirgin = true
+var mouthvirgin = true
+var assvirgin = true
+var penisvirgin = true
+
+var sensvagina = 0
+var sensmouth = 0
+var senspenis = 0
+var sensanal = 0
+
+var forcedsex = false
+var sexexp = {partners = {}, watchers = {}, actions = {}, seenactions = {}, orgasms = {}, orgasmpartners = {}}
+var knowntechniques = []
+var sexuals = {actions = {}, unlocked = false, affection = 0, kinks = {}, unlocks = [], lastaction = ''}
+var kinks = []
+var sensation = {}
+
+var state = 'normal'
+var tags = []
+var effects = {}
+var away = {duration = 0, at = ''}
+var preg = {fertility = 0, has_womb = true, duration = 0, baby = null}
+var traits = []
+var genes = {}
+var spec = null
+var gear = {costume = null, underwear = null, armor = null, weapon = null, accessory = null}
+var luxury = 0
+
+var brand = 'none'
+var rules = {'silence':false, 'pet':false, 'contraception':false, 'aphrodisiac':false, 'masturbation':false, 'nudity':false, 'betterfood':false, 'personalbath':false,'cosmetics':false,'pocketmoney':false}
+var masternoun = 'Master'
+
+var work = 'rest'
+var farmoutcome = false
+var cattle = {is_cattle = false, work = '', used_for = 'food'}
+var sleep = ''
+
+var level = 1
+var levelupreqs = {} setget levelupreqs_set
+var xp = 0 setget xp_set, xp_get
+var realxp = 0
+var skillpoints = 2
+var learningpoints = 0 setget learningpoints_set
+
+var ability = ['attack']
+var abilityactive = ['attack']
+
+var origins = 'slave'
+var originstrue = ''
+var fromguild = false
+var memory = ''
+
+var attention = 0
+var lastinteractionday = 0
+var lastsexday = 0
+var relations = {}
+var metrics = {ownership = 0, jail = 0, mods = 0, brothel = 0, sex = 0, partners = [], randompartners = 0, item = 0, spell = 0, orgy = 0, threesome = 0, win = 0, capture = 0, goldearn = 0, foodearn = 0, manaearn = 0, birth = 0, preg = 0, vag = 0, anal = 0, oral = 0, roughsex = 0, roughsexlike = 0, orgasm = 0}
 
 var beauty = 0 setget ,beauty_get
 var beautybase = 0 setget beautybase_set
 var beautytemp = 0 
 
-
-var asser = 0
-
-var pubichair = 'clean'
-
-var fear = 0 setget fear_set,fear_get
 var fear_mod = 1
 
 var lewdness = 0 setget lewdness_set
-
-var lactation = false
-
-var titsextra = 0
-
-var titsextradeveloped = false
-
-var consent = false
-var vagina = 'normal'
-var vagvirgin = true
-
-var mouthvirgin = true
-
-var assvirgin = true
-
-var penisvirgin = true
-var penis = 'none'
-
-var balls = 'none'
-
-var penistype = 'human'
-
-var penisextra = 0
-
-var sensvagina = 0
-
-var sensmouth = 0
-
-var senspenis = 0
-
-var sensanal = 0
-
-var knowntechniques = []
-
-
-
-var state = 'normal'
-var preg = {fertility = 0, has_womb = true, duration = 0, baby = null}
-var rules = {'silence':false, 'pet':false, 'contraception':false, 'aphrodisiac':false, 'masturbation':false, 'nudity':false, 'betterfood':false, 'personalbath':false,'cosmetics':false,'pocketmoney':false}
-var traits = []
-
-var gear = {costume = null, underwear = null, armor = null, weapon = null, accessory = null}
-
-var genes = {}
-var effects = {}
-
-var brand = 'none'
-
-var work = 'rest'
-var sleep = ''
-
-var farmoutcome = false
-
-
-var ability = ['attack']
-
-var abilityactive = ['attack']
-
-var customdesc = ''
-
-var piercing = {earlobes = null, eyebrow = null, nose = null, lips = null, tongue = null, navel = null, nipples = null, clit = null, labia = null, penis = null}
-
-var tattoo = {chest = 'none', face = 'none', ass = 'none', arms = 'none', legs = 'none', waist = 'none'}
-var level = 1
-var xp = 0 setget xp_set, xp_get
-var realxp = 0
-var skillpoints = 2
-var levelupreqs = {} setget levelupreqs_set
-var away = {duration = 0, at = ''}
-
-var cattle = {is_cattle = false, work = '', used_for = 'food'}
-var mods = {}
-
-var tattooshow = {chest = true, face = true, ass = true, arms = true, legs = true, waist = true}
-
-var tags = []
-var origins = 'slave'
-
-var originstrue = ''
-
-var memory = ''
-
-var attention = 0
-
-var sexuals = {actions = {}, unlocked = false, affection = 0, kinks = {}, unlocks = [], lastaction = ''}
-
-var kinks = []
-
-var forcedsex = false
-
-var sexexp = {partners = {}, watchers = {}, actions = {}, seenactions = {}, orgasms = {}, orgasmpartners = {}}
-
-var sensation = {}
-
-var metrics = {ownership = 0, jail = 0, mods = 0, brothel = 0, sex = 0, partners = [], randompartners = 0, item = 0, spell = 0, orgy = 0, threesome = 0, win = 0, capture = 0, goldearn = 0, foodearn = 0, manaearn = 0, birth = 0, preg = 0, vag = 0, anal = 0, oral = 0, roughsex = 0, roughsexlike = 0, orgasm = 0}
-var fromguild = false
-var masternoun = 'Master'
-
-var lastinteractionday = 0
-
-var lastsexday = 0
-var learningpoints = 0 setget learningpoints_set
-var luxury = 0
-
-
-var relations = {}
+var asser = 0
 
 var stats = {
 	str_max = 0,
@@ -224,26 +173,26 @@ var stats = {
 	loyal_min = 0,
 }
 var health setget health_set,health_get
+var energy setget energy_set,energy_get
 
-var obed setget obed_set,obed_get
-var stress setget stress_set,stress_get
-var loyal setget loyal_set,loyal_get
+var sstr setget str_set,str_get
+var sagi setget agi_set,agi_get
+var smaf setget maf_set,maf_get
+var send setget end_set,end_get
+
 var cour setget cour_set,cour_get
 var conf setget conf_set,conf_get
 var wit setget wit_set,wit_get
 var charm setget charm_set,charm_get
 
+var fear = 0 setget fear_set,fear_get
+var obed setget obed_set,obed_get
+var stress setget stress_set,stress_get
+var loyal setget loyal_set,loyal_get
+
 var lust setget lust_set,lust_get
 var toxicity setget tox_set,tox_get
 
-var energy setget energy_set,energy_get
-
-var sstr setget str_set,str_get
-var sagi setget agi_set,agi_get
-
-var smaf setget maf_set,maf_get
-
-var send setget end_set,end_get
 
 func fear_raw(value):
 	fear += value
@@ -524,7 +473,8 @@ func cour_set(value):
 	stats.cour_base = clamp(value, 0, min(stats.cour_max, originvalue[origins]))
 
 func conf_set(value):
-	stats.conf_base = clamp(value, 0, min(stats.conf_max, originvalue[origins]))
+	var bonus = max(0, stats.conf_max - originvalue['noble'])
+	stats.conf_base = clamp(value, 0, min(stats.conf_max, originvalue[origins]) + bonus)
 
 func wit_set(value):
 	stats.wit_base = clamp(value, 0, min(stats.wit_max, originvalue[origins]))
@@ -552,7 +502,7 @@ func maf_set(value):
 	stats.maf_base = min(stats.maf_base, stats.maf_max)
 
 func end_set(value):
-	var plushealth = false
+	var plushealth = true
 	if stats.end_base < value:
 		plushealth = true
 	stats.end_base = min(stats.end_base, stats.end_max)

@@ -2,20 +2,16 @@
 extends Control
 
 var period = 'base'
-#warning-ignore:unused_class_variable
 var phase = ''
 var currentenemies
-#warning-ignore:unused_class_variable
 var enemygear = {}
 var playergroup = []
 var enemygroup = []
 var selectedcharacter
 var targetskill
 var nocaptures = false
-#warning-ignore:unused_class_variable
 var area
 var trapper = false
-#warning-ignore:unused_class_variable
 var trappername
 var turns = 0
 var combatantnodes = []
@@ -49,6 +45,7 @@ var playerpaneltextures = {
 
 func _ready():
 	$grouppanel/skilline/skill.set_meta('skill', {})
+	$Tween.start()
 	if debug == true:
 		var scene = load("res://files/scripts/exploration.gd")
 		globals.main = self
@@ -119,7 +116,6 @@ func start_battle(nosound = false):
 	yield(get_parent(),'animfinished')
 	get_node("autowin").visible = get_parent().get_node("new slave button").visible
 	var _slave
-#warning-ignore:unused_variable
 	var combatant
 	trapper = false
 	enemyturn = false
@@ -160,6 +156,11 @@ func start_battle(nosound = false):
 		checkforinheritdebuffs(newcombatant)
 		combatantnodes.append(newbutton)
 	
+	for i in playergroup:
+		if i.person.spec == 'trapper':
+			trapper = true
+			trappername = i.name
+
 	for i in currentenemies:
 		var newcombatant = self.combatant.new()
 		var newbutton = $enemypanel/enemyline/character.duplicate()
@@ -201,7 +202,6 @@ func start_battle(nosound = false):
 		globals.main.get_node("tutorialnode").combat()
 
 
-#warning-ignore:unused_argument
 func _process(delta):
 	if self.visible == false:
 		return
@@ -223,17 +223,13 @@ func _process(delta):
 		
 		if ongoinganimation:
 			break
-		if combatant.state in ['defeated','escaped'] && combatant.animationplaying == false:
-			combatant.effects.clear()
-			i.hide()
-			#i.queue_free()
-			combatantnodes.erase(i)
-			return
 		
 		i.get_node("portrait").texture = globals.loadimage(combatant.portrait)
 		i.get_node("name").text = combatant.name
-		if i.get_node("hp").value != (combatant.hp/combatant.hpmax)*100:
-			$Tween.interpolate_property(i.get_node("hp"), "value", i.get_node('hp').value, (combatant.hp/combatant.hpmax)*100, 0.6, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+		var hpPercent = (combatant.hp/combatant.hpmax)*100
+		if !i.get_node("hp").has_meta('hp') || i.get_node("hp").get_meta('hp') != hpPercent:
+			$Tween.interpolate_property(i.get_node("hp"), "value", i.get_node('hp').value, hpPercent, 0.6, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+			i.get_node("hp").set_meta('hp', hpPercent)
 			#i.get_node("hp").value = (combatant.hp/combatant.hpmax)*100
 		i.get_node("hp/Label").text = str(ceil(combatant.hp)) + "/" + str(combatant.hpmax)
 		if combatant.group == 'enemy' && playergroup[0].effects.has('mindreadeffect'):
@@ -316,7 +312,6 @@ class combatant:
 	var person
 	var group
 	var state = 'normal'
-#warning-ignore:unused_class_variable
 	var panel
 	var name
 	var hp setget health_set, health_get
@@ -331,11 +326,9 @@ class combatant:
 	var attack = 0
 	var magic = 0
 	var armor = 0
-#warning-ignore:unused_class_variable
 	var protection = 0
 	var speed = 0
 	var portrait
-#warning-ignore:unused_class_variable
 	var target
 	var geareffects = []
 	var abilities
@@ -344,14 +337,12 @@ class combatant:
 	var scene
 	var cooldowns = {}
 	var actionpoints = 1
-#warning-ignore:unused_class_variable
 	var effects = {}
 	var faction
 	
 	var animationplaying = false
 	
 	var ai = ''
-#warning-ignore:unused_class_variable
 	var aimemory = ''
 	
 	
@@ -401,7 +392,7 @@ class combatant:
 			portrait = data.icon
 			if person.sex in ['female','futa'] && data.has('iconalt'):
 				portrait = data.iconalt
-		abilities = person.ability
+		abilities = person.ability.duplicate()
 		activeabilities = person.abilityactive
 		if data != null:
 			for i in data.stats.abilities:
@@ -540,7 +531,6 @@ class combatant:
 		scene.floattext(node.rect_global_position, 'Miss!', '#ffff00')
 	
 	func health_set(value):
-#warning-ignore:unused_variable
 		var effect = ''
 		var color = 'white'
 		var difference = ceil(value - hp)
@@ -559,7 +549,7 @@ class combatant:
 		
 		#draw()
 		scene.floattext(node.rect_global_position, str(difference), color)
-		if hp <= 0:
+		if hp <= 0 && state != 'defeated':
 			defeat()
 	
 	func health_get():
@@ -570,7 +560,8 @@ class combatant:
 		scene.defeatanimation(self)
 		yield(scene, 'defeatfinished')
 		node.hide()
-		animationplaying = false
+		effects.clear()
+		scene.combatantnodes.erase(node)
 		scene.combatlog += scene.combatantdictionary(self, self, "\n[color=aqua][name1] has been defeated.[/color]")
 		if group == 'enemy':
 			for i in scene.enemygroup:
@@ -604,15 +595,30 @@ class combatant:
 					_slave.death()
 		else:
 			scene.repositionanimation()
+		animationplaying = false
+		scene.ongoinganimation = false
+		scene.emit_signal("defeat2finished")
 		scene.endcombatcheck()
-	
+
+	func escape():
+		state = 'escaped'
+		if group == 'enemy':
+			scene.combatlog += scene.combatantdictionary(self, self,'[name1] has escaped.')
+		scene.escapeanimation(self)
+		yield(scene, 'escapefinished')
+		node.hide()
+		effects.clear()
+		scene.combatantnodes.erase(node)
+		if group == 'enemy':
+			scene.repositionanimation()
+		animationplaying = false
+		scene.ongoinganimation = false
 
 func checkforresults():
 	if playergroup[0].state == 'defeated':
 		lose()
 		return
 	var counter = 0
-#warning-ignore:unused_variable
 	var text = ''
 	
 	for i in playergroup:
@@ -770,7 +776,10 @@ func floattextdelete(node):
 	node.queue_free()
 
 func pressskill(skill):
-	if (skill.costmana > 0 && globals.resources.mana < skill.costmana) || (skill.costenergy > 0 && selectedcharacter.energy < skill.costenergy):
+	var cost = skill.costmana
+	if globals.state.spec == 'Mage':
+		cost = round(cost/2)
+	if (cost > 0 && globals.resources.mana < cost) || (skill.costenergy > 0 && selectedcharacter.energy < skill.costenergy):
 		return
 	if skill.target in ['one']:
 		period = 'skilltarget'
@@ -799,7 +808,6 @@ func useskills(skill, caster = null, target = null, retarget = false):
 	var damage = 0
 	var group
 	var hit = 'hit'
-#warning-ignore:unused_variable
 	var targetparty
 	var targetarray
 	globals.hidetooltip()
@@ -900,7 +908,7 @@ func useskills(skill, caster = null, target = null, retarget = false):
 				return
 		#buffs and effects
 		if skill.attributes.has('noescape') && target.effects.has('escapeeffect'):
-			self.combatlog += "[targetname1] being held in place! "
+			text += "[targetname1] being held in place! "
 			removebuff("escapeeffect",target)
 		
 		if skill.effect != null && hit == 'hit' && skill.target != 'all':
@@ -910,9 +918,9 @@ func useskills(skill, caster = null, target = null, retarget = false):
 		if skill.has('effectself') && skill.effectself != null:
 			sendbuff(caster, caster, skill.effectself)
 		
-		
 		yield(self, 'tweenfinished')
-	
+		if skill.target == 'one' && target.animationplaying == true:
+			yield(self, 'defeat2finished')
 	if skill.code == 'heal':
 		globals.abilities.restorehealth(caster,target)
 	elif skill.code == "masshealcouncil":
@@ -928,11 +936,12 @@ func useskills(skill, caster = null, target = null, retarget = false):
 		target = targetarray
 	
 	self.combatlog += '\n' + combatantdictionary(caster, target, text)
-	endcombatcheck()
-	if period == 'win':
-		playerwin() 
-	if period == 'skilluse':
-		period = 'base'
+	if period != 'enemyturn':
+		endcombatcheck()
+		if period == 'win':
+			playerwin() 
+		if period == 'skilluse':
+			period = 'base'
 		
 	emit_signal("skillplayed")
 
@@ -1014,7 +1023,6 @@ func deselectall():
 		if i.get_class() == 'TextureButton':
 			i.pressed = false
 
-#warning-ignore:function_conflicts_variable
 func enemyturn():
 	if $autoattack.pressed == true:
 		for i in playergroup:
@@ -1024,7 +1032,11 @@ func enemyturn():
 						useskills(globals.abilities.abilitydict.attack, i, j)
 						break
 				yield(self, 'skillplayed')
-	
+				endcombatcheck()
+				if period == 'win':
+					playerwin() 
+					return
+
 	for i in enemygroup + playergroup:
 		if i.state != 'normal':
 			continue
@@ -1038,8 +1050,7 @@ func enemyturn():
 						i.state = 'defeated'
 						self.combatlog += combatantdictionary(i, i,'[name1] has tried to escape but was caught in one of the traps... ')
 						continue
-					escapeanimation(i)
-					i.state = 'escaped'
+					i.escape()
 				if effect.type == 'onendturn':
 					self.combatlog += "\n" + combatantdictionary(i, i, globals.abilities.call(globals.abilities.effects[effect.code].script, i))
 				if effect.duration > 0:
@@ -1053,8 +1064,7 @@ func enemyturn():
 			continue
 		for effect in combatant.effects.values():
 			if effect.code == 'escapeeffect':
-				escapeanimation(combatant)
-				combatant.state = 'escaped'
+				combatant.escape()
 		var skill = []
 		for k in combatant.abilities:
 			var i = globals.abilities.abilitydict[k]
@@ -1129,7 +1139,7 @@ func enemyturn():
 		i.actionpoints = 1
 		if i.effects.has("stun"):
 			i.actionpoints = 0
-		for k in i.cooldowns:
+		for k in i.cooldowns.duplicate():
 			i.cooldowns[k] -= 1
 			if i.cooldowns[k] <= 0:
 				i.cooldowns.erase(k)
@@ -1191,7 +1201,7 @@ func playerescape():
 	for i in playergroup:
 		if i.state in ['normal', 'escaped']:
 			escapeanimation(i)
-	yield(self, 'tweenfinished')
+	yield(self, 'escapefinished')
 	get_parent().animationfade(0.4)
 	if OS.get_name() != 'HTML5':
 		yield(get_parent(),'animfinished')
@@ -1232,12 +1242,10 @@ func speed(combatant, value):
 func protection(combatant, value):
 	combatant.protection += value
 
-#warning-ignore:unused_argument
 func lust(combatant, value):
 	combatant.person.lust += 2
 
 func victory():
-#warning-ignore:unused_variable
 	var deads = []
 	
 	get_parent().animationfade(0.4)
@@ -1272,7 +1280,9 @@ func _on_autowin_pressed():
 signal damagetrigger
 signal tweenfinished
 signal skillplayed
+signal escapefinished
 signal defeatfinished
+signal defeat2finished
 var ongoinganimation = false
 
 func damagein():
@@ -1285,6 +1295,8 @@ func tweenfinished():
 	ongoinganimation = false
 	emit_signal("tweenfinished")
 
+func escapefinished():
+	emit_signal("escapefinished")
 
 func defeatfinished():
 	emit_signal("defeatfinished")
@@ -1347,7 +1359,6 @@ func firebreathanimationtarget(combatant):
 	tween.interpolate_property(node, "modulate", Color(1,0.25,0.25,1), Color(1,1,1,1), 0.6, Tween.TRANS_SINE, Tween.EASE_IN)
 	tween.start()
 
-#warning-ignore:unused_argument
 func slamanimation(combatant):
 	var tween = $Tween
 	
@@ -1367,7 +1378,7 @@ func escapeanimation(combatant):
 		change = -change
 	tween.interpolate_property(node, "rect_position", pos, Vector2(pos.x, pos.y-change), 1, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.interpolate_property(node, "modulate", Color(1,1,1,1), Color(1,1,1,0), 0.5, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, 0.5)
-	tween.interpolate_callback(self, 1.2, 'tweenfinished')
+	tween.interpolate_callback(self, 1.2, 'escapefinished')
 	tween.start()
 
 func defeatanimation(combatant):
@@ -1383,34 +1394,32 @@ func defeatanimation(combatant):
 	tween.start()
 
 func repositionanimation():
-	var previousposition
-	var tempposition
 	if enemygroup.size() < 10:
 		return
-	
+
 	var counter = 0
 	for i in enemygroup:
-		if i.state != 'defeated' && i.node.visible == true:
+		if i.state == 'normal':
 			counter += 1
-	
 	if counter < 8:
 		return
-	
-	var replacedead = false
-	
+
+	var previousposition = null
+	var tempposition
 	for i in enemygroup:
-		if i.node.visible == false:
-			previousposition = i.node.get_position()
-			replacedead = true
-			continue
+		tempposition = i.node.get_position()
 		if previousposition != null:
-			tempposition = i.node.get_position()
-			if replacedead == true:
-				i.node.set_position(Vector2(previousposition.x, previousposition.y - 25))
-				replacedead = false
-			else:
-				i.node.set_position(Vector2(previousposition.x, previousposition.y))
-			previousposition = tempposition
+			if i.state == 'normal':
+				if tempposition.x <= previousposition.x:
+					previousposition = null
+				else:
+					i.node.set_position(previousposition)
+					previousposition = tempposition
+			elif tempposition.x <= previousposition.x:
+				previousposition = Vector2(tempposition.x, tempposition.y - (25 if i.state == 'defeated' else 40))
+		elif i.state != 'normal':
+			previousposition = Vector2(tempposition.x, tempposition.y - (25 if i.state == 'defeated' else 40))
+
 
 func takedamage(combatant):
 	var node = combatant.node

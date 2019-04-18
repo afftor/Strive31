@@ -1,30 +1,26 @@
 ### Mansion - Main
 extends Control
 
-#warning-ignore:unused_class_variable
+var corejobs = ['rest','forage','hunt','cooking','library','nurse','maid','storewimborn','artistwimborn','assistwimborn','whorewimborn','escortwimborn','fucktoywimborn', 'lumberer', 'ffprostitution','guardian', 'research', 'slavecatcher','fucktoy']
+
 var test = File.new()
 var testslaverace = globals.allracesarray
 var testslaveage = 'random'
 var testslavegender = 'male'
 var testslaveorigin = ['slave','poor','commoner','rich','noble']
 var currentslave = 0 setget currentslave_set
-#warning-ignore:unused_class_variable
 var selectedslave = -1
 var texture = null
 var startcombatzone = "darkness"
 var nameportallocation
 var enddayprocess = false
-#warning-ignore:unused_class_variable
 onready var maintext = '' setget maintext_set, maintext_get
 onready var exploration = get_node("explorationnode")
-#warning-ignore:unused_class_variable
 onready var slavepanel = get_node("MainScreen/slave_tab")
-#warning-ignore:unused_class_variable
 onready var outside = $outside
 
 onready var tween = $Tween
 
-#warning-ignore:unused_class_variable
 onready var minimap = $outside/minimappanel/map/Control
 
 signal animfinished
@@ -34,7 +30,6 @@ var checkforevents = false
 var debug = false
 
 #QMod - Variables
-#warning-ignore:unused_class_variable
 onready var mansionStaff = get_node("joblist").mansionStaff
 
 func _ready():
@@ -45,7 +40,8 @@ func _ready():
 		get_node("startcombat").show()
 		get_node("new slave button").show()
 		get_node("debug").show()
-	rebuildrepeatablequests()
+	if !globals.state.tutorialcomplete:
+		rebuildrepeatablequests()
 	globals.main = self
 	globals.items.main = self
 	globals.mainscreen = 'mansion'
@@ -68,11 +64,8 @@ func _ready():
 	rebuild_slave_list()
 	globals.player.consent = true
 	globals.spells.main = get_tree().get_current_scene()
-#warning-ignore:return_value_discarded
 	get_node("birthpanel/raise/childpanel/child").connect('pressed', self, 'babyage', ['child'])
-#warning-ignore:return_value_discarded
 	get_node("birthpanel/raise/childpanel/teen").connect('pressed', self, 'babyage', ['teen'])
-#warning-ignore:return_value_discarded
 	get_node("birthpanel/raise/childpanel/adult").connect('pressed', self, 'babyage', ['adult'])
 	#exploration
 	get_node("explorationnode").buttoncontainer = get_node("outside/buttonpanel/outsidebuttoncontainer")
@@ -93,7 +86,7 @@ func _ready():
 	
 	if globals.state.tutorialcomplete == false && globals.resources.day == 1:
 		get_node("tutorialnode").starttutorial()
-		globals.state.tutorialcomplete == true
+		globals.state.tutorialcomplete = true
 	
 	if globals.showalisegreet == true:
 		alisegreet()
@@ -105,31 +98,19 @@ func _ready():
 		get(i).get_node('Control').connect('mouse_exited', globals, 'hidetooltip')
 		get(i).get_node('Button').connect("pressed",self,'statup', [i])
 	
-	
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/selfinspect/relativespanel/relativestext.connect("meta_hover_started",self,'relativeshover')
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/selfinspect/relativespanel/relativestext.connect("meta_hover_ended",globals, 'slavetooltiphide')
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/selfinspect/relativespanel/relativestext.connect("meta_clicked",self, "relativesselected")
 	
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/mansioninfo.connect("meta_hover_started",self,'slavehover')
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/mansioninfo.connect("meta_hover_ended",globals, 'slavetooltiphide')
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/mansioninfo.connect("meta_clicked",self, "slaveclicked")
 	
-#warning-ignore:return_value_discarded
 	$outside/textpanel/outsidetextbox.connect("meta_hover_started",self,'slavehover')
-#warning-ignore:return_value_discarded
 	$outside/textpanelexplore/outsidetextbox2.connect("meta_hover_started",self,'slavehover')
-#warning-ignore:return_value_discarded
 	$outside/textpanel/outsidetextbox.connect("meta_hover_ended",globals, 'slavetooltiphide')
-#warning-ignore:return_value_discarded
 	$outside/textpanelexplore/outsidetextbox2.connect("meta_hover_ended",globals, 'slavetooltiphide')
 	
-#warning-ignore:return_value_discarded
 	$MainScreen/mansion/selfinspect/Contraception.connect("pressed", self, 'contraceptiontoggle')
 	
 	if variables.oldemily == true:
@@ -140,6 +121,8 @@ func _ready():
 	
 	for i in [$sexselect/managerypanel/dogplus, $sexselect/managerypanel/dogminus, $sexselect/managerypanel/horseplus, $sexselect/managerypanel/horseminus]:
 		i.connect("pressed", self, 'animalforsex', [i])
+	if get_node("FinishDayPanel/FinishDayScreen/Global Report").get_bbcode().empty():
+		get_node("Navigation/endlog").disabled = true
 	_on_mansion_pressed()
 	#startending()
 
@@ -594,17 +577,13 @@ func _on_end_pressed():
 	
 	
 	var text = ''
-#warning-ignore:unused_variable
 	var temp = ''
-#warning-ignore:unused_variable
 	var poorcondition = false
-#warning-ignore:unused_variable
 	var person
 	var count
 	var chef
 	var jailer
 	var headgirl
-#warning-ignore:unused_variable
 	var labassist
 	var farmmanager
 	var workdict
@@ -613,7 +592,6 @@ func _on_end_pressed():
 	var text2 = get_node("FinishDayPanel/FinishDayScreen/Secondary Report")
 	var start_gold = globals.resources.gold
 	var start_food = globals.resources.food
-#warning-ignore:unused_variable
 	var start_mana = globals.resources.mana
 	var deads_array = []
 	var gold_consumption = 0
@@ -667,6 +645,7 @@ func _on_end_pressed():
 					handcuffs = true
 		text = ''
 		
+		var jobRestore = person.work
 		var slavehealing = person.send * 0.03 + 0.02
 		if person.away.duration == 0: ## Sequence for all present slaves
 			
@@ -677,8 +656,11 @@ func _on_end_pressed():
 					person.relations[i] += 15
 			
 			if person.sleep != 'jail' && person.sleep != 'farm':
-				if person.work in ['rest','forage','hunt','cooking','library','nurse','maid','storewimborn','artistwimborn','assistwimborn','whorewimborn','escortwimborn','fucktoywimborn', 'lumberer', 'ffprostitution','guardian', 'research', 'slavecatcher','fucktoy']:
+				if person.work in corejobs:
 					
+					if person.work != 'rest' && person.energy < 30:
+						person.work = 'rest'
+
 					for i in globals.slaves:
 						if i.away.duration == 0 && i.work == person.work && i != person:
 							globals.addrelations(person, i, 0)
@@ -712,8 +694,11 @@ func _on_end_pressed():
 #							else:
 #								globals.addrelations(person, i, (rand_range(10,20)))
 					
-					if person.work != 'rest' && person.energy < 30:
-						text = "$name had no energy to fulfill $his duty and had to take a rest. \n"
+					if person.work == 'rest':
+						if jobRestore != 'rest':
+							text = "$name had no energy to fulfill $his duty and had to take a rest. \n"
+						else:
+							text = '$name has spent most of the day relaxing.\n'
 						slavehealing += 0.15
 						person.stress -= 20
 					else:
@@ -730,15 +715,16 @@ func _on_end_pressed():
 							if workdict.has('gold') && workdict.gold > 0:
 								workdict.gold *= 1.15
 						for i in globals.state.reputation:
-							if globals.state.reputation[i] < -10 && randf() < 0.33 && get_node("MainScreen/slave_tab").jobdict[person.work].tags.find(i) >= 0:
-								person.obed -= max(abs(globals.state.reputation[i])*2 - person.loyal/6,0)
-								person.loyal -= rand_range(1,3)
-								text += "[color=#ff4949]$name has been influenced by local townfolk, which is hostile towards you. [/color]\n"
-							elif globals.state.reputation[i] > 10 && randf() < 0.2:
-								person.obed += abs(globals.state.reputation[i])
-								person.loyal += rand_range(1,3)
-								text += "[color=green]$name has been influenced by local townfolk, which is loyal towards you. [/color]\n"
-						text = workdict.text
+							if get_node("MainScreen/slave_tab").jobdict[person.work].tags.find(i) >= 0:
+								if globals.state.reputation[i] < -10 && randf() < 0.33:
+									person.obed -= max(abs(globals.state.reputation[i])*2 - person.loyal/6,0)
+									person.loyal -= rand_range(1,3)
+									text += "[color=#ff4949]$name has been influenced by local townfolk, which is hostile towards you. [/color]\n"
+								elif globals.state.reputation[i] > 10 && randf() < 0.2:
+									person.obed += abs(globals.state.reputation[i])
+									person.loyal += rand_range(1,3)
+									text += "[color=green]$name has been influenced by local townfolk, which is loyal towards you. [/color]\n"
+						text += workdict.text
 						if person.spec == 'housekeeper' && person.work in ['rest','cooking','library','nurse','maid','headgirl','farmmanager','labassist','jailer']:
 							globals.state.condition += (5.5 + (person.sagi+person.send)*6)/2
 							text2.bbcode_text += person.dictionary("$name has managed to clean the mansion a bit while being around. \n")
@@ -769,16 +755,16 @@ func _on_end_pressed():
 						person.add_effect(i, true)
 				if i.has("ondayend"):
 					globals.effects.call(i.ondayend, person)
-			if globals.resources.food >= 5:
+			var consumption = variables.basefoodconsumption
+			if chef != null:
+				consumption = max(3, consumption - (chef.sagi + (chef.wit/20))/2)
+				if chef.race == 'Scylla':
+					consumption = max(3, consumption - 1)
+			if person.traits.has("Small Eater"):
+				consumption = consumption/3
+			if globals.resources.food >= consumption:
 				person.loyal += rand_range(0,1)
 				person.obed += person.loyal/5 - (person.cour+person.conf)/10
-				var consumption = variables.basefoodconsumption
-				if chef != null:
-					consumption = max(3, 10 - (chef.sagi + (chef.wit/20))/2)
-					if chef.race == 'Scylla':
-						consumption = max(3, consumption - 1)
-				if person.traits.has("Small Eater"):
-					consumption = consumption/3
 				globals.resources.food -= consumption
 			else:
 				person.stress += 20
@@ -835,7 +821,9 @@ func _on_end_pressed():
 							text0.set_bbcode(text0.get_bbcode() + i.dictionary("[color=green]$name managed to lift ") + person.dictionary("$name out of $his wild behavior and turn into a socially functioning person.[/color]\n "))
 			if person.traits.has("Infirm"):
 				slavehealing = slavehealing/3
-			if person.traits.has("Clingy") && person.loyal >= 15 && person.attention > 75 && randf() > 0.5:
+			if person.attention < 150 && person.sleep != 'your':
+				person.attention += rand_range(5,7)
+			if person.traits.has("Clingy") && person.loyal >= 15 && person.attention > 40 && randf() > 0.5:
 				person.obed -= rand_range(10,30)
 				person.loyal -= rand_range(1,5)
 				text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=yellow]$name is annoyed by you paying no attention to $him. [/color]\n"))
@@ -953,8 +941,9 @@ func _on_end_pressed():
 				person.mentalbreakdown()
 			
 			
-			person.stress -= rand_range(5,10)
 			if person.race == 'Fairy':
+				person.stress -= rand_range(10,20)
+			else:
 				person.stress -= rand_range(5,10)
 			
 			#sleep conditions
@@ -1018,8 +1007,6 @@ func _on_end_pressed():
 			
 			if person.skillpoints < 0:
 				person.skillpoints = 0
-			if person.attention < 150 && person.sleep != 'your':
-				person.attention += rand_range(5,7)
 			if person.preg.duration > 0:
 				person.preg.duration += 1
 				if person.health < 20 && rand_range(0,100) > person.health*2:
@@ -1052,7 +1039,7 @@ func _on_end_pressed():
 				gold_consumption += luxurycheck.goldspent
 				if luxurycheck.nosupply == true:
 					lacksupply = true
-				if !person.traits.has("Grateful") && luxury < personluxury && person.metrics.ownership - person.metrics.jail > 7 :
+				if !person.traits.has("Grateful") && luxury < personluxury && person.metrics.ownership - person.metrics.jail > 7:
 					person.loyal -= (personluxury - luxury)/2.5
 					person.obed -= (personluxury - luxury)
 					text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=#ff4949]$name appears to be rather unhappy about quality of $his life and demands better living conditions from you. [/color]\n"))
@@ -1061,14 +1048,29 @@ func _on_end_pressed():
 			if person.away.duration == 0 && person.away.at == 'lab' && person.health < 5:
 				var temptext = "$name has not survived the laboratory operation due to poor health."
 				deads_array.append({number = count, reason = temptext})
-			elif person.away.duration == 0:
-				person.away.at = ''
-				text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name returned to the mansion and went back to $his duty. \n"))
+			else:
+				if person.away.duration == 0:
+					person.away.at = ''
+					text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name returned to the mansion and went back to $his duty. \n"))
+				for i in person.effects.values():
+					if i.has('duration') && i.code != 'captured':
+						if person.race != 'Dark Elf' || randf() > 0.5:
+							i.duration -= 1
+						if i.duration <= 0:
+							person.add_effect(i, true)
+					elif i.code == 'captured':
+						if i.duration <= 0:
+							if i.code == 'captured':
+								text0.set_bbcode(text0.get_bbcode() + person.dictionary('$name grew accustomed to your ownership.\n'))
+							person.add_effect(i, true)
+					if i.has("ondayend"):
+						globals.effects.call(i.ondayend, person)
+		person.work = jobRestore
 		count+=1
 	if headgirl != null && globals.state.headgirlbehavior != 'none':
 		var headgirlconf = headgirl.conf
 		if headgirl.spec == 'executor':
-			headgirlconf = 100
+			headgirlconf = max(100, headgirl.conf)
 		for i in globals.slaves:
 			if i != headgirl && i.traits.find('Loner') < 0 && i.away.duration < 1 && i.sleep != 'jail' && i.sleep != 'farm':
 				headgirl.xp += 3
@@ -1091,7 +1093,7 @@ func _on_end_pressed():
 	if jailer != null:
 		var jailerconf = jailer.conf
 		if jailer.spec == 'executor':
-			jailerconf = 100
+			jailerconf = max(100, jailer.conf)
 		for person in globals.slaves:
 			if person.sleep == 'jail':
 				jailer.xp += 5
@@ -1104,7 +1106,7 @@ func _on_end_pressed():
 	if farmmanager != null:
 		var farmconf = farmmanager.conf
 		if farmmanager.spec == 'executor':
-			farmconf = 100
+			farmconf = max(100, farmmanager.conf)
 		for person in globals.slaves:
 			if person.sleep == 'farm':
 				var production = 0
@@ -1173,14 +1175,15 @@ func _on_end_pressed():
 			text0.set_bbcode(text0.get_bbcode() + "[color=green]Sebastian should have your order ready by this time. [/color]\n")
 	globals.state.groupsex = true
 	
-	
-	if globals.resources.food >= 5:
-		if chef != null:
-			globals.resources.food -= max(3, variables.basefoodconsumption - (chef.sagi + (chef.wit/20))/2)
-		else:
-			globals.resources.food -= variables.basefoodconsumption
+	var consumption = variables.basefoodconsumption
+	if chef != null:
+		consumption = max(3, consumption - (chef.sagi + (chef.wit/20))/2)
+		if chef.race == 'Scylla':
+			consumption = max(3, consumption - 1)
+	if globals.resources.food >= consumption:
+		globals.resources.food -= consumption
 	else:
-		if globals.resources.gold < 5:
+		if globals.resources.gold < 20:
 			get_node("gameover").show()
 			get_node("gameover/Panel/text").set_bbcode("[center]With no food and money your mansion falls in chaos. \nGame over.[/center]")
 		else:
@@ -1189,7 +1192,6 @@ func _on_end_pressed():
 	
 	for i in globals.state.repeatables:
 		for ii in globals.state.repeatables[i]:
-#warning-ignore:unused_variable
 			var removed = false
 			if ii.time >= 0 && ii.taken == true:
 				ii.time -= 1
@@ -1250,6 +1252,7 @@ func _on_end_pressed():
 	aliseresults = results
 	if lacksupply == true:
 		text0.set_bbcode(text0.get_bbcode()+"[color=#ff4949]You have expended your supplies and some of the actions couldn't be finished. [/color]\n")
+	get_node("Navigation/endlog").disabled = false
 	nextdayevents()
 
 var aliseresults
@@ -1280,7 +1283,7 @@ func nextdayevents():
 #		return
 #
 	#Old scheduled event system
-	for i in globals.state.upcomingevents:
+	for i in globals.state.upcomingevents.duplicate():
 		if $scene.is_visible_in_tree() == true:
 			break
 		i.duration -= 1
@@ -1353,7 +1356,7 @@ func launchrandomevent():
 			personlist.append(i)
 	while personlist.size() > 0:
 		var number = floor(rand_range(0,personlist.size()))
-		if personlist[number].attention < rand_range(30,150):
+		if personlist[number].attention >= rand_range(30,150):
 			get_node("dailyevents").person = personlist[number]
 			rval = get_node("dailyevents").getrandomevent(personlist[number])
 			#rval = $dailyevents.getfixedevent('assaultevent')
@@ -1420,9 +1423,7 @@ func startnewday():
 
 
 func autosave():
-#warning-ignore:unused_variable
 	var counter = 3
-#warning-ignore:unused_variable
 	var savegame = File.new()
 	var dir = Directory.new()
 	if dir.dir_exists("user://saves") == false:
@@ -1495,7 +1496,6 @@ func popup(text):
 
 func _on_popupmessagetext_meta_clicked( meta ):
 	if meta == 'patreon':
-#warning-ignore:return_value_discarded
 		OS.shell_open('https://www.patreon.com/maverik')
 
 var spritedict = globals.spritedict
@@ -1696,7 +1696,6 @@ func _on_mainmenubutton_pressed():
 	yesnopopup('Exit to main menu? Make sure to save', 'mainmenu')
 
 func mainmenu():
-#warning-ignore:return_value_discarded
 	get_tree().change_scene("res://files/mainmenu.scn")
 
 
@@ -1708,7 +1707,6 @@ var yesbutton = {target = null, function = null}
 func yesnopopup(text, yesfunc, target = self):
 	if yesbutton.target != null && get_node("yesnopopup/HBoxContainer/yesbutton").is_connected("pressed",yesbutton.target, yesbutton.function):
 		get_node("yesnopopup/HBoxContainer/yesbutton").disconnect("pressed",yesbutton.target,yesbutton.function)
-#warning-ignore:return_value_discarded
 	get_node("yesnopopup/HBoxContainer/yesbutton").connect('pressed',target,yesfunc,[],4)
 	yesbutton.target = target
 	yesbutton.function = yesfunc
@@ -1731,9 +1729,7 @@ func _on_SavePanel_visibility_changed():
 	if get_node("menucontrol/menupanel/SavePanel").visible == false:
 		return
 	var node
-#warning-ignore:unused_variable
 	var pressedsave
-#warning-ignore:unused_variable
 	var moddedtext
 	for i in get_node("menucontrol/menupanel/SavePanel/ScrollContainer/savelist").get_children():
 		if i != get_node("menucontrol/menupanel/SavePanel/ScrollContainer/savelist/Button"):
@@ -1743,7 +1739,7 @@ func _on_SavePanel_visibility_changed():
 	if dir.dir_exists("user://saves") == false:
 		dir.make_dir("user://saves")
 	var savefiles = globals.dir_contents()
-	for i in globals.savelist:
+	for i in globals.savelist.duplicate():
 		if savefiles.find(i) < 0:
 			globals.savelist.erase(i)
 	pressedsave = get_node("menucontrol/menupanel/SavePanel//saveline").text
@@ -1833,7 +1829,6 @@ func savefile():
 
 func _on_saveloadfolder_pressed():
 	var temp = OS.get_user_data_dir()
-#warning-ignore:return_value_discarded
 	OS.shell_open('file://'+temp + '/saves')
 
 
@@ -1853,7 +1848,6 @@ func hide_everything():
 	get_node("MainScreen/mansion/upgradespanel").hide()
 	globals.hidetooltip()
 
-#warning-ignore:unused_class_variable
 var background setget background_set, background_get
 
 func background_set(text, forcefade = false):
@@ -1883,7 +1877,6 @@ func animationfade(value = 0.4, duration = 0.05):
 
 
 var musicdict = globals.musicdict
-#warning-ignore:unused_class_variable
 var musicvolume = 0
 
 
@@ -1956,6 +1949,7 @@ func _on_mansion_pressed():
 	get_node("charlistcontrol").show()
 	get_node("MainScreen").show()
 	get_node("Navigation").show()
+	$ResourcePanel.show()
 	get_node("ResourcePanel/menu").disabled = false
 	get_node("ResourcePanel/helpglossary").disabled = false
 	get_node("MainScreen/mansion/sexbutton").set_disabled(globals.state.sexactions < 1 && globals.state.nonsexactions < 1)
@@ -2005,7 +1999,7 @@ func _on_mansion_pressed():
 		text = text + 'Nobody is assigned to follow you.\n\n'
 	else:
 		slavearray.clear()
-		for i in globals.state.playergroup:
+		for i in globals.state.playergroup.duplicate():
 			var person = globals.state.findslave(i)
 			if person != null:
 				slavearray.append(person)
@@ -2260,7 +2254,6 @@ func _on_brewbutton_pressed():
 	_on_alchemy_pressed()
 	get_node("MainScreen/mansion/alchemypanel/brewbutton").set_disabled(true)
 
-#warning-ignore:unused_argument
 func _on_brewcounter_value_changed( value ):
 	if typeof(potselected) != 4:
 		brewlistpressed(potselected)
@@ -2290,7 +2283,6 @@ func _on_library_pressed():
 			i.hide()
 			i.queue_free()
 	
-#warning-ignore:unused_variable
 	var array = []
 	for i in loredict.values():
 		if globals.evaluate(i.reqs) == false:
@@ -2729,13 +2721,9 @@ func statup(stat):
 	globals.player[stat] += 0
 	updatestats(globals.player)
 
-#warning-ignore:unused_class_variable
 onready var sstr = get_node("MainScreen/mansion/selfinspect/statspanel/sstr")
-#warning-ignore:unused_class_variable
 onready var sagi = get_node("MainScreen/mansion/selfinspect/statspanel/sagi")
-#warning-ignore:unused_class_variable
 onready var smaf = get_node("MainScreen/mansion/selfinspect/statspanel/smaf")
-#warning-ignore:unused_class_variable
 onready var send = get_node("MainScreen/mansion/selfinspect/statspanel/send")
 
 func updatestats(person):
@@ -2771,7 +2759,6 @@ func updatestats(person):
 		person.imageportait = null
 		$MainScreen/mansion/selfinspect/statspanel/TextureRect/portrait.set_texture(null)
 
-#warning-ignore:unused_class_variable
 var gradeimages = {
 'slave' : load("res://files/buttons/mainscreen/40.png"),
 poor = load("res://files/buttons/mainscreen/41.png"),
@@ -2898,7 +2885,6 @@ var potionselected
 func potbuttonpressed(potion):
 	potionselected = potion
 	var description = get_node("MainScreen/mansion/selfinspect/selectpotionpanel/potionusedescription")
-#warning-ignore:unused_variable
 	var potlist = get_node("MainScreen/mansion/selfinspect/selectpotionpanel/ScrollContainer/selectpotionlist")
 	for i in get_tree().get_nodes_in_group('usables'):
 		if i.get_text() != potion.name && i.is_pressed() == true:
@@ -3069,7 +3055,6 @@ func _on_portals_pressed():
 
 
 func portalbuttonpressed(newbutton, portal):
-#warning-ignore:unused_variable
 	var text
 	nameportallocation = portal.code
 	$MainScreen/mansion/portalspanel/traveltoportal.disabled = false
@@ -3336,7 +3321,6 @@ func _on_cleanbutton_pressed():
 
 
 
-#warning-ignore:unused_argument
 func _on_defeateddescript_meta_clicked( meta ):
 	var person = get_node("explorationnode/winningpanel/defeateddescript").get_meta('slave')
 	showracedescript(person)
@@ -3349,9 +3333,7 @@ func _on_selloutclose_pressed():
 	get_node("sellout").hide()
 
 
-#warning-ignore:unused_argument
 func _on_sellouttext_meta_clicked( meta ):
-#warning-ignore:return_value_discarded
 	OS.shell_open('https://www.patreon.com/maverik')
 
 
@@ -3409,13 +3391,32 @@ func setname(person):
 	$entertext/confirmentertext.disabled = false
 
 func seteyecolor(person):
-	var text = person.dictionary("Choose new eye color for $name. \n[color=yellow]Requires 40 Mana, 100 Gold, 1 Nature Essence and 2 days.[/color]")
+	var assist
+	for i in globals.slaves:
+		if i.work == 'labassist':
+			assist = i
+			break
+	var priceModifier = 1 / (1+assist.wit/200.0)
+	var timeCost = 0
+	if person == globals.player:
+		priceModifier *= 2
+	else:
+		timeCost = max(round(2/(1+assist.smaf/8.0)),1)
+	if person.race == 'Demon':
+		priceModifier *= 0.7
+	var manaCost = round(40 * priceModifier)
+	var goldCost = round(100 * priceModifier)
+	var text = person.dictionary("Choose new eye color for $name. \n[color=yellow]Requires ") + str(manaCost) + " Mana, "
+	text += str(goldCost) + " Gold, 1 Nature Essence and " + str(timeCost) + " days.[/color]"
 	$entertext.show()
 	$entertext.set_meta('action', 'eyecolor')
 	$entertext.set_meta("slave", person)
+	$entertext.set_meta("manaCost", manaCost)
+	$entertext.set_meta("goldCost", goldCost)
+	$entertext.set_meta("timeCost", timeCost)
 	$entertext/LineEdit.text = person.eyecolor
 	$entertext/dialoguetext.bbcode_text = text
-	if globals.resources.mana < 40 || globals.resources.gold < 100 || globals.itemdict.natureessenceing.amount < 1:
+	if globals.resources.mana < manaCost || globals.resources.gold < goldCost || globals.itemdict.natureessenceing.amount < 1:
 		$entertext/confirmentertext.disabled = true
 	else:
 		$entertext/confirmentertext.disabled = false
@@ -3432,12 +3433,15 @@ func _on_confirmentertext_pressed():
 		rebuild_slave_list()
 	elif meta == 'eyecolor':
 		person = get_node("entertext").get_meta("slave")
+		var manaCost = get_node("entertext").get_meta("manaCost")
+		var goldCost = get_node("entertext").get_meta("goldCost")
+		var timeCost = get_node("entertext").get_meta("timeCost")
 		person.eyecolor = text
 		if person != globals.player:
-			person.away.duration = 2
-		person.away.at = 'lab'
-		globals.resources.gold -= 100
-		globals.resources.mana -= 40
+			person.away.duration = timeCost
+			person.away.at = 'lab'
+		globals.resources.gold -= goldCost
+		globals.resources.mana -= manaCost
 		globals.itemdict.natureessenceing.amount -= 1
 		rebuild_slave_list()
 		$MainScreen/mansion/labpanel._on_labstart_pressed()
@@ -3549,15 +3553,11 @@ func _on_listclose_pressed():
 
 
 
-#warning-ignore:unused_class_variable
 var itemselected
-#warning-ignore:unused_class_variable
 var categoryselected
-#warning-ignore:unused_class_variable
 var inventorymode = 'mainscreen'
 
 
-#warning-ignore:unused_argument
 func _on_inventory_pressed(mode = 'mainscreen'):
 	get_node("inventory").open("mansion")
 #
@@ -3578,7 +3578,6 @@ func _on_inventory_pressed(mode = 'mainscreen'):
 
 
 func _on_wiki_pressed():
-#warning-ignore:return_value_discarded
 	OS.shell_open('http://strive4power.wikia.com/wiki/Strive4power_Wiki')
 
 
@@ -3814,6 +3813,7 @@ func _on_startbutton_pressed():
 	get_node("charlistcontrol").hide()
 	get_node("sexselect").hide()
 	if sexmode == 'meet':
+		$ResourcePanel.hide()
 		$date.initiate(sexslaves[0])
 		return
 	elif sexmode == 'abuse':
@@ -3873,11 +3873,9 @@ func _on_headgirlbehavior_item_selected( ID ):
 	get_node("mansionsettings/Panel/supplykeep").set_value(globals.state.supplykeep)
 	get_node("mansionsettings/Panel/supplykeep/supplybuy").set_pressed(globals.state.supplybuy)
 
-#warning-ignore:unused_argument
 func _on_foodbuy_value_changed( value ):
 	globals.state.foodbuy = get_node("mansionsettings/Panel/foodbuy").get_value()
 
-#warning-ignore:unused_argument
 func _on_supplykeep_value_changed( value ):
 	globals.state.supplykeep = get_node("mansionsettings/Panel/supplykeep").get_value()
 
@@ -3903,9 +3901,7 @@ func _on_selftattoo_pressed():
 
 #Tweens
 
-#warning-ignore:unused_argument
 func tweenanimate(node, name):
-#warning-ignore:unused_variable
 	var pos = node.rect_position
 	var tweennode
 	if node.has_node('tween') == false:
@@ -3924,6 +3920,7 @@ func repeattweenanimate(node, name):
 	var tweennode
 	if node.has_node('reptween') == false:
 		tweennode = tween.duplicate()
+		tweennode.remove_all()
 		tweennode.repeat = true
 		tweennode.name = 'reptween'
 		node.add_child(tweennode)
@@ -3932,10 +3929,11 @@ func repeattweenanimate(node, name):
 	if name == 'stop':
 		tweennode.seek(0)
 		tweennode.set_active(false)
-	if name == 'fairy':
-		var change = 30
-		tweennode.interpolate_property(node, "rect_position", pos, Vector2(pos.x, pos.y-change), 2.5, Tween.TRANS_SINE, Tween.EASE_OUT)
-		tweennode.interpolate_property(node, "rect_position", Vector2(pos.x, pos.y-change), pos, 2.5, Tween.TRANS_SINE, Tween.EASE_OUT, 2.5)
+	elif name == 'fairy':
+		if tweennode.get_runtime() == 0:
+			var change = 30
+			tweennode.interpolate_property(node, "rect_position", pos, Vector2(pos.x, pos.y-change), 2.5, Tween.TRANS_SINE, Tween.EASE_OUT)
+			tweennode.interpolate_property(node, "rect_position", Vector2(pos.x, pos.y-change), pos, 2.5, Tween.TRANS_SINE, Tween.EASE_OUT, 2.5)
 		tweennode.start()
 
 func nodeunfade(node, duration = 0.4, delay = 0):
@@ -3953,6 +3951,9 @@ func traitpanelshow(person, effect):
 	traitaction = effect
 	var text = ''
 	var array = []
+	var timeCost = 0
+	var manaCost = 0
+	var goldCost = 0
 	for i in $traitselect/Container/VBoxContainer.get_children():
 		if i.name != 'Button':
 			i.hide()
@@ -3960,14 +3961,28 @@ func traitpanelshow(person, effect):
 	if effect == 'clearmental':
 		text += person.dictionary("Select mental trait to remove from $name.")
 	elif effect == 'clearphys':
-		text += person.dictionary("Select physical trait  to remove from $name. Requires 1 [color=yellow]Clarity Potion[/color], 100 gold and 3 days.")
+		var assist
+		for i in globals.slaves:
+			if i.work == 'labassist':
+				assist = i
+				break
+		var priceModifier = 1 / (1+assist.wit/200.0)
+		if person == globals.player:
+			priceModifier *= 2
+		else:
+			timeCost = max(round(3/(1+assist.smaf/8.0)),1)
+		if person.race == 'Demon':
+			priceModifier *= 0.7
+		manaCost = round(50 * priceModifier)
+		goldCost = round(100 * priceModifier)
+		text += person.dictionary("Select physical trait to remove from $name. Requires 1 [color=yellow]Clarity Potion[/color], ") + str(manaCost) + " mana, " + str(goldCost) +" gold, and " + timeCost + " days."
 	for i in person.traits:
 		var trait = globals.origins.trait(i)
 		if effect == 'clearmental':
 			if trait.tags.has('mental'):
 				array.append(trait)
 		elif effect == 'clearphys':
-			if globals.itemdict.claritypot.amount < 1 || globals.resources.gold < 100 || globals.resources.mana < 50 || trait.tags.has('physical') == false:
+			if globals.itemdict.claritypot.amount < 1 || globals.resources.gold < goldCost || globals.resources.mana < manaCost || trait.tags.has('physical') == false:
 				continue
 			else:
 				array.append(trait)
@@ -3978,21 +3993,23 @@ func traitpanelshow(person, effect):
 		newnode.text = i.name
 		newnode.connect("mouse_entered", globals, 'showtooltip', [person.dictionary(i.description)])
 		newnode.connect("mouse_exited", globals, 'hidetooltip')
-		newnode.connect("pressed", self, 'traitselect', [person, i])
+		newnode.connect("pressed", self, 'traitselect', [person, i, manaCost, goldCost, timeCost])
 	$traitselect/RichTextLabel.bbcode_text = text
 
-func traitselect(person, i):
-	globals.itemdict.claritypot.amount -= 1
+func traitselect(person, i, manaCost, goldCost, timeCost):
 	person.trait_remove(i.name)
 	$traitselect.hide()
 	globals.hidetooltip()
 	if traitaction == 'clearmental':
+		globals.state.removeStackableItem('claritypot', 1, $inventory.state)
 		$inventory.updateitems()
 	elif traitaction == 'clearphys':
-		$MainScreen/mansion/labpanel.labperson.away.duration = 3
-		$MainScreen/mansion/labpanel.labperson.away.at = 'lab'
-		globals.resources.gold -= 100
-		globals.resources.mana -= 50
+		globals.itemdict.claritypot.amount -= 1
+		if person != globals.player:
+			person.away.duration = timeCost
+			person.away.at = 'lab'
+		globals.resources.gold -= goldCost
+		globals.resources.mana -= manaCost
 		rebuild_slave_list()
 		$MainScreen/mansion/labpanel._on_labstart_pressed()
 

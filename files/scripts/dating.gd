@@ -3,16 +3,21 @@ extends Control
 var location
 var person
 var public = false
+var modFearObed = 1
 var mood = 0.0 setget mood_set,mood_get
 var fear = 0.0 setget fear_set
 var stress = 0.0 setget stress_set
+var fearStart
+var obedStart
+var stressStart
+var loyalStart
+var lustStart
+var learningpointsStart
 var date = false
 var jail = false
 var drunkness = 0.0
 var actionhistory = []
-#warning-ignore:unused_class_variable
 var categories = ['Actions','P&P','Location','Items']
-#warning-ignore:unused_class_variable
 var locationarray = ['livingroom','town','dungeon','garden','bedroom']
 var showntext = '' setget showtext_set,showtext_get
 var turns = 0 setget turns_set,turns_get
@@ -217,15 +222,15 @@ var actionsdict = {
 	castfear = {
 		group = "P&P",
 		name = 'Cast Fear',
-		descript = "Punish $name with Fear spell. \n[color=aqua]Costs " + str(globals.spelldict.fear.manacost) + " mana.[/color]",
-		reqs = "globals.spelldict.fear.learned == true && globals.resources.mana >= globals.spelldict.fear.manacost",
+		descript = "Punish $name with Fear spell. \n[color=aqua]Costs " + str(globals.spells.spellcost(globals.spelldict.fear)) + " mana.[/color]",
+		reqs = "globals.spelldict.fear.learned == true && globals.resources.mana >= globals.spells.spellcost(globals.spelldict.fear)",
 		effect = 'castfear',
 	},
 	castsedate = {
 		group = "P&P",
 		name = 'Cast Sedation',
-		descript = "Use Sedation spell on $name. \n[color=aqua]Costs " + str(globals.spelldict.sedation.manacost) + " mana.[/color]",
-		reqs = "globals.spelldict.sedation.learned == true && globals.resources.mana >= globals.spelldict.sedation.manacost",
+		descript = "Use Sedation spell on $name. \n[color=aqua]Costs " + str(globals.spells.spellcost(globals.spelldict.sedation)) + " mana.[/color]",
+		reqs = "globals.spelldict.sedation.learned == true && globals.resources.mana >= globals.spells.spellcost(globals.spelldict.sedation)",
 		effect = 'castsedate',
 	},
 	
@@ -259,7 +264,7 @@ var actionsdict = {
 	tea = {
 		group = "Items",
 		name = "Drink Tea",
-		descript = "Serve tea for you and $name. Requires 1 supply.",
+		descript = "Serve tea for you and $name. [color=yellow]Requires 1 supply.[/color]",
 		reqs = 'location in ["livingroom","bedroom"]',
 		disablereqs = 'globals.itemdict.supply.amount >= 1',
 		effect = 'tea',
@@ -267,7 +272,7 @@ var actionsdict = {
 	wine = {
 		group = "Items",
 		name = "Drink Wine",
-		descript = "Serve wine for you and $name (Alcohol eases intimacy request but may cause a knockout). Requires 2 supplies",
+		descript = "Serve wine for you and $name (Alcohol eases intimacy request but may cause a knockout). [color=yellow]Requires 2 supplies.[/color]",
 		reqs = 'location in ["livingroom","bedroom","garden","town"]',
 		disablereqs = 'globals.itemdict.supply.amount >= 2',
 		effect = 'wine',
@@ -304,24 +309,16 @@ var locationdicts = {
 var dateclassarray = []
 
 class dateclass:
-#warning-ignore:unused_class_variable
 	var person
-#warning-ignore:unused_class_variable
 	var sex
-#warning-ignore:unused_class_variable
 	var name
-#warning-ignore:unused_class_variable
 	var lust = 0
-#warning-ignore:unused_class_variable
 	var lube = 0
-#warning-ignore:unused_class_variable
 	var sens = 0 
 
 func _ready():
 	for i in helpdescript:
-#warning-ignore:return_value_discarded
 		get_node(i).connect("mouse_entered",globals,'showtooltip',[helpdescript[i]])
-#warning-ignore:return_value_discarded
 		get_node(i).connect("mouse_exited",globals,'hidetooltip')
 
 func initiate(tempperson):
@@ -341,6 +338,8 @@ func initiate(tempperson):
 	
 	
 	person = tempperson
+	if person.race == 'Human':
+		modFearObed = 1.5
 	var newclass = dateclass.new()
 	newclass.sex = person.sex
 	newclass.name = person.name_short()
@@ -358,6 +357,12 @@ func initiate(tempperson):
 	
 	self.stress = person.stress
 	self.fear = person.fear
+	self.obedStart = person.obed
+	self.fearStart = person.fear
+	self.stressStart = person.stress
+	self.loyalStart = person.loyal
+	self.lustStart = person.lust
+	self.learningpointsStart = person.learningpoints
 	self.turns = 10
 	$fullbody.set_texture(null)
 	if nakedspritesdict.has(person.unique):
@@ -451,9 +456,10 @@ func selectcategory(button):
 	updatelist()
 
 func endencounter():
-	var text = calculateresults()
-	$end/RichTextLabel.bbcode_text = text
-	$end.visible = true
+	if $sexswitch.visible == false && $end.visible == false:
+		var text = calculateresults()
+		$end/RichTextLabel.bbcode_text = text
+		$end.visible = true
 
 func updatelist():
 	for i in $panel/ScrollContainer/GridContainer.get_children():
@@ -556,7 +562,6 @@ func checkhistory(action):
 			counter += 1
 	return counter
 
-#warning-ignore:unused_argument
 func chat(person, counter):
 	var text = ''
 	text += "You attempt to initiate a friendly chat with [name2]. "
@@ -655,7 +660,6 @@ func hug(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func kiss(person, counter): 
 	var text = ''
 	text += "You gently kiss [name2] on the cheek. "
@@ -670,7 +674,6 @@ func kiss(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func frenchkiss(person, counter): 
 	var text = ''
 	text += "You invade [name2]'s mouth with your tongue. "
@@ -689,7 +692,6 @@ func frenchkiss(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func pushdown(person, counter):
 	var text = ''
 	var mode
@@ -710,7 +712,6 @@ func pushdown(person, counter):
 	showsexswitch(text,mode)
 	return text
 
-#warning-ignore:unused_argument
 func propose(person, counter):
 	var text = ''
 	var mode
@@ -752,7 +753,6 @@ func propose(person, counter):
 
 var sexmode
 
-#warning-ignore:unused_argument
 func showsexswitch(text, mode):
 	$sexswitch.visible = true
 	sexmode = mode
@@ -792,7 +792,6 @@ func praise(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func pathead(person, counter):
 	var text = ''
 	text += "You pat [name2]'s head and praise [him2] for [his2] recent behavior. "
@@ -806,13 +805,11 @@ func pathead(person, counter):
 		self.mood -= 1
 	return text
 
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func scold(person, counter):
 	var text = ''
 	text += "You scold [name2] for [his2] recent faults. "
 	self.mood -= 2
-	self.fear += 7
+	self.fear += 7 * modFearObed
 	
 	text += punishaddedeffect()
 	return text
@@ -827,7 +824,7 @@ func punishaddedeffect():
 		self.mood += 3
 		self.stress -= 5
 	if person.traits.has("Coward"):
-		self.fear += 5
+		self.fear += 5 * modFearObed
 		text += "[Coward][name2] reacts strongly to your aggression. "
 	if public == true:
 		var slavearray = []
@@ -838,54 +835,48 @@ func punishaddedeffect():
 			text += "\n\n[color=yellow]Invited slaves watch over [name2] in awe. [/color] "
 			self.stress += 4
 			for i in slavearray:
-				i.fear += 3
+				if i.race == 'Human':
+					i.fear += 6
+				else:
+					i.fear += 3
 				i.stress += 3
 				if actionhistory.back() in ['woodenhorse','flagellate']:
 					i.lust += 2
-	
-	
 	return text
 
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func slap(person, counter):
 	var text = ''
 	text += "You slap [name2] across the face as punishment. [his2] cheek gets red. "
-	self.fear += 6
+	self.fear += 6 * modFearObed
 	self.mood -= 2
 	text += punishaddedeffect()
 	return text
 
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func flag(person, counter):
 	var text = ''
 	text += "You put [name2] on the punishment table, and after exposing [his2] rear, punish it with force. "
 	
-	self.fear += 9
+	self.fear += 9 * modFearObed
 	self.mood -= 3
 	
 	text += punishaddedeffect()
 	return text
 
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func whip(person, counter):
 	var text = ''
 	text += "You put [name2] on the punishment table, and after exposing [his2] rear, whip it with force. "
 	
-	self.fear += 11
+	self.fear += 11 * modFearObed
 	self.mood -= 3
 	
 	text += punishaddedeffect()
 	return text
 
-#warning-ignore:unused_argument
 func horse(person, counter):
 	var text = ''
 	text += "You tie [name2] securely to the wooden horse with [his2] legs spread wide. [he2] cries with pain under [his2] own weight. "
 	
-	self.fear += 12
+	self.fear += 12 * modFearObed
 	self.mood -= 4
 	person.lust += rand_range(5,10)
 	
@@ -893,13 +884,11 @@ func horse(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func wax(person, counter):
 	var text = ''
 	text += "You put [name2] on the punishment table and after exposing [his2] body you drip hot wax over it making [him2] cry with pain. "
 	
-	self.fear += 11
+	self.fear += 11 * modFearObed
 	self.mood -= 3
 	
 	text += punishaddedeffect()
@@ -928,7 +917,6 @@ func teach(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func gift(person, counter):
 	var text = ''
 	text += "You present [name2] with a small decorative gift. "
@@ -947,7 +935,6 @@ func gift(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func sweets(person, counter):
 	var text = ''
 	text += "You purchase some candies for [name2] from a local vendor. "
@@ -967,7 +954,6 @@ func sweets(person, counter):
 	return text
 
 
-#warning-ignore:unused_argument
 func tea(person, counter):
 	var text = ''
 	text += "You serve tea for you and [name2]. While drinking, you both chatand get a bit closer.  "
@@ -1007,7 +993,6 @@ func wine(person, counter):
 	
 	return text
 
-#warning-ignore:unused_argument
 func castfear(person, counter):
 	var text = ''
 	var spell = globals.spelldict.fear
@@ -1018,7 +1003,6 @@ func castfear(person, counter):
 	updatebars()
 	return text
 
-#warning-ignore:unused_argument
 func castsedate(person, counter):
 	var text = ''
 	var spell = globals.spelldict.sedation
@@ -1030,10 +1014,6 @@ func castsedate(person, counter):
 	return text
 
 
-
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func public(person, counter):
 	var text = ''
 	public = !public
@@ -1047,9 +1027,6 @@ func updatebars():
 	self.fear = person.fear
 	self.stress = person.stress
 
-
-#warning-ignore:unused_argument
-#warning-ignore:unused_argument
 func stop(person, counter):
 	var text = ''
 	turns = 1
@@ -1061,20 +1038,29 @@ func drunkness():
 		endencounter()
 		$end/RichTextLabel.bbcode_text += decoder('\n\n[color=yellow][name2] has passed out from alcohol overdose. [/color]')
 
+func strChange(value):
+	if value > 0:
+		return "+" + str(round(value))
+	else:
+		return str(round(value))
+
 func calculateresults():
 	var text = ''
 	globals.hidetooltip()
-	var tempfear = 0
-	var loyal = 0
-	var obed = 0
-	tempfear = fear
-	if person.race == 'Human':
-		mood *= 1.5
-		tempfear *= 1.5
-	loyal = 2+(mood/10)
-	obed = mood/1.5
-	text += "\nFinal results: "
-	text += "\nFear: " + str(floor(tempfear)) + "\nLoyalty: " + str(floor(loyal)) + "\nObedience: " + str(floor(obed))
+	var tempfear = fear
+	var loyal = 2 + (mood / 10)
+	var obed = mood / 1.5 * modFearObed
+	self.fearStart = person.fear - self.fearStart
+	self.obedStart = person.obed - self.obedStart
+	self.stressStart = person.stress - self.stressStart
+	self.loyalStart = person.loyal + loyal - self.loyalStart
+	self.lustStart = person.lust - self.lustStart
+	self.learningpointsStart = person.learningpoints - self.learningpointsStart
+	text += "\nMood Bonus: "
+	text += "\nObedience: " + strChange(obed) + "\nLoyalty: " + strChange(loyal)
+	text += "\n\nFinal results: "
+	text += "\nFear: " + strChange(self.fearStart) + "\nObedience: " + strChange(obed) + "\nStress: " + strChange(self.stressStart)
+	text += "\nLoyalty: " + strChange(self.loyalStart) + "\nLust: " + strChange(self.lustStart) + "\nLearning Points: " + strChange(self.learningpointsStart)
 	var dict = {loyal = loyal, obed = obed}
 	
 	for i in dict:
@@ -1092,7 +1078,8 @@ func _on_cancelsex_pressed():
 	$sexswitch.visible = false
 
 func _on_confirmsex_pressed():
-	calculateresults()
+	if $sexswitch/cancelsex.visible == true:
+		calculateresults()
 	self.visible = false
 	get_parent().sexmode = 'sex'
 	get_parent().sexslaves = [person]
