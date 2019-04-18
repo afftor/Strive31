@@ -99,9 +99,6 @@ func _on_labstart_pressed(selected = null):
 	if globals.state.mansionupgrades.mansionlab < 2:
 		$labmodpanel/ScrollContainer/primalmodlist/traitremove.disabled = true
 		$labmodpanel/ScrollContainer/primalmodlist/traitremove.hint_tooltip = 'Requires Laboratory Upgrade 2'
-	else:
-		$labmodpanel/ScrollContainer/primalmodlist/traitremove.disabled = false
-		$labmodpanel/ScrollContainer/primalmodlist/traitremove.hint_tooltip = ''
 	get_node("labmodpanel/modificationtext").set_bbcode(text)
 
 
@@ -467,10 +464,13 @@ func modchosen(dict= {}, string = '', selected=''):
 			text = "$names already possess " + selected.capitalize().replace('None', 'no') + ' ' +  string + '.'
 		else:
 			text = "Change $name's " + string + ' to ' + selected.capitalize() + '? Currently $he has ' + person[string].capitalize().replace('None', 'no') + ' ' + string + '. \nRequirements: \n' 
+			var priceModifier = 1 / (1+assist.wit/200.0)
+			if person == globals.player:
+				priceModifier *= 2
+			if person.race == 'Demon':
+				priceModifier *= 0.7
 			for i in modification.price:
-				modification.price[i] = round(modification.price[i]/(1+assist.wit/200.0))
-				if person == globals.player:
-					modification.price[i] = modification.price[i]*2
+				modification.price[i] = round(modification.price[i] * priceModifier)
 				if globals.resources[i] >= modification.price[i]:
 					text = text + '[color=yellow]'+str(i) + '[/color] - [color=green]' + str(modification.price[i]) + '[/color], \n'
 				else:
@@ -486,9 +486,10 @@ func modchosen(dict= {}, string = '', selected=''):
 				else:
 					allow = false
 					text = text + item.name + ' - [color=red]' + str(modification.items[i]) + '[/color], \n'
-			modification.time = max(round(modification.time/(1+assist.smaf/20.0)),1)
 			if person == globals.player:
 				modification.time = 0
+			else:
+				modification.time = max(round(modification.time/(1+assist.smaf/15.0)),1)
 			text = text + 'Required time - ' + str(modification.time) + globals.fastif(modification.time == 1, ' day',' days')+'. ' 
 	
 	if allow == true:
@@ -573,28 +574,31 @@ func customenh(dict, action):
 	
 	
 	
+	var priceModifier = 1 / (1+assist.wit/200.0)
+	if person == globals.player:
+		priceModifier *= 2
+	if person.race == 'Demon':
+		priceModifier *= 0.7
 	for i in modification.data[action].price:
-		modification.data[action].price[i] = round(modification.data[action].price[i]/(1+assist.wit/200.0))
-		if person == globals.player:
-			modification.data[action].price[i] = modification.data[action].price[i]*2
+		modification.data[action].price[i] = round(modification.data[action].price[i] * priceModifier)
 		if globals.resources[i] >= modification.data[action].price[i]:
 			text = text + str(i) + ' - [color=green]' + str(modification.data[action].price[i]) + '[/color], \n'
 		else:
 			allow = false
 			text = text + str(i) + ' - [color=red]' + str(modification.data[action].price[i]) + '[/color], \n'
 	for i in modification.data[action].items:
-		modification.data[action].items[i] = round(modification.data[action].items[i]/(1+assist.wit/200.0))
-		if person == globals.player:
-			modification.data[action].items[i] = modification.data[action].items[i]*2
+		modification.data[action].items[i] = round(modification.data[action].items[i] * priceModifier)
 		var item = globals.itemdict[i]
 		if item.amount >= modification.data[action].items[i]:
 			text = text + item.name + ' - [color=green]' + str(modification.data[action].items[i]) + '[/color], \n'
 		else:
 			allow = false
 			text = text + item.name + ' - [color=red]' + str(modification.data[action].items[i]) + '[/color], \n'
-	modification.data[action].time = max(round(modification.data[action].time/(1+assist.smaf*4)),1)
+	
 	if person == globals.player:
 		modification.data[action].time = 0
+	else:
+		modification.data[action].time = max(round(modification.data[action].time/(1+assist.smaf/8.0)),1)
 	text = text + 'Required time - ' + str(modification.data[action].time) + globals.fastif(modification.data[action].time == 1, ' day',' days')+'. ' 
 	
 	if allow == true:
@@ -623,8 +627,9 @@ func _on_labconfirm_pressed():
 		person[operation.target] = result
 		get_tree().get_current_scene().rebuild_slave_list()
 		get_node("labmodpanel").visible = false
-		person.away.duration = operation.time
-		person.away.at = 'lab'
+		if person != globals.player:
+			person.away.duration = operation.time
+			person.away.at = 'lab'
 		person.stress += rand_range(70,95) - person.loyal/3
 		person.health -= rand_range(person.stats.health_max/8,person.stats.health_max/4)
 		for i in operation.price:
@@ -699,8 +704,9 @@ func _on_labconfirm_pressed():
 			else:
 				person.beautybase += 20
 	if operation.type == 'custom':
-		person.away.duration = operation.data[result].time
-		person.away.at = 'lab'
+		if person != globals.player:
+			person.away.duration = operation.data[result].time
+			person.away.at = 'lab'
 		person.stress += rand_range(70,95) - person.loyal/3
 		person.health -= rand_range(person.stats.health_max/8,person.stats.health_max/4)
 		for i in operation.data[result].price:

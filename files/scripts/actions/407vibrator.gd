@@ -12,13 +12,13 @@ const virginloss = true
 const giverconsent = 'basic'
 const takerconsent = 'any'
 const givertags = ['pet', 'noorgasm']
-const takertags = ['pussy']
+const takertags = ['pet','vagina']
 
 func getname(state = null):
 	return "Vibrator"
 
 func getongoingname(givers, takers):
-	return "[name1] put vibrator[s/1] in [names2] vagina."
+	return "[name1] put [a /2]vibrator[/s2] in [names2] vagina[/s2]."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -62,11 +62,11 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] {^push:place:shove:stick}[s/1] a vibrator into [names2] {^pussy:fuck hole:front door:vagina}[/s1]"]
+	temparray += ["[name1] {^push:place:shove:stick}[s/1] [a /2]vibrator[/s2] into [names2] {^pussy:fuck hole:front door:vagina}[/s2]"]
 #	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()
-	temparray += [", {^stimulating:teasing} it."]
+	temparray += [", {^stimulating:teasing} [it2]."]
 #	temparray += [", {^lightly:gently} {^nibbling at:stimulating} them with [his1] teeth."]
 #	temparray += [", {^greedily slurping at them:nursing} like [a /1]bab[y/ies1]."]
 	text += temparray[randi()%temparray.size()]

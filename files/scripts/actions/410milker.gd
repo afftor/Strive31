@@ -11,14 +11,14 @@ const takerpart = 'acc5'
 const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
-const givertags = ['pet','noorgasm']
+const givertags = ['noorgasm']
 const takertags = ['tits']
 
 func getname(state = null):
 	return "Milker"
 
 func getongoingname(givers, takers):
-	return "[name1] put milker[s/1] on [names2] nipples."
+	return "[name1] put [a /2]milker[/s2] on [names2] nipples."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -61,7 +61,7 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] {^place:shove:stick}[s/1] the milker on [names2] nipples"]
+	temparray += ["[name1] {^place:shove:stick}[s/1] [a /2]milker[/s2] on [names2] nipples"]
 #	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()

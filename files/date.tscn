@@ -22,6 +22,7 @@
 [ext_resource path="res://files/buttons/mana.png" type="Texture" id=20]
 [ext_resource path="res://files/images/items/supply.png" type="Texture" id=21]
 [ext_resource path="res://files/buttons/mainscreen/gold.png" type="Texture" id=22]
+[ext_resource path="res://files/buttons/outside/bar.png" type="Texture" id=23]
 
 [sub_resource type="ShaderMaterial" id=1]
 render_priority = 1
@@ -159,12 +160,20 @@ expand = true
 
 [node name="Label" type="Label" parent="textfield"]
 margin_left = 317.0
-margin_top = -360.0
+margin_top = -356.0
 margin_right = 629.0
 margin_bottom = -302.0
 custom_fonts/font = ExtResource( 9 )
 text = "Test"
 align = 1
+
+[node name="TextureRect" type="TextureRect" parent="textfield/Label" index="0"]
+margin_left = -20.0
+margin_top = -2.0
+margin_right = 332.0
+margin_bottom = 56.0
+texture = ExtResource( 23 )
+expand = true
 
 [node name="panel" type="Panel" parent="."]
 margin_left = 4.0

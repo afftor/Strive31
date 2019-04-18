@@ -17,7 +17,7 @@ func getname(state = null):
 	return "Face sitting"
 
 func getongoingname(givers, takers):
-	return "[name1] sits on [names2] face."
+	return "[name1] sit[s/1] on [names2] face[/s2]."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -62,7 +62,7 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] {^place:shove:stick}[s/1] bottom parts on [names2] face and mouth."]
+	temparray += ["[name1] {^place:shove:stick}[s/1] [his1] intimate parts on [names2] face[/s2] and mouth[/es2]."]
 #	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()

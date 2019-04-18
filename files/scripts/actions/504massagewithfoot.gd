@@ -5,19 +5,19 @@ const code = 'massagefoot'
 var givers
 var takers
 const canlast = true
-const giverpart = ''
-const takerpart = 'feet'
+const giverpart = 'feet'
+const takerpart = ''
 const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
 const givertags = ['pet','noorgasm']
-const takertags = ['shame', 'punish']
+const takertags = ['pet','shame', 'punish']
 
 func getname(state = null):
 	return "Massage with foot"
 
 func getongoingname(givers, takers):
-	return "[name1] steps on [names2] giving a humiliating massage."
+	return "[name1] step[s/1] on [name2] giving a humiliating massage."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -65,7 +65,7 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] steps on [names2] shamefully massaging them."]
+	temparray += ["[name1] step[s/1] on [name2] shamefully massaging [him2]."]
 #	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()

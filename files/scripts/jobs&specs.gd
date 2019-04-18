@@ -288,7 +288,7 @@ geisha = {
 name = "Geisha",
 code = 'geisha',
 descript = "A Geisha is an adept of love. They are trained to please both men and women, not only with sex but also in companionship. They are genuinely pleasant to have around as they try their best to feel what a potential partner might want. ",
-descriptbonus = "+25% to escort and prostitution, no penalties for same-sex, opposite dominance or perverted actions",
+descriptbonus = "+25% gold and half stress from escort and prostitution, no penalties for same-sex, opposite dominance or perverted actions",
 descriptreqs = "Charm 75+, Beauty 60+, grade Commoner or above, unlocked sex.",
 reqs = "person.charm >= 75 && person.beautybase >= 60 && !person.origins in ['slave','poor'] && person.consent == true"
 },
@@ -304,7 +304,7 @@ executor = {
 name = "Executor",
 code = 'executor',
 descript = "Executors are trained to work with people in a most efficient way. Their commands are always straight and on-point and their attitude is met with respect. ",
-descriptbonus = "Management-related tasks ignore confidence (will always count as 100). Obedience can't drop below 50.",
+descriptbonus = "At least 100 confidence for Management-related tasks. Obedience can't drop below 50.",
 descriptreqs = "Conf 75+, Wit 50+, grade Rich or above",
 reqs = "person.conf >= 75 && person.wit >= 50 && person.origins in ['rich', 'noble']"
 },
@@ -344,7 +344,7 @@ nympho = {
 name = "Nympho",
 code = 'nympho',
 descript = "Nymphos devote their life entirely to the lewdness. They are ready for anything and everything and want more. It's common practice to make such slaves into tools and toys for their owners. ",
-descriptbonus = "Sex actions take only half energy, + 2 mana from sex actions, + 25% to fucktoy, no penalties from any sex activities. ",
+descriptbonus = "+1 mana from sex actions, +25% to fucktoy, half stress from other sexual jobs, no penalties from any sex activities.",
 descriptreqs = "Grade: Commoner and below, Unlocked sex, Charm and Courage 50+ ",
 reqs = "person.origins in ['slave','poor','commoner'] && person.consent == true && person.cour >= 50 && person.charm >= 50"
 },
@@ -352,7 +352,7 @@ merchant = {
 name = "Merchant",
 code = 'merchant',
 descript = "People with a talent for bargains, not only profitable to keep around, but also good at connecting with others. ",
-descriptbonus = "Bonus shopping activities, bonus item selling while in party 25% (does not stack). ",
+descriptbonus = "Bonus to market job, 25% bonus to non-gear item selling while in party (does not stack).",
 descriptreqs = "Wit and Charm 50+ ",
 reqs = "person.wit >= 50 && person.charm >= 50"
 },
@@ -360,8 +360,8 @@ tamer = {
 name = "Tamer",
 code = 'tamer',
 descript = "Tamers are trained to work with wild animals and savagely behaving individuals. By utilizing many simple lessons they will eventually bring their true potential out of those. ",
-descriptbonus = "Uncivilized races more obedient and can lose that trait while a Tamer is resting, managing or working on the same occupation. ",
-descriptreqs = "Confidence and charm 50+, Grade: Commoner and above",
+descriptbonus = "Uncivilized races become more obedient and can lose that trait while a Tamer is resting, managing or working on the same occupation. ",
+descriptreqs = "Confidence and charm 50+, Grade: Commoner and above, not Uncivilized",
 reqs = "person.conf >= 50 && person.charm >= 50 && person.origins in ['commoner','rich','noble'] && !person.traits.has('Uncivilized')"
 },
 }
@@ -395,10 +395,10 @@ func vacation(person):
 	person.levelup()
 
 func itemlevelup(person):
-	if globals.itemdict[person.levelupreqs.value].amount < 1:
+	if globals.state.getCountStackableItem(person.levelupreqs.value) < 1:
 		globals.get_tree().get_current_scene().popup(person.dictionary("Sadly, you have no available " + globals.itemdict[person.levelupreqs.value].name + " in possession. "))
 	else:
-		globals.itemdict[person.levelupreqs.value].amount -= 1
+		globals.state.removeStackableItem(person.levelupreqs.value)
 		globals.get_tree().get_current_scene().popup(person.dictionary("You gift $name " + globals.itemdict[person.levelupreqs.value].name + ". After returning a surprised look, $he whole-heartedly shows $his gratitude"))
 		person.levelup()
 
@@ -458,14 +458,14 @@ func multitemlevelup(person):
 	var hasitems = true
 	for i in person.levelupreqs.value:
 		for k in i:
-			if globals.itemdict[k].amount < i[k]:
+			if globals.state.getCountStackableItem(k) < i[k]:
 				hasitems = false
 	if hasitems == false:
 		globals.get_tree().get_current_scene().popup("Sadly, you don't have all required items in your possessions. ")
 	else:
 		for i in person.levelupreqs.value:
 			for k in i:
-				globals.itemdict[k].amount -= i[k]
+				globals.state.removeStackableItem(k,i[k])
 		globals.get_tree().get_current_scene().popup(person.dictionary("You gift $name an assortment of items. After returning a surprised look, $he whole-heartedly shows $his gratitude"))
 		person.levelup()
 
@@ -555,7 +555,7 @@ func forage(person):
 	if person.smaf * 3 + 2 >= rand_range(0,100):
 		text += "$name has found nature's essence. \n"
 		globals.itemdict.natureessenceing.amount += 1
-	food = round(min(food, (person.sstr+person.send)*20+25))
+	food = min(food, (person.sstr+person.send)*20+25)
 	if person.spec == 'ranger':
 		food *= 1.25
 	food = round(food)
@@ -575,9 +575,9 @@ func hunt(person):#agility, strength, endurance, courage
 		food = food*1.3
 	if person.spec in ['ranger','trapper']:
 		food *= 1.25
+	food = round(min(food, (person.sstr+person.send)*30+40))
 	globals.itemdict.supply.amount += round(food/12)
 	person.xp += food/7
-	food = min(food, (person.sstr+person.send)*30+40)
 	text += "In the end $he brought [color=aqua]" + str(round(food)) + "[/color] food and [color=yellow]" + str(round(food/12)) + "[/color] supplies. \n"
 	if person.smaf * 3 + 3 >= rand_range(0,100):
 		text += "$name has found bestial essence. \n"
@@ -589,8 +589,8 @@ func hunt(person):#agility, strength, endurance, courage
 func library(person):
 	var text = "$name spends $his time studying in the library.\n"
 	if person.race == 'Gnome':
-		person.xp += max((30 + 5*globals.state.mansionupgrades.mansionlibrary + person.wit/12) - (person.level-1)*8,0)
-		person.learningpoints += ceil(((person.wit/20)+globals.state.mansionupgrades.mansionlibrary)*2)
+		person.xp += 2 * max((15 + 5*globals.state.mansionupgrades.mansionlibrary + person.wit/12) - (person.level-1)*8,0)
+		person.learningpoints += ceil(2 * (person.wit/20 + globals.state.mansionupgrades.mansionlibrary))
 	else:
 		person.xp += max((15 + 5*globals.state.mansionupgrades.mansionlibrary + person.wit/12) - (person.level-1)*8,0)
 		person.learningpoints += ceil(person.wit/20)+globals.state.mansionupgrades.mansionlibrary
@@ -601,12 +601,13 @@ func library(person):
 
 func nurse(person):
 	var text = "$name is taking care of residents' health.\n"
-	
-	globals.player.health += person.wit/15+person.smaf*3
+	if globals.player.health < globals.player.health_max:
+		globals.player.health += person.wit/15+person.smaf*3
+		person.xp += rand_range(1,3)
 	for i in globals.slaves:
 		if i.away.duration == 0 && i.health < i.stats.health_max:
 			if globals.itemdict.supply.amount > 0:
-				i.health += person.wit/25+person.smaf*2
+				i.health += person.wit/25+person.smaf*3
 			else:
 				i.health += person.wit/35+person.smaf*3
 			person.xp += rand_range(1,3)
@@ -656,8 +657,8 @@ func ffprostitution(person):
 	if rand_range(1,10) > 4:
 		globals.impregnation(person)
 	var counter = 0
-	gold = rand_range(1,5) + person.charm/4 + person.send*15 + person.beauty/5 + person.lewdness/2
-	if person.traits.has('Sex-crazed') == true || person.traits.has('Fickle'):
+	gold = rand_range(1,5) + max(5, person.charm/4 + person.send*15 + person.lewdness/2) + person.beauty/5
+	if person.traits.has('Sex-crazed') == true || person.traits.has('Fickle') == true:
 		person.stress += -counter*4
 		gold = gold*1.2
 	if person.mods.has("augmenttongue"):
@@ -756,7 +757,7 @@ func fucktoy(person):
 
 func slavecatcher(person):
 	var text = "$name spent the day helping Gorn's slavers to acquire and transport slaves. \n"
-	var gold = person.sstr*rand_range(5,10) + person.sagi*rand_range(5,10) + person.cour/4
+	var gold = max(5, person.sstr*rand_range(5,10) + person.sagi*rand_range(5,10) + person.cour/4)
 	person.xp += gold/6
 	text += "In the end $he made [color=yellow]" + str(round(gold)) + "[/color] gold\n"
 	person.stress += rand_range(5,15)
@@ -765,52 +766,39 @@ func slavecatcher(person):
 	return dict
 
 func storewimborn(person):
-	var text
-	var gold
+	var text = "$name worked at the local market. "
 	var bonus = 1
-	var supplyprice = round(rand_range(3,4))
-	var supplysold
-	text = "$name worked at the local market. "
-	gold = rand_range(1,5) + (person.charm + person.wit)/3
-	gold = gold*(min(0.30*(globals.originsarray.find(person.origins)+1),1))
+	var supplyPrice = round(rand_range(3,4))
 	if person.race.find("Tanuki")>= 0:
-		bonus = bonus + 0.3
-		supplyprice += 1
+		bonus += 0.3
+		supplyPrice += 1
 	if person.traits.has('Pretty voice') == true:
-		bonus = bonus + 0.2
+		bonus += 0.2
 	elif person.traits.has('Foul Mouth') == true:
-		bonus = bonus - 0.3
+		bonus -= 0.3
 	if person.spec == 'merchant':
 		bonus += 0.3
-		supplyprice += 1
-	gold = round(gold*bonus)
-	supplysold = floor(gold/supplyprice)
-	if globals.itemdict.supply.amount-globals.state.supplykeep >= supplysold:
-		gold = supplysold*supplyprice
-		globals.itemdict.supply.amount -= supplysold
-	elif globals.state.supplybuy == true && globals.itemdict.supply.amount < globals.state.supplykeep:
-		gold = ((gold-supplysold*supplyprice)*0.5) + (supplysold*supplyprice)
-		var purchaseamount = globals.state.supplykeep - globals.itemdict.supply.amount
-		var counter = 0
-		supplysold = 0
-		while purchaseamount > 0 && gold >= 5:
-			counter += 1
-			gold -= 5
-			purchaseamount -= 1
-			globals.itemdict.supply.amount += 1
-		text += "With the money earned $he purchased " + str(counter) + ' supply units. '
-	else:
-		supplysold = globals.itemdict.supply.amount - globals.state.supplykeep
-		gold = ((gold-supplysold*supplyprice)*0.5) + (supplysold*supplyprice)
-		globals.itemdict.supply.amount -= supplysold
-	if supplysold > 0:
-		text += "$He managed to sell [color=yellow]" + str(supplysold) + "[/color] units of supplies. "
-	person.metrics.goldearn += gold
+		supplyPrice += 1
+	var gold = rand_range(1,5) + (person.charm + person.wit) / 2
+	gold = round(gold * min(0.30 * (globals.originsarray.find(person.origins) + 1), 1) * bonus)
+
+	var supplySold = min(floor(gold / supplyPrice), globals.itemdict.supply.amount - globals.state.supplykeep)
+	if supplySold > 0:
+		gold += supplySold * supplyPrice / 3
+		globals.itemdict.supply.amount -= supplySold
+		text += "$He managed to sell [color=yellow]" + str(supplySold) + "[/color] units of supplies. "
+	elif globals.state.supplybuy == true && supplySold < 0:
+		supplySold = min(floor(gold / 5), -supplySold)
+		gold -= 5 * supplySold
+		globals.itemdict.supply.amount += supplySold
+		text += "With the money earned $he purchased [color=yellow]" + str(supplySold) + "[/color] supply units. "
+		supplySold = -supplySold
+
 	gold = round(gold)
-	person.xp += gold/4
+	person.xp += gold / 4
 	person.stress += rand_range(5,10)
 	text = text + "$He earned "+str(gold)+" gold by the end of day.\n"
-	var dict = {text = text, gold = gold, supplies = -supplysold}
+	var dict = {text = text, gold = gold, supplies = -supplySold}
 	return dict
 
 func assistwimborn(person):
@@ -818,7 +806,7 @@ func assistwimborn(person):
 	var gold
 	text = "$name worked at the Mage's Order.\n"
 	gold = rand_range(1,5) + person.smaf*15 + person.wit/4 + min(globals.state.reputation.wimborn/1.5,50)
-	gold = round(gold)
+	gold = round(max(5, gold))
 	person.xp += gold/5
 	person.stress += rand_range(5,10)
 	text = text + "$He earned [color=yellow]"+str(gold)+"[/color] gold by the end of day.\n"
@@ -829,7 +817,7 @@ func artistwimborn(person):
 	var text
 	var gold
 	text ="$name worked in town as a public entertainer.\n"
-	gold = rand_range(1,5) + person.cour/7 + person.charm/4 + person.sagi*20 + person.beauty/3
+	gold = rand_range(1,5) + max(5, person.cour/7 + person.charm/4 + person.sagi*20) + person.beauty/3
 	if person.race == 'Nereid':
 		gold = gold*1.25
 	if person.traits.has('Pretty voice') == true:
@@ -860,8 +848,8 @@ func whorewimborn(person):
 	if rand_range(1,10) > 4:
 		globals.impregnation(person)
 	var counter = 0
-	gold = rand_range(1,5) + person.charm/4 + person.send*15 + person.beauty/5 + person.lewdness/2
-	if person.traits.has('Sex-crazed') == true || person.traits.has('Fickle'):
+	gold = rand_range(1,5) + max(5, person.charm/4 + person.send*15 + person.lewdness/2) + person.beauty/5
+	if person.traits.has('Sex-crazed') == true || person.traits.has('Fickle') == true:
 		person.stress += -counter*4
 		gold = gold*1.2
 	if person.mods.has("augmenttongue"):
@@ -900,15 +888,15 @@ func escortwimborn(person):
 			person.stress += 15
 		person.loyal += rand_range(-1,-3)
 		text += "$His virginity was taken by one of the customers.\n"
-	if person.race.find('Bunny') >= 0 || person.spec in ['nympho', 'geisha']:
-		person.stress += 10 - person.lewdness/10
+	if person.race.find('Bunny') >= 0 || person.spec in ['geisha','nympho']:
+		person.stress += 10 - person.lewdness/5
 	else:
 		person.stress += 20 - person.lewdness/10
 	person.lust -= rand_range(10,20)
 	person.lastsexday = globals.resources.day
 	if rand_range(1,10) > 7:
 		globals.impregnation(person)
-	gold = rand_range(15,35) + person.charm/1.8 + person.conf/3 + person.beauty/3 + min(globals.state.reputation.wimborn,60)
+	gold = rand_range(15,35) + person.conf/3 + person.beauty/3 + max(5, person.charm/1.8 + min(globals.state.reputation.wimborn,60))
 	if person.traits.has('Pretty voice') == true:
 		gold = gold*1.2
 	elif person.traits.has('Foul Mouth') == true:

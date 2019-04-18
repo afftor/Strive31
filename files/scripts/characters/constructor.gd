@@ -1,6 +1,5 @@
 extends Node
 
-#warning-ignore:unused_class_variable
 var person
 
 func getrandomsex(person):
@@ -12,7 +11,6 @@ func getrandomsex(person):
 		person.sex = 'female'
 
 func getage(age):
-#warning-ignore:unused_variable
 	var temp
 	var agearray = ['teen']
 	if globals.rules.children == true:
@@ -27,9 +25,7 @@ func getage(age):
 
 
 func newslave(race, age, sex, origins = 'slave'):
-#warning-ignore:unused_variable
 	var temp
-#warning-ignore:unused_variable
 	var temp2
 	var person = globals.person.new()
 	if race == 'randomcommon':
@@ -122,7 +118,7 @@ func get_caste(person, caste):
 		person.cour -= rand_range(5,15)
 		person.conf -= rand_range(5,15)
 		person.wit -= rand_range(5,15)
-		person.charm += rand_range(-5,15)
+		person.charm -= rand_range(5,15)
 		person.beautybase = rand_range(10,50)
 		if rand_range(0,10) >= 8:
 			person.level += round(rand_range(0,2))
@@ -138,7 +134,7 @@ func get_caste(person, caste):
 		person.cour += rand_range(5,20)
 		person.conf += rand_range(5,25)
 		person.wit += rand_range(5,20)
-		person.charm += rand_range(-5,15)
+		person.charm += rand_range(5,25)
 		person.beautybase = rand_range(35,75)
 		person.stats.obed_mod -= 0.2
 		if rand_range(0,10) >= 5:

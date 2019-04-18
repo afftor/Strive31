@@ -346,8 +346,8 @@ func names(group):
 				text += ', '
 			elif takers.find(i) == takers.size()-2:
 				text += ' and '
-	if group.size() > 1 or (group.size() > 0 && group[0].person != globals.player):
-		text += "'s"
+		if i.person != globals.player:
+			text += "'s"
 	return text
 
 #no recursive functions allowed in godot so this looks semi-horrible, but whatever

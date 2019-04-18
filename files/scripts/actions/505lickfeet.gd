@@ -10,14 +10,14 @@ const takerpart = 'mouth'
 const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
-const givertags = ['pet','noorgasm']
+const givertags = ['noorgasm']
 const takertags = ['shame', 'punish', 'mouth','noorgasm']
 
 func getname(state = null):
-	return "Lick feet"
+	return "Order Lick feet"
 
 func getongoingname(givers, takers):
-	return "[name1] put [his1] feets in front of [names2] ordering [him2] to service it."
+	return "[name2] lick[s/2] [names1] feet as ordered."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -63,7 +63,7 @@ func initiate():
 	var text = ''
 	var temparray = []
 #	temparray += ["[name1] {^take:place:shove:stick}[s/1] [names2] nipples into [his1] mouth[/s1]"]
-	temparray += ["[name1] {^shove:stick:pushe}[s/1] [his1] foot in front of [names2] ordering [him2] to {^lick:suck:service} it clean."]
+	temparray += ["[name1] {^place:shove:stick}[s/1] [his1] feet in front of [name2] and order[s/1] [him2] to {^lick:suck:service} [his1] feet clean."]
 #	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()

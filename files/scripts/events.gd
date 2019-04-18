@@ -18,13 +18,10 @@ var finaleperson
 var lastEventPlace = {region = 'none', location = 'none'}
 
 #Quest Variables
-#warning-ignore:unused_class_variable
 var mainquest
 var sidequests = {}
 
-#warning-ignore:unused_class_variable
 var mainquestTexts
-#warning-ignore:unused_class_variable
 var sidequestTexts
 
 
@@ -88,7 +85,6 @@ var sidequestTexts
 #
 #	return placeEffects
 #
-##warning-ignore:unused_argument
 #func _call_events_schedule(place, callback = null):	
 #	var placeEffects = {hasEvent = false, text = ''}
 #
@@ -259,12 +255,12 @@ func emily(state = 1):
 		var emily = globals.characters.create('Emily')
 		globals.state.upcomingevents.append({code = 'tishaappearance',duration =7})
 		globals.slaves = emily
-		#backstreets()
+		outside.backstreets()
 	elif state == 5:
-		#backstreets()
+		outside.backstreets()
 		main.close_dialogue()
 	elif state == 0:
-		#backstreets()
+		outside.backstreets()
 		main.close_dialogue()
 
 func emilymansion(stage = 0):
@@ -281,7 +277,7 @@ func emilymansion(stage = 0):
 		text = textnode.EmilyMansion
 		sprite = [['emilyhappy','pos1','opac']]
 		state = false
-		if globals.itemdict.aphrodisiac.amount > 0:
+		if globals.state.getCountStackableItem('aphrodisiac') > 0:
 			buttons.append({text = 'Spike her with aphrodisiac',function = 'emilymansion',args = 1})
 		else:
 			buttons.append({text = 'Spike her with aphrodisiac',function = 'emilymansion',args = 1, disabled = true})
@@ -290,7 +286,7 @@ func emilymansion(stage = 0):
 	elif stage == 1:
 		image = 'emilyshower'
 		globals.state.decisions.append("emilyseduced")
-		globals.itemdict.aphrodisiac.amount -= 1
+		globals.state.removeStackableItem('aphrodisiac')
 		text = textnode.EmilyShowerSex
 		globals.main.savedtrack = globals.main.get_node("music").get_meta("currentsong")
 		globals.main.music_set("intimate")
@@ -554,7 +550,6 @@ func tishadorms(stage=0):
 	var buttons = []
 	var text = ""
 	var state = false
-#warning-ignore:unused_variable
 	var sprite = null
 
 	for i in globals.state.playergroup:
@@ -573,13 +568,13 @@ func tishadorms(stage=0):
 			globals.state.sidequests.emily = 13
 			state = true
 		else:
-			if globals.spelldict.domination.learned == true && globals.spelldict.domination.manacost <= globals.resources.mana:
+			if globals.spelldict.domination.learned == true && globals.spells.spellcost(globals.spelldict.domination) <= globals.resources.mana:
 				buttons.append(['Cast Domination', 'tishadorms', 2])
 			buttons.append(['Threaten', 'tishadorms', 3])
 			if globals.resources.gold >= 50:
 				buttons.append(['Bribe', 'tishadorms', 4])
 	elif stage == 2:
-		globals.resources.mana -= globals.spelldict.domination.manacost
+		globals.resources.mana -= globals.spells.spellcost(globals.spelldict.domination)
 		text = textnode.TishaDormsDominate
 		text += textnode.TishaDormsInfo
 		state = true
@@ -598,7 +593,6 @@ func tishadorms(stage=0):
 	globals.main.dialogue(state,self,text,buttons)
 
 func tishabackstreets(stage = 0):
-#warning-ignore:unused_variable
 	var emily
 	var buttons = []
 	var text = ""
@@ -910,7 +904,9 @@ func gornpalace():
 	elif globals.state.mainquest == 15:
 		text = textnode.MainQuestGornPalaceReturn
 		sprite = [['garthor','pos1','opac']]
-		buttons = [['Execute','gornpalaceivran', 1],['Keep imprisoned','gornpalaceivran', 2],['Leave him to you','gornpalaceivran', 3],['Decide later','gornpalaceivran', 4]]
+		buttons = [['Execute','gornpalaceivran', 1],['Keep imprisoned','gornpalaceivran', 2],['Decide later','gornpalaceivran', 4]]
+		if globals.state.sidequests.ivran != 'notaltered':
+			buttons.insert(2, ['Leave him to you','gornpalaceivran', 3])
 		state = false
 	elif globals.state.mainquest == 37:
 		text = textnode.MainQuestFinaleGorn
@@ -928,13 +924,17 @@ func gornpalaceivran(stage):
 	
 	if stage == 1:
 		sprite = [['garthor','pos1']]
-		text = textnode.MainQuestGornIvranExecute + textnode.MainQuestGornAydaSolo
+		text = textnode.MainQuestGornIvranExecute
+		if !globals.state.sidequests.ivran in ['tobetaken','tobealtered','potionreceived','notaltered']:
+			text += textnode.MainQuestGornAydaSolo
 		globals.state.sidequests.ivran = 'killed'
 		globals.state.mainquest = 16
 		globals.main.exploration.zoneenter('gorn')
 	elif stage == 2:
 		sprite = [['garthor','pos1']]
-		text = textnode.MainQuestGornIvranImprison + textnode.MainQuestGornAydaSolo
+		text = textnode.MainQuestGornIvranImprison
+		if !globals.state.sidequests.ivran in ['tobetaken','tobealtered','potionreceived','notaltered']:
+			text += textnode.MainQuestGornAydaSolo
 		globals.state.sidequests.ivran = 'imprisoned'
 		globals.state.mainquest = 16
 		globals.main.exploration.zoneenter('gorn')
@@ -1275,9 +1275,7 @@ func gornaydatalk(stage = 0):
 
 func gornaydaselect(person = null):
 	var text
-#warning-ignore:unused_variable
 	var state = true
-#warning-ignore:unused_variable
 	var sprite
 	var buttons = []
 	if person == null:
@@ -1295,10 +1293,8 @@ func gornaydaselect(person = null):
 
 func gornaydaivran(stage = 0):
 	var text
-#warning-ignore:unused_variable
 	var sprite
 	var buttons = []
-#warning-ignore:unused_variable
 	var state = true
 	if stage == 0:
 		text = textnode.MainQuestGornAydaIvran
@@ -1316,7 +1312,6 @@ func gornaydaivran(stage = 0):
 	#globals.main.dialogue(state, self, text, buttons, sprite)
 
 func undercitybosswin():
-#warning-ignore:unused_variable
 	var reward
 	var text = ''
 	if globals.state.mainquest == 24:
@@ -1328,9 +1323,10 @@ func undercitybosswin():
 		globals.state.lorefound.append('amberguardlog3')
 		text += "[color=yellow]You've found some old writings in the ruins. Does not look like what you came for, but you can read them later.[/color]"
 	globals.main.exploration.zoneenter('undercityruins')
+	globals.main.dialogue(true, self, text)
 	globals.main.exploration.winscreenclear()
 	globals.main.exploration.generaterandomloot([], {number = 0}, rand_range(1,3), [1,3])
-	globals.main.exploration.generateloot([globals.weightedrandom([['armorplate',1],["armorplate+",1],['weaponcursedsword', 1]]), 1], text)
+	globals.main.exploration.generateloot([globals.weightedrandom([['armorplate',1],["armorplate+",1],['weaponcursedsword', 1]]), 1], '')
 
 func frostfordcityhall(stage = 0):
 	var text 
@@ -1501,7 +1497,6 @@ func dryadfightwin():
 	globals.main.exploration.zoneenter('frostfordoutskirts')
 	globals.main.dialogue(true, self, text, buttons, sprite)
 
-#warning-ignore:unused_argument
 func zoefightwin(stage = 0):
 	var state = false
 	var text  = ''
@@ -1530,7 +1525,6 @@ func zoechooseslave(person = null):
 	buttons.append({text = "Refuse", function = "zoerefusehelp", args = 0})
 	globals.main.dialogue(state, self, text, buttons, sprite)
 
-#warning-ignore:unused_argument
 func zoerefusehelp(stage = 0):
 	var state = true
 	var text = textnode.MainQuestFrostfordZoeDie
@@ -1689,7 +1683,6 @@ func mountainwin(stage = 0):
 		
 	globals.main.dialogue(state, self, text, buttons, sprite)
 
-#warning-ignore:unused_argument
 func garthorencounter(stage = 0):
 	var sprite = [['garthor','pos1','opac']]
 	var buttons = []
@@ -1698,7 +1691,6 @@ func garthorencounter(stage = 0):
 	buttons.append({text = "Fight", function = 'semifinalfight'})
 	globals.main.dialogue(false, self, text, buttons, sprite)
 
-#warning-ignore:unused_argument
 func davidencounter(stage = 0):
 	var sprite = null
 	var buttons = []
@@ -1761,10 +1753,10 @@ func orderfinale(stage = 0):
 		if stage == 0:
 			text = textnode.MainQuestFinaleGoodWimborn
 			text += "\n\n[color=yellow]Party's health and energy restored.[/color]"
-			globals.player.health = 200
+			globals.player.health += 400
 			globals.player.energy = 200
 			for i in globals.slaves:
-				i.health = 200
+				i.health += 400
 				i.energy = 200
 			buttons.append({text = "Continue", function = 'orderfinale', args = 1})
 		elif stage == 1:
@@ -1790,15 +1782,14 @@ func orderfinale(stage = 0):
 		if stage == 0:
 			text = textnode.MainQuestFinaleBadWimborn
 			text += "\n\n[color=yellow]Party's health and energy restored.[/color]"
-			globals.player.health = 200
+			globals.player.health += 400
 			globals.player.energy = 200
 			for i in globals.slaves:
-				i.health = 200
+				i.health += 400
 				i.energy = 200
 			buttons.append({text = "Continue", function = 'orderfinale', args = 1})
 		elif stage == 1:
 			globals.main.background_set('mainorderfinale')
-			closedialogue()
 			if OS.get_name() != "HTML5":
 				yield(globals.main, 'animfinished')
 			outside.clearbuttons()
@@ -2051,7 +2042,7 @@ func calibar():
 		text = textnode.CaliBarLastpay
 	if !globals.state.sidequests.calibarsex in ['disliked','liked','sebastianfinish'] && globals.resources.gold >= 500:
 		buttons.append(['Pay 500 gold for information', 'calibar1', 1])
-	if !globals.state.sidequests.calibarsex in ['disliked','liked','agreed','forced','sebastianfinish']:
+	if !globals.state.sidequests.calibarsex in ['disliked','liked','agreed','forced','sebastian','sebastianfinish']:
 		buttons.append(['Talk to Cali', 'calibar1', 2])
 	if globals.state.sidequests.calibarsex in ['disliked','liked','sebastianfinish'] && globals.resources.gold >= 100 && globals.state.sidequests.cali < 17:
 		buttons.append(['Pay 100 gold for information', 'calibar1', 3])
@@ -2098,7 +2089,7 @@ func calibar1(value):
 			text += "\n\n[color=yellow]— What? You are not trying to make me... — she cringes — He's disgusting, have you seen how he looks at me?[/color]\n\nCali looks completely repulsed by the whole suggestion, but perhaps you could change her mind. With the right word here and there she may open to the idea."
 			buttons.append(["Try talk her into it", 'calibar1', 7])
 		else:
-			text += "\n\n[color=yellow— I don’t know what to do… Maybe there’s another way?[/color] "
+			text += "\n\n[color=yellow]— I don’t know what to do… Maybe there’s another way?[/color] "
 		buttons.append(["Agree and don't press the issue further", 'calibar1', 8])
 	elif value == 3:
 		globals.resources.gold -= 100
@@ -2213,9 +2204,9 @@ func calibanditcamp():
 		text = "As you carefully scout out the situation you realize that there’s probably more here than you can easily handle at once. A bandit is examining the captive girl with interest, while another is trying to bandage up a nasty stomach wound. Two bandits are lying in a drunken stupor near the mead cask and the body of a stabbed bandit lies dead near the center of the camp."
 	if globals.main.exploration.scout.wit >= 70 && calibanditcampstage != 1 && calibanditcampstage != 3 && globals.main.exploration.scout != globals.player:
 		buttons.append(["Poison the bandit’s mead", 'calibanditcampaction', 1])
-	if globals.spelldict.domination.learned == true && calibanditcampstage != 2 && calibanditcampstage != 3 && globals.spelldict.domination.manacost <= globals.resources.mana:
+	if globals.spelldict.domination.learned == true && calibanditcampstage != 2 && calibanditcampstage != 3 && globals.spells.spellcost(globals.spelldict.domination) <= globals.resources.mana:
 		buttons.append(["Dominate the wandering sentry", 'calibanditcampaction', 2])
-		globals.resources.mana -= globals.spelldict.domination.manacost
+		globals.resources.mana -= globals.spells.spellcost(globals.spelldict.domination)
 	buttons.append(['Attack the camp', 'calibanditcampattack'])
 	globals.main.dialogue(false,self,text,buttons)
 
@@ -2261,18 +2252,21 @@ func calibanditcampwin():
 	var buttons = []
 	buttons.append(['Return the girl', 'calibanditcampchoice', 1])
 	buttons.append(['Kidnap the girl', 'calibanditcampchoice', 2])
-	if globals.spelldict.entrancement.learned == true && globals.spelldict.entrancement.manacost <= globals.resources.mana:
+	if globals.spelldict.entrancement.learned == true && globals.spells.spellcost(globals.spelldict.entrancement) <= globals.resources.mana:
 		buttons.append(['Seduce the girl', 'calibanditcampchoice', 3])
-		globals.resources.mana -= globals.spelldict.entrancement.manacost
+		globals.resources.mana -= globals.spells.spellcost(globals.spelldict.entrancement)
 	globals.main.dialogue(false,self,textnode.CaliBanditCampVictory,buttons)
 
 func calibanditcampchoice(choice):
 	var texttemp
-	var person = globals.characters.create("Tia")
 	if choice == 1:
 		texttemp = textnode.CaliReturnGirl
 		globals.state.sidequests.cali = 21
-	elif choice == 2:
+		globals.main.dialogue(true,self,texttemp)
+		globals.main.exploration.zoneenter('shaliq')
+		return
+	var person = globals.characters.create("Tia")
+	if choice == 2:
 		texttemp = textnode.CaliKidnapGirl
 		globals.state.decisions.append("tiataken")
 		person.obed += -100
@@ -2378,9 +2372,7 @@ func calislaver(choice):
 func calislaverscampwin():
 	var cali = null
 	var text = ""
-#warning-ignore:unused_variable
 	var buttons = []
-#warning-ignore:unused_variable
 	var state
 	var sprite
 	for i in globals.state.playergroup:
@@ -2398,11 +2390,8 @@ func calislaverscampwin():
 
 func calistraybandit():
 	var cali = null
-#warning-ignore:unused_variable
 	var text = ""
-#warning-ignore:unused_variable
 	var buttons = []
-#warning-ignore:unused_variable
 	var state
 	for i in globals.state.playergroup:
 		if globals.state.findslave(i).unique == 'Cali':
@@ -2428,7 +2417,6 @@ func calistraybanditwin():
 func calireturnhome():
 	var text = ""
 	var buttons = []
-#warning-ignore:unused_variable
 	var state
 	var sprite
 	if globals.state.sidequests.caliparentsdead == true:
@@ -2582,7 +2570,7 @@ func chloeforest(stage = 0):
 					havegnomemember = true
 			if havegnomemember == false:
 				text = textnode.ChloeEncounter
-				if globals.spelldict.sedation.learned == true && globals.spelldict.sedation.manacost <= globals.resources.mana:
+				if globals.spelldict.sedation.learned == true && globals.spells.spellcost(globals.spelldict.sedation) <= globals.resources.mana:
 					buttons.append({text = 'Cast Sedation',function = 'chloeforest',args = 1, disabled = false})
 				elif globals.spelldict.sedation.learned == true:
 					buttons.append({text = 'Cast Sedation',function = 'chloeforest',args = 1, disabled = true, tooltip = 'Not enough mana'})
@@ -2590,13 +2578,13 @@ func chloeforest(stage = 0):
 					buttons.append({text = "You have no other available options yet",function = 'chloeforest',args = 1, disabled = true})
 			else:
 				text = textnode.ChloeEncounterGnome
-				buttons.append({text = 'Talk with her',function = 'chloeforest',args = 2, disabled = true, tooltip = 'Not enough mana'})
+				buttons.append({text = 'Talk with her',function = 'chloeforest',args = 2, disabled = false})
 			buttons.append({text = 'Leave her alone',function = 'chloeforest',args = 6})
 	
 	
 	
 	elif stage == 1:
-		globals.resources.mana -= globals.spelldict.sedation.manacost
+		globals.resources.mana -= globals.spells.spellcost(globals.spelldict.sedation)
 		text = textnode.ChloeSedate + textnode.ChloeEncounterTalk
 		globals.state.sidequests.chloe = 1
 		buttons.append({text = 'Lead her to the Shaliq',function = 'chloeforest',args = 4})
@@ -2798,11 +2786,11 @@ func chloealchemy(stage = 0):
 	var text = 'As you prepare to make the required antidote, your experience says you can take advantage of the situation. Perhaps you could try adding some additional potion for differnt effect, providing you have them. '
 	if stage == 0:
 		buttons.append(['Make an antidote for Chloe','chloealchemy',1])
-		if globals.itemdict.amnesiapot.amount >= 1:
+		if globals.state.getCountStackableItem('amnesiapot') >= 1:
 			buttons.append({text = 'Mix antidote with amnesia potion', function = 'chloealchemy', args = 2})
 		else:
 			buttons.append({text = 'Mix antidote with amnesia potion', function = 'chloealchemy', args = 2, disabled = true, tooltip = 'Amnesia Potion Required'})
-		if globals.itemdict.aphrodisiac.amount >= 1 && globals.itemdict.stimulantpot.amount >= 1: 
+		if globals.state.getCountStackableItem('aphrodisiac') >= 1 && globals.state.getCountStackableItem('stimulantpot') >= 1: 
 			buttons.append({text = 'Replace antidote with high grade stimulant', function = 'chloealchemy', args = 3})
 		else:
 			buttons.append({text = 'Replace antidote with high grade stimulant', function = 'chloealchemy', args = 3, disabled = true, tooltip = 'Aphrodisiac and Stimulant Required'})
@@ -2810,11 +2798,11 @@ func chloealchemy(stage = 0):
 		globals.state.decisions.append("chloecure")
 	elif stage == 2:
 		globals.state.decisions.append("chloeamnesia")
-		globals.itemdict.amnesiapot.amount -= 1
+		globals.state.removeStackableItem('amnesiapot')
 	elif stage == 3:
 		globals.state.decisions.append("chloeaphrodisiac")
-		globals.itemdict.aphrodisiac.amount -= 1
-		globals.itemdict.stimulantpot.amount -= 1
+		globals.state.removeStackableItem('aphrodisiac')
+		globals.state.removeStackableItem('stimulantpot')
 	if stage in [1,2,3]:
 		text = 'After half-hour you finish preparations and now can return back to Chloe.'
 		globals.state.sidequests.chloe = 9
@@ -3368,7 +3356,6 @@ func sspotion(stage = 0):
 	if startslave == null:
 		return
 	
-#warning-ignore:unused_variable
 	var textdict 
 	
 	if startslave.imagefull != null:
@@ -3422,7 +3409,6 @@ func sspotion(stage = 0):
 	
 	globals.main.dialogue(state, self, startslave.dictionary(text), buttons, sprites)
 
-#warning-ignore:unused_argument
 func sspotionaftermatch(stage = 0):
 	var state = true
 	var text
@@ -3453,7 +3439,6 @@ func sspotionaftermatch(stage = 0):
 	else:
 		var weak = 0
 		var strict = 0
-#warning-ignore:unused_variable
 		var fair = 0
 		
 		var weakdict = ['ssweak','ssmassageweak','sspotionweak']
@@ -3710,7 +3695,6 @@ func finalbossenc(stage = 0):
 			return
 		7:
 			var counter = 0
-#warning-ignore:unused_variable
 			var names = ''
 			text = "After sacrificing your party, your power grows again. "
 			for i in globals.state.playergroup:

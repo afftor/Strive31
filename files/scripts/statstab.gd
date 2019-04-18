@@ -12,7 +12,6 @@ func _on_stats_visibility_changed():
 		tab = 'prison'
 	else:
 		tab = 'normal'
-#warning-ignore:unused_variable
 	var text
 	player = globals.player
 	person = globals.slaves[get_tree().get_current_scene().currentslave]
@@ -44,7 +43,7 @@ func _on_trainingabils_pressed():
 	for i in ['cour','conf','wit','charm']:
 		get_node("trainingabilspanel/" +i ).text = globals.statsdict[i] + ": " + str(person[i]) + "/" + str(min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]))
 		get_node("trainingabilspanel/"+i+"/Button").disabled = !(person.stats[i+'_base'] < min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat)
-		get_node("trainingabilspanel/"+i+"/Button2").disabled = !(person.stats[i+'_base']+5 <= min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat*5)
+		get_node("trainingabilspanel/"+i+"/Button2").disabled = !(person.stats[i+'_base']+4 < min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat*5)
 		
 	
 	$trainingabilspanel/learningpoints.text = "Free Learn Points: " + str(person.learningpoints)
@@ -105,7 +104,7 @@ func chooseability(ability):
 	text = text.substr(0, text.length() - 2) + '.'
 	
 	if ability.has("learncost"):
-		text += "\nRequred skillpoints: [color=aqua]" + str(ability.learncost) + "[/color]"
+		text += "\nRequred learning points: [color=aqua]" + str(ability.learncost) + "[/color]"
 	
 	confirmbutton.set_meta('abil', ability)
 	
@@ -127,7 +126,6 @@ func chooseability(ability):
 			text += person.dictionary('\n[color=#ff4949]You must purchase this spell before you will be able to teach it others. [/color]')
 	get_node("trainingabilspanel/abilitytext").set_bbcode(text)
 
-#warning-ignore:unused_argument
 func levelfirst(first, second):
 	if first == 'level':
 		return true
@@ -204,7 +202,6 @@ func spellbuttonpressed(spell):
 	get_node("selectspellpanel").popup()
 	spellselected = spell
 	var description = get_node("selectspellpanel/spellusedescription")
-#warning-ignore:unused_variable
 	var spelllist = get_node("selectspellpanel/ScrollContainer/selectspelllist")
 	for i in get_tree().get_nodes_in_group('spells'):
 		if i.get_text() != spell.name && i.is_pressed() == true:
@@ -285,7 +282,7 @@ func _on_talk_pressed(mode = 'talk'):
 					text = text + "— I'll try my best for you, $master. Despite what others might think, you are invaluable to me!\n"
 				if person.stress > 50:
 					text = text + "— It has been tough for me recently... Could you consider giving me a small break, please?\n"
-				if person.lust >= 60 && person.consent == true && person.sexuals.actions.has('pussy'):
+				if person.lust >= 60 && person.consent == true && person.metrics.vag > 0:
 					text = text + "— I actually would love to fuck right now. \n"
 				elif person.lust >= 60 && person.consent == true:
 					text = text + "— Uhm... would you like to give me some private attention? — $name gives you a deep lusting look. \n"
@@ -296,7 +293,7 @@ func _on_talk_pressed(mode = 'talk'):
 			if person.levelupreqs.activate == 'fromtalk':
 				buttons.append({text = person.levelupreqs.button, function = 'levelup', args = person.levelupreqs.effect})
 		if person.unique == 'Zoe' && globals.state.sidequests.zoe == 5:
-			if globals.itemdict.teleportseal.amount >= 10 && globals.itemdict.taintedessenceing.amount >= 5 && globals.itemdict.magicessenceing.amount >= 5:
+			if globals.state.getCountStackableItem('teleportseal') >= 10 && globals.state.getCountStackableItem('taintedessenceing') >= 5 && globals.state.getCountStackableItem('magicessenceing') >= 5:
 				buttons.append({text = "Give Zoe requested items", function = 'zoequest'})
 			else:
 				buttons.append({text = "Give Zoe requested items", function = 'zoequest', disabled = true, tooltip = "You don't have everything requested."})
@@ -356,9 +353,9 @@ func callorder():
 	get_node("callorder/LineEdit").set_text(person.masternoun)
 
 func zoequest():
-	globals.itemdict.teleportseal.amount -= 10
-	globals.itemdict.taintedessenceing.amount -= 5
-	globals.itemdict.magicessenceing.amount -= 5
+	globals.state.removeStackableItem('teleportseal', 10)
+	globals.state.removeStackableItem('taintedessenceing', 5)
+	globals.state.removeStackableItem('magicessenceing', 5)
 	globals.events.zoepassitems()
 
 func _on_callconfirm_pressed():

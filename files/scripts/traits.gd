@@ -1,13 +1,13 @@
 extends Node
 
-#warning-ignore:unused_class_variable
 var traits = {
   "Foul Mouth": {
     "name": "Foul Mouth",
     "description": "All too often, $name uses words more suited for construction workers and sailors. \n\n[color=aqua]Vocal occupations are less effective. Max Charm -25. [/color]",
     "effect": {
       "code": "foul_mouth",
-      "charm_max": -25
+      "charm_max": -25,
+      "charm": 0
     },
     "tags": [
       "mental",
@@ -37,9 +37,10 @@ var traits = {
     "description": "$name trusts you to a great degree. $His willingness to follow you caused $him to find new strengths in $his character. \n\n[color=aqua]Courage +25. Wit +25. Min Loyalty: 80.[/color]",
     "effect": {
       "code": "devoted",
-      "cour_base": 25,
-      "wit_base": 25,
-      "loyal_min": 80
+      "cour": 25,
+      "wit": 25,
+      "loyal_min": 80,
+      "loyal": 0
     },
     "tags": [
       "mental",
@@ -51,7 +52,7 @@ var traits = {
   },
   "Passive": {
     "name": "Passive",
-    "description": "$name prefers to go with the flow and barely tries to proactively affect $his surroundings. \n\n[color=aqua]Can't take management related jobs. Obedience +25%. [/color]",
+    "description": "$name prefers to go with the flow and barely tries to proactively affect $his surroundings. \n\n[color=aqua]Can't take management related jobs. Obedience growth +25%. [/color]",
     "effect": {
       "code": "passive",
       "obed_mod": 0.25
@@ -65,7 +66,7 @@ var traits = {
   },
   "Masochist": {
     "name": "Masochist",
-    "description": "$name enjoys pain far more than $he should. \n\n[color=aqua]Physical punishments more effective and cause lust to grow. [/color]",
+    "description": "$name enjoys pain far more than $he should. \n\n[color=aqua]Physical punishments are more effective and cause lust to grow. [/color]",
     "effect": {
       
     },
@@ -99,9 +100,10 @@ var traits = {
     "description": "Your influence over $name caused $him to accept sex in many forms and enjoy $his body to the fullest. \n\n[color=aqua]Confidence +25. Charm +25. Min Loyalty: 80. [/color]",
     "effect": {
       "code": "slutty",
-      "charm_base": 25,
-      "conf_base": 25,
-      "loyal_min": 80
+      "charm": 25,
+      "conf": 25,
+      "loyal_min": 80,
+      "loyal": 0
     },
     "tags": [
       "mental",
@@ -143,7 +145,7 @@ var traits = {
   },
   "Monogamous": {
     "name": "Monogamous",
-    "description": "$name does not favor random encounters and believes there is one true partner in life for $him. \n\n[color=aqua]Refuses to work as prostitute, loyalty builds faster from sex with master. Sleeping with other partners is more stressful. [/color]",
+    "description": "$name does not favor random encounters and believes there is one true partner in life for $him. \n\n[color=aqua]Refuses to work as prostitute. Loyalty builds faster from sex with master. Sleeping with other partners is more stressful. [/color]",
     "effect": {
       
     },
@@ -157,10 +159,10 @@ var traits = {
   },
   "Pretty voice": {
     "name": "Pretty voice",
-    "description": "$name's voice is downright charming, making surrounding people just want to hear more of it.\n\n[color=aqua]Vocal occupations more effective. Charm +20. [/color]",
+    "description": "$name's voice is downright charming, making surrounding people just want to hear more of it.\n\n[color=aqua]Vocal occupations are more effective. Charm +20. [/color]",
     "effect": {
       "code": "pretty_voice",
-      "charm_base": 20
+      "charm": 20
     },
     "tags": [
       "physical"
@@ -171,10 +173,10 @@ var traits = {
   },
   "Clingy": {
     "name": "Clingy",
-    "description": "$name gets easily attached to people. However this behavior is rarely met with acceptance, which in turn annoys $him. \n\n[color=aqua]Loyalty +35%. Obedience drops quickly if constantly ignored. [/color]",
+    "description": "$name gets easily attached to people. However, this behavior is rarely met with acceptance, which in turn annoys $him. \n\n[color=aqua]Loyalty growth +35%. Obedience drops quickly if constantly ignored. [/color]",
     "effect": {
       "code": "clingy",
-      "loyal_mod": 35
+      "loyal_mod": 0.35
     },
     "tags": [
       "mental"
@@ -214,7 +216,7 @@ var traits = {
   },
   "Strong": {
     "name": "Strong",
-    "description": "$name has been blessed with greater strength than most. $He also appears to be harder to tame. \n\n[color=aqua]Strength +2, Obedience -20%[/color]",
+    "description": "$name has been blessed with greater strength than most. $He also appears to be harder to tame. \n\n[color=aqua]Strength +2, Obedience growth -20%[/color]",
     "effect": {
       "code": "strong",
       "str_mod": 2,
@@ -244,7 +246,7 @@ var traits = {
   },
   "Quick": {
     "name": "Quick",
-    "description": "$name is very active whenever $he does something. However, it also makes $his nervous system less stable. \n\n[color=aqua]Agility +2, Stress +20%[/color]",
+    "description": "$name is very active whenever $he does something. However, it also makes $his nervous system less stable. \n\n[color=aqua]Agility +2, Stress change +20%[/color]",
     "effect": {
       "code": "quick",
       "agi_mod": 2,
@@ -274,7 +276,7 @@ var traits = {
   },
   "Responsive": {
     "name": "Responsive",
-    "description": "$name is in touch with raw energy, making $him potentially useful in magic area. \n\n[color=aqua]Magic Affinity +2, Toxicity +20%[/color]",
+    "description": "$name is in touch with raw energy, making $him potentially useful in magic area. \n\n[color=aqua]Magic Affinity +2, Toxicity change +20%[/color]",
     "effect": {
       "code": "responsive",
       "maf_mod": 2,
@@ -304,7 +306,7 @@ var traits = {
   },
   "Robust": {
     "name": "Robust",
-    "description": "$name's physiques is way better than most. \n\n[color=aqua]Endurance +2, Fear -20%[/color]",
+    "description": "$name's physique is way better than most. \n\n[color=aqua]Endurance +2, Fear change -20%[/color]",
     "effect": {
       "code": "robust",
       "end_mod": 2,
@@ -322,7 +324,7 @@ var traits = {
     "description": "$name's body is covered in massive burn scars. Besides being terrifying to look at, this also makes $him suffer from low confidence.\n\n[color=aqua]Charm -30. Beauty -30. [/color]",
     "effect": {
       "code": "scarred",
-      "charm_base": -30,
+      "charm": -30,
       "beautybase": -30
     },
     "tags": [
@@ -338,7 +340,7 @@ var traits = {
     "description": "$name's skin is covered in a lot of imperfections. Besides being unappealing to look at, this also makes $him suffer from low self esteem.\n\n[color=aqua]Charm -10. Beauty -10. [/color]",
     "effect": {
       "code": "Blemished",
-      "charm_base": -10,
+      "charm": -10,
       "beautybase": -10
     },
     "tags": [
@@ -378,7 +380,7 @@ var traits = {
   },
   "Alcohol Intolerance": {
     "name": "Alcohol Intolerance",
-    "description": "$name does not stomach alcoholic beverages too well. \n\n[color=aqua]Alcohol intakes make slave drunker lot quicker. [/color]",
+    "description": "$name does not stomach alcoholic beverages too well. \n\n[color=aqua]Alcohol intake makes slave drunker a lot quicker. [/color]",
     "effect": {
     },
     "tags": [
@@ -447,11 +449,11 @@ var traits = {
   },
   "Dominant": {
     "name": "Dominant",
-    "description": "$name really prefers to be in control, instead of being controlled. \n\n[color=aqua]Obedience -20%. Confidence +25. Max Confidence +15.  [/color]",
+    "description": "$name really prefers to be in control, instead of being controlled. \n\n[color=aqua]Obedience growth -20%. Confidence +25. Max Confidence +15.  [/color]",
     "effect": {
       "code": "dominant",
       "conf_max": 15,
-      "conf_base": 25,
+      "conf": 25,
       "obed_mod": -0.2
     },
     "tags": [
@@ -463,11 +465,11 @@ var traits = {
   },
   "Submissive": {
     "name": "Submissive",
-    "description": "$name is very comfortable when having someone $he can rely on. \n\n[color=aqua]Obedience +40%. No penalty for rape actions as long as loyalty is above average. Confidence -10. Max Confidence -30. [/color]",
+    "description": "$name is very comfortable when having someone $he can rely on. \n\n[color=aqua]Obedience growth +40%. No penalty for rape actions as long as loyalty is above average. Confidence -10. Max Confidence -30. [/color]",
     "effect": {
       "code": "submissive",
       "conf_max": -30,
-      "conf_base": -10,
+      "conf": -10,
       "obed_mod": 0.4
     },
     "tags": [
@@ -509,8 +511,11 @@ var traits = {
     "effect": {
       "code": "uncivilized",
       "wit_max": -50,
+      "wit": 0,
       "obed_max": -30,
-      "loyal_max": -65
+      "obed": 0,
+      "loyal_max": -65,
+      "loyal": 0
     },
     "tags": [
       "secondary"
@@ -539,8 +544,11 @@ var traits = {
     "effect": {
       "code": "sexcrazed",
       "wit_max": -80,
+      "wit": 0,
       "conf_max": -60,
-      "lust_min": 50
+      "conf": 0,
+      "lust_min": 50,
+      "lust": 0
     },
     "tags": [
       "secondary",
@@ -741,7 +749,7 @@ var traits = {
   },
   "Grateful": {
     "name": "Grateful",
-    "description": "Due to your actions, $name will overlook certain hardships willing to stick close to you.\n\n [color=aqua]No luxury requirements. [/color]",
+    "description": "Due to your actions, $name will overlook certain hardships to stick close to you.\n\n [color=aqua]No luxury requirements. [/color]",
     "effect": {
       
     },

@@ -48,18 +48,14 @@ func _ready():
 	maleslider(globals.rules.male_chance)
 	for i in ['furry','furrynipples','futa','futaballs','slaverguildallraces','children','receiving','permadeath','noadults']:
 		get_node("TabContainer/Game/" + i).pressed = globals.rules[i]
-#warning-ignore:return_value_discarded
 		get_node("TabContainer/Game/" + i).connect("pressed", self, 'ruletoggle', [i])
 	for i in ['fadinganimation','spritesindialogues','randomcustomportraits','instantcombatanimation','thumbnails']:
 		get_node("TabContainer/Settings/" + i).pressed = globals.rules[i]
-#warning-ignore:return_value_discarded
 		get_node("TabContainer/Settings/" + i).connect("pressed", self, 'ruletoggle', [i])
 	get_node("TabContainer/Settings/fullscreen").set_pressed(OS.is_window_fullscreen())
 	get_node("TabContainer/Supporter section/cheatpassword").set_text('')
-	get_node("TabContainer/Settings/fontsize").set_editable(globals.rules.fontsize)
-#warning-ignore:return_value_discarded
+	get_node("TabContainer/Settings/fontsize").set_value(globals.rules.fontsize)
 	$TabContainer/Settings/musicslider.connect("value_changed", self, "_on_musicslider_value_changed")
-#warning-ignore:return_value_discarded
 	$TabContainer/Settings/soundslider.connect("value_changed", self, "_on_soundslider_value_changed")
 	_on_soundslider_value_changed(round(globals.rules.soundvol*3))
 	_on_musicslider_value_changed(round(globals.rules.musicvol*3))
@@ -253,7 +249,6 @@ func _on_screenresize_pressed():
 
 func _on_RichTextLabel_meta_clicked( meta ):
 	if meta == 'patreon':
-#warning-ignore:return_value_discarded
 		OS.shell_open('https://www.patreon.com/maverik')
 
 

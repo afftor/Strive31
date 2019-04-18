@@ -1,11 +1,9 @@
 
 extends Node
 var namefile = load("res://files/scripts/characters/names.gd").new()
-#warning-ignore:unused_class_variable
 var names = namefile.names
 
 
-#warning-ignore:unused_class_variable
 var races = {
 Human = {
 	skin = ['pale', 'fair', 'olive', 'tan'],
@@ -13,7 +11,7 @@ Human = {
 	haircolor = ['blond', 'red', 'auburn', 'brown', 'black'],
 	surname = names.humansurname,
 	description = "Humans are a highly successful militaristic people whose members can be found throughout much of the world, their presence often receiving a mixed reception. Slavery is a common part of human society, viewed as a civilized form of alternative punishment, with many laws and businesses based around the concept. Because of this slave driven culture, you have found that humans tend to be the most widely accessible residents, servants, and slaves.",
-	details = "[color=aqua]Racial trait: +50% Fear and Obedience from dates.[/color]\n\n[color=yellow]Stat potential: Strength - 5, Agility - 3, Magic - 2, Endurance - 4 [/color]",
+	details = "[color=aqua]Racial trait: +50% Fear and Obedience during meet interactions.[/color]\n\n[color=yellow]Stat potential: Strength - 5, Agility - 3, Magic - 2, Endurance - 4 [/color]",
 	pricemod = 1,
 	startingrace = true,
 	wimbornrace = true,
@@ -154,7 +152,7 @@ Goblin = {
 Fairy = {
 	bodyshape = ['shortstack'],
 	description = "Modern fairies, often referred to as city fairies by some parts of the magic community, are an unexpected evolution of nature spirits sharing the same name, resulting from interaction with outsiders and migration into cities. These fairies have retained much of the cute, friendly, and playful attitudes of the spirits they came from, making them popular for positions with high volumes of public interaction.",
-	details = "[color=aqua]Racial trait: build-up stress dissipates twice as fast.[/color]\n\n[color=yellow]Stat potential: Strength - 2, Agility - 5, Magic - 6, Endurance - 2 [/color]",
+	details = "[color=aqua]Racial trait: doubles the daily base stress dissipation.[/color]\n\n[color=yellow]Stat potential: Strength - 2, Agility - 5, Magic - 6, Endurance - 2 [/color]",
 	pricemod = 2,
 	startingrace = false,
 	wimbornrace = true,
@@ -587,7 +585,5 @@ Scylla = {
 },
 }
 
-#warning-ignore:unused_class_variable
 var beastkindescription = "The term Beastkin refers to a wide range of sentient species with prominent humanoid and animalistic traits. True beastkin are fully covered in fur, feathers, or scales, with similar stature and proportions to a human. Even among individual species, there are wide differences to be observed with inherited animal traits, such as eyes, claws, and teeth. It is unknown whether Beastkin are man-made or the product of nature, as their spread and diversity often leads to inconsistent findings."
-#warning-ignore:unused_class_variable
 var halfkindescription = "Halfkin are the offspring produced by the union of a beastkin and a human. Halfkin most prominently display their human lineage, lacking fur and other major animalistic characteristics, but do possess secondary traits from their beastkin forebears, such as claws, ears, and tails, and tend to exhibit behavior from both parents equally.\n\nThe fate of halfkin varies from place to place, some living normally as any other race, others living under persecution and prejudice, and even rumors of far off lands where they are respected and worshipped. Regardless of what kind of environment they live in, halfkin are a popular item among collectors for their exotic appearance and the unique quality that their offspring will often swing back to fully human or fully beast."

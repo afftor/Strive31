@@ -12,7 +12,7 @@ const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
 const givertags = ['pet','noorgasm']
-const takertags = ['penis']
+const takertags = ['pet','penis']
 
 func getname(state = null):
 	if givers.size() + takers.size() == 2:
@@ -21,7 +21,7 @@ func getname(state = null):
 		return "Smlt. Titjob"
 
 func getongoingname(givers, takers):
-	return "[name1] give[s/1] [a /1]titjob[/s1] to [name2]."
+	return "[name1] give[s/1] [a /2]titjob[/s2] to [name2]."
 
 func getongoingdescription(givers, takers):
 	var temparray = []

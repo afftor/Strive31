@@ -172,15 +172,15 @@ static func _check_item_reqs(items):
 			if items[kitem].has('compare'):
 				compareType = items[kitem].compare
 				
-			if !_compare(ownedItems[kitem].amount, items[kitem].value, compareType):
+			if !_compare(globals.state.getCountStackableItem(kitem), items[kitem].value, compareType):
 				if tooltip != '':
 					tooltip += "\n"
-				tooltip += "Need " + compareType + kitem + '[' + str(items[kitem]) + ']'
+				tooltip += "Need "  + ownedItems[kitem].name + " " + compareType + " " + str(items[kitem])
 		else:
-			if !_compare(ownedItems[kitem].amount, items[kitem], compareType):
+			if !_compare(globals.state.getCountStackableItem(kitem), items[kitem], compareType):
 				if tooltip != '':
 					tooltip += "\n"
-				tooltip += "Need " + compareType + kitem + '[' + str(items[kitem]) + ']'
+				tooltip += "Need "  + ownedItems[kitem].name + " " + compareType + " " + str(items[kitem])
 	
 	if tooltip != '':		
 		checkResult.meetsReqs = false

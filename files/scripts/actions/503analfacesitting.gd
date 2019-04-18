@@ -5,7 +5,7 @@ const code = 'afacesit'
 var givers
 var takers
 const canlast = true
-const giverpart = ''
+const giverpart = 'anus'
 const takerpart = 'mouth'
 const virginloss = false
 const giverconsent = 'advanced'
@@ -17,7 +17,7 @@ func getname(state = null):
 	return "Anal face sitting"
 
 func getongoingname(givers, takers):
-	return "[name1] sits on [names2] placing [his1] anus on [his2] face."
+	return "[name1] sit[s/1] [his1] anus[/es1] on [names2] face."
 
 func getongoingdescription(givers, takers):
 	return ""
@@ -62,7 +62,7 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] {^place:shove:stick}[s/1] bottom parts on [names2] face and mouth tilting [his2] hipps to make sure its the asshole who is given."]
+	temparray += ["[name1] {^place:shove:stick}[s/1] [his1] bottom parts on [names2] face[/s2] and mouth[/es2] tilting [his2] hips to make sure it's the asshole that is given."]
 #	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()

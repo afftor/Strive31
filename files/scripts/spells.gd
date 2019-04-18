@@ -164,7 +164,7 @@ acidspit = {
 	name = 'Acid Spit',
 	description = "Turns your saliva into highly potent corrosive substance for a short time. \nDeals spell damage to single target enemy and reduces it's armor. ",
 	effect = '',
-	manacost = 5,
+	manacost = 6,
 	req = 2,
 	price = 400,
 	personal = false,
@@ -177,7 +177,7 @@ mindblast = {
 	name = 'Mind Blast',
 	description = "Simple mind attack which can be utilized in combat. While not terribly effective on its own, can eventually break the enemy. \nDeals spell damage to single target enemy. ",
 	effect = '',
-	manacost = 3,
+	manacost = 5,
 	req = 1,
 	price = 100,
 	personal = false,
@@ -249,7 +249,7 @@ func mindreadeffect():
 	var spell = globals.spelldict.mindread
 	var text = ''
 	globals.resources.mana -= spellcost(spell)
-	text = "You peer into $name's soul. $He is of " + person.origins + " origins. \nObedience: " + str(round(person.obed)) + ", Fear: " + str(person.fear) + ', Stress: '+ str(round(person.stress)) + ', Loyalty: ' + str(round(person.loyal)) + ', Lust: '+ str(round(person.lust)) + ', Courage: ' + str(round(person.cour)) + ', Confidence: ' + str(round(person.conf)) + ', Wit: '+ str(round(person.wit)) + ', Charm: ' + str(round(person.charm)) + ", Toxicity: " + str(floor(person.toxicity)) + ", Lewdness: " + str(floor(person.lewdness)) 
+	text = "You peer into $name's soul. $He is of " + person.origins + " origins. \nObedience: " + str(round(person.obed)) + ", Fear: " + str(person.fear) + ', Stress: '+ str(round(person.stress)) + ', Loyalty: ' + str(round(person.loyal)) + ', Lust: '+ str(round(person.lust)) + ', Courage: ' + str(round(person.cour)) + ', Confidence: ' + str(round(person.conf)) + ', Wit: '+ str(round(person.wit)) + ', Charm: ' + str(round(person.charm)) + ", Toxicity: " + str(floor(person.toxicity)) + ", Lewdness: " + str(floor(person.lewdness)) + ", Role Preference: " + str(floor(person.asser))
 	text += "\nStrength: " + str(person.sstr) + ", Agility: " + str(person.sagi) + ", Magic Affinity: " + str(person.smaf) + ", Endurance: " + str(person.send)
 	text += "\nBase Beauty: " + str(person.beautybase) + ', Temporal Beauty: ' + str(person.beautytemp)
 	if person.effects.has('captured') == true:
@@ -308,7 +308,7 @@ func dreameffect():
 	person.stress -= rand_range(25,35) + caster.smaf*5
 	text = 'You cast sleep on $name, putting $him into deep rest until the next day. '
 	main._on_mansion_pressed()
-	return text
+	return person.dictionary(text)
 
 
 func invigorateeffect():
@@ -324,7 +324,6 @@ func invigorateeffect():
 func entrancementeffect():
 	var text = ''
 	var spell = globals.spelldict.entrancement
-#warning-ignore:unused_variable
 	var exists = false
 	globals.resources.mana -= spellcost(spell)
 	if person.effects.has('entranced') == false:
@@ -392,7 +391,6 @@ func markeffect():
 	return text
 
 func tentacleeffect():
-#warning-ignore:unused_variable
 	var spell = globals.spelldict.summontentacle
 	var text = "As you finish chanting the spell, a stream of tentacles emerge from small breach in air. "
 	if person.unique == 'Zoe':
@@ -425,12 +423,10 @@ func mutateeffect():
 	globals.main.rebuild_slave_list()
 	return text
 
-#warning-ignore:unused_argument
 func mutate(power=2, silent = false):
 	var array = ['traitadd','height','tits','ass','penis','balls','penistype','skin','skincov','eyecolor','eyeshape','haircolor','hairlength','ears','tail','wings','horns','beauty','lactation','nipples','lust','amnesia','pregnancy']
 	var line
 	var text = "Raw magic in $name's body causes $him to uncontrollably mutate. \n\n"
-#warning-ignore:unused_variable
 	var temp
 	while power >= 1:
 		person.stress += rand_range(5,15)
