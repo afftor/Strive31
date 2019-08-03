@@ -340,9 +340,11 @@ func initiate(tempperson):
 	person = tempperson
 	if person.race == 'Human':
 		modFearObed = 1.5
+	else:
+		modFearObed = 1
 	var newclass = dateclass.new()
-	newclass.sex = person.sex
-	newclass.name = person.name_short()
+	newclass.sex = globals.player.sex
+	newclass.name = globals.player.name_short()
 	newclass.person = globals.player
 	dateclassarray.append(newclass)
 	newclass = dateclass.new()

@@ -15,7 +15,7 @@ func _ready():
 func goto_scene(path): # game requests to switch to this scene
 	loader = ResourceLoader.load_interactive(path)
 	if loader == null: # check for errors
-		#show_error()
+		print('Error loading resource: ' + str(path))
 		return
 	#print(true)
 	set_process(true)
@@ -50,7 +50,7 @@ func _process(delta):
 		elif err == OK:
 			update_progress()
 		else: # error during loading
-			#show_error()
+			print('Error loading resource: ' + str(err))
 			loader = null
 			break
 

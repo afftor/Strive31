@@ -19,7 +19,7 @@ func _init():
 	for i in variables.list:
 		oldvariables[i] = variables[i]
 	var file = File.new()
-	var text = str()
+	var text = ''
 	if !file.file_exists(modfolder +"storedvariables"): #makes info.txt to store mod description
 		file.open(modfolder +"storedvariables", File.WRITE)
 		file.store_line(text)

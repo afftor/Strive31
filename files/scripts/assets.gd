@@ -1,47 +1,6 @@
 
 extends Node
 
- 
-
-#
-#static func getRandomName(person):
-#	if person.race == 'Human':
-#		person.surname = getRandomHumanSurname()
-#		if person.sex != 'male':
-#			person.name = getRandomHumanFName()
-#		else:
-#			person.name = getRandomHumanMName()
-#	elif person.race == 'Elf'|| person.race == 'Dark Elf' || person.race == 'Drow':
-#		if person.sex != 'male':
-#			person.name = getRandomFElfName()
-#		else:
-#			person.name = getRandomMElfName()
-#		person.surname = getRandomElfSurname()
-#	elif person.race.find('Beastkin') >= 0 || (person.race.find('Halfkin') >= 0 && rand_range(0,1) > 0.6) :
-#		if person.sex != 'male':
-#			person.name = getRandomHumanFName()
-#		else:
-#			person.name = getRandomHumanMName()
-#		person.surname = getRandomFurrySurname()
-#	elif person.race == 'Orc'|| person.race == 'Goblin':
-#		if person.sex != 'male':
-#			person.name = getRandomFOrcName()
-#		else:
-#			person.name = getRandomMOrcName()
-#		person.surname = getRandomOrcSurname()
-#	elif person.race == 'Demon':
-#		if person.sex != 'male':
-#			person.name = getRandomFDemonName()
-#		else:
-#			person.name = getRandomMDemonName()
-#		person.surname = getRandomHumanSurname()
-#	else:
-#		if person.sex != 'male':
-#			person.name = getRandomHumanFName()
-#		else:
-#			person.name = getRandomHumanMName()
-#		person.surname = getRandomHumanSurname()
-
 
 func getrandomage():
 	var text = []

@@ -278,8 +278,7 @@ func startending():
 	close_dialogue()
 	animationfade(3)
 	
-	if OS.get_name() != 'HTML5':
-		yield(self, 'animfinished')
+	yield(self, 'animfinished')
 	scene.add_to_group('blockmaininput')
 	scene.add_to_group('blockoutsideinput')
 	add_child_below_node($tooltip, scene)
@@ -300,7 +299,7 @@ func _on_new_slave_button_pressed():
 	#music_set('mansion')
 	get_node("music").play(100)
 	#globals.state.capturedgroup.append(globals.newslave(testslaverace[rand_range(0,testslaverace.size())], testslaveage, testslavegender, testslaveorigin[rand_range(0,testslaveorigin.size())]))
-	var person = globals.newslave(testslaverace[rand_range(0,testslaverace.size())], testslaveage, testslavegender, testslaveorigin[rand_range(0,testslaveorigin.size())])
+	var person = globals.newslave(testslaverace[rand_range(0,testslaverace.size())], testslaveage, 'female', testslaveorigin[rand_range(0,testslaveorigin.size())])
 	person.obed += 100
 	person.loyal += 100
 	person.xp += 9990
@@ -309,6 +308,7 @@ func _on_new_slave_button_pressed():
 	person.spec = 'merchant'
 	globals.connectrelatives(globals.player, person, 'sibling')
 	globals.impregnation(person, globals.player)
+	person.preg.duration = 30
 	person.attention = 70
 	person.skillpoints = 100
 	for i in ['conf','cour','charm','wit']:
@@ -338,7 +338,7 @@ func _on_new_slave_button_pressed():
 	globals.player.ability.append('heal')
 	#globals.player.stats.maf_cur = 3
 	globals.state.branding = 2
-	globals.resources.gold += 1000
+	globals.resources.gold += 5000
 	globals.resources.food += 1000
 	globals.resources.mana += 5
 	globals.player.energy += 100
@@ -346,7 +346,7 @@ func _on_new_slave_button_pressed():
 	globals.resources.upgradepoints += 100
 	globals.state.mainquest = 0
 	#globals.state.sidequests.ayda = 15
-	globals.state.sidequests.cali = 26
+	globals.state.sidequests.emily = 14
 	#globals.state.decisions.append('')
 	globals.state.rank = 3
 	#globals.state.plotsceneseen = ['garthorscene','hade1','hade2','frostfordscene']#,'slaverguild']
@@ -367,6 +367,7 @@ func _on_new_slave_button_pressed():
 			person = globals.characters.create(i)
 			globals.addrelations(globals.slaves[0], person, -800)
 			person.loyal = 100
+			person.health = 20
 			person.stress = 0
 			person.obed = 100
 			person.lust = 0
@@ -598,8 +599,8 @@ func _on_end_pressed():
 	var lacksupply = false
 	var results = 'normal'
 	_on_mansion_pressed()
-	if OS.get_name() != 'HTML5':
-		yield(self, 'animfinished')
+	#if OS.get_name() != 'HTML5':
+	yield(self, 'animfinished')
 	for i in range(globals.slaves.size()):
 		if globals.slaves[i].away.duration == 0:
 			if globals.slaves[i].work == 'cooking':
@@ -1215,6 +1216,8 @@ func _on_end_pressed():
 	globals.player.energy += 100
 	
 	for i in globals.player.effects.values():
+		if i.has("ondayend") && i.code.find("animalistic") >= 0:
+			globals.effects.call(i.ondayend, globals.player)
 		if i.has('duration') && i.code != "contraceptive":
 			i.duration -= 1
 			if i.duration <= 0:
@@ -1595,7 +1598,7 @@ func close_dialogue(mode = 'normal'):
 
 	nodefade($dialogue, 0.4)
 	get_node("dialogue/blockinput").show()
-	if OS.get_name() != "HTML5" && mode != 'instant':
+	if mode != 'instant':
 		yield(tween, 'tween_completed')
 	get_node("dialogue").hide()
 	for i in nodedict.values():
@@ -1665,7 +1668,7 @@ func closescene():
 	get_node("infotext").show()
 	if $music.stream == globals.musicdict.intimate:
 		music_set(savedtrack)
-	if OS.get_name() != "HTML5" && globals.rules.fadinganimation == true:
+	if globals.rules.fadinganimation == true:
 		yield(tween, 'tween_completed')
 	get_node("scene").hide()
 
@@ -2051,8 +2054,7 @@ func _on_mansion_pressed():
 
 func _on_jailbutton_pressed():
 	background_set('jail')
-	if OS.get_name() != 'HTML5':
-		yield(self, 'animfinished')
+	yield(self, 'animfinished')
 	hide_everything()
 	get_node("MainScreen/mansion/jailpanel").show()
 	if globals.state.tutorial.jail == false:
@@ -2145,8 +2147,7 @@ var potselected
 
 func _on_alchemy_pressed():
 	background_set('alchemy' + str(globals.state.mansionupgrades.mansionalchemy))
-	if OS.get_name() != 'HTML5':
-		yield(self, 'animfinished')
+	yield(self, 'animfinished')
 	hide_everything()
 	get_node("MainScreen/mansion/alchemypanel").show()
 	if globals.state.tutorial.alchemy == false:
@@ -2268,8 +2269,7 @@ func _on_library_pressed():
 		background_set('library1')
 	else:
 		background_set('library2')
-	if OS.get_name() != 'HTML5':
-		yield(self, 'animfinished')
+	yield(self, 'animfinished')
 	hide_everything()
 	get_node("MainScreen/mansion/librarypanel").show()
 	var text = ''
@@ -2576,6 +2576,8 @@ func childbirth(person):
 	person.preg.duration = 0
 	person.preg.baby = null
 	person.preg.fertility = 5
+	if baby == null:
+		return
 	if globals.state.mansionupgrades.mansionnursery == 1:
 		if globals.player == person:
 			text = person.dictionary('You gave birth to a ')
@@ -3020,8 +3022,8 @@ func _on_portals_pressed():
 		infotext("Your backpack is too heavy to leave", 'red')
 		return
 	_on_mansion_pressed()
-	if OS.get_name() != 'HTML5':
-		yield(self, 'animfinished')
+	#if OS.get_name() != 'HTML5':
+	yield(self, 'animfinished')
 	var list = get_node("MainScreen/mansion/portalspanel/ScrollContainer/VBoxContainer")
 	var button = get_node("MainScreen/mansion/portalspanel/ScrollContainer/VBoxContainer/portalbutton")
 	get_node("MainScreen/mansion/portalspanel").popup()
@@ -3947,7 +3949,7 @@ func nodefade(node, duration = 0.4, delay = 0):
 var traitaction = '' 
 
 func traitpanelshow(person, effect):
-	$traitselect.visible = true
+	$traitselect.show()# = true
 	traitaction = effect
 	var text = ''
 	var array = []
@@ -3975,7 +3977,7 @@ func traitpanelshow(person, effect):
 			priceModifier *= 0.7
 		manaCost = round(50 * priceModifier)
 		goldCost = round(100 * priceModifier)
-		text += person.dictionary("Select physical trait to remove from $name. Requires 1 [color=yellow]Clarity Potion[/color], ") + str(manaCost) + " mana, " + str(goldCost) +" gold, and " + timeCost + " days."
+		text += person.dictionary("Select physical trait to remove from $name. Requires 1 [color=yellow]Clarity Potion[/color], ") + str(manaCost) + " mana, " + str(goldCost) +" gold, and " + str(timeCost) + " days."
 	for i in person.traits:
 		var trait = globals.origins.trait(i)
 		if effect == 'clearmental':

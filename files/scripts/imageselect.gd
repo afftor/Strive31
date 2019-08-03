@@ -221,7 +221,7 @@ func _on_choosebodyfolder_pressed():
 	get_node("folderdialogue").set_meta('meta', "body")
 	get_node("folderdialogue").popup()
 	if bodypath.find('user://') >= 0:
-		get_node("folderdialogue").set_current_path(OS.get_data_dir() + '/' +bodypath.replace("user://", ''))
+		get_node("folderdialogue").set_current_path(OS.get_user_data_dir() + '/' +bodypath.replace("user://", ''))
 	else:
 		get_node("folderdialogue").set_current_path(bodypath)
 

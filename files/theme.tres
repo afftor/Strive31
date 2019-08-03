@@ -178,7 +178,7 @@ margin_right = 9.0
 margin_top = 5.0
 margin_bottom = 2.0
 
-[sub_resource type="StyleBoxTexture" id=32]
+[sub_resource type="StyleBoxTexture" id=26]
 texture = ExtResource( 18 )
 region_rect = Rect2( 0, 0, 500, 500 )
 margin_left = 5.0
@@ -186,14 +186,8 @@ margin_right = 5.0
 margin_top = 5.0
 margin_bottom = 5.0
 
-[sub_resource type="StyleBoxTexture" id=26]
-texture = ExtResource( 19 )
-region_rect = Rect2( 0, 0, 34, 26 )
-margin_top = 5.0
-margin_bottom = 5.0
-
 [sub_resource type="StyleBoxTexture" id=27]
-texture = ExtResource( 20 )
+texture = ExtResource( 19 )
 region_rect = Rect2( 0, 0, 34, 26 )
 margin_top = 5.0
 margin_bottom = 5.0
@@ -203,16 +197,22 @@ texture = ExtResource( 20 )
 region_rect = Rect2( 0, 0, 34, 26 )
 margin_top = 5.0
 margin_bottom = 5.0
-expand_margin_top = 5.0
-expand_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxTexture" id=29]
 texture = ExtResource( 20 )
 region_rect = Rect2( 0, 0, 34, 26 )
 margin_top = 5.0
 margin_bottom = 5.0
+expand_margin_top = 5.0
+expand_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxTexture" id=30]
+texture = ExtResource( 20 )
+region_rect = Rect2( 0, 0, 34, 26 )
+margin_top = 5.0
+margin_bottom = 5.0
+
+[sub_resource type="StyleBoxTexture" id=31]
 texture = ExtResource( 21 )
 region_rect = Rect2( 0, 0, 34, 58 )
 margin_left = 10.0
@@ -220,7 +220,7 @@ margin_right = 10.0
 margin_top = 20.0
 margin_bottom = 20.0
 
-[sub_resource type="StyleBoxTexture" id=31]
+[sub_resource type="StyleBoxTexture" id=32]
 texture = ExtResource( 12 )
 region_rect = Rect2( 0, 0, 500, 500 )
 margin_left = 5.0
@@ -319,18 +319,18 @@ TooltipLabel/colors/font_color_shadow = Color( 0, 0, 0, 0.1 )
 TooltipLabel/constants/shadow_offset_x = 1
 TooltipLabel/constants/shadow_offset_y = 1
 TooltipLabel/fonts/font = null
-TooltipPanel/styles/panel = SubResource( 32 )
+TooltipPanel/styles/panel = SubResource( 26 )
 VScrollBar/icons/decrement = null
 VScrollBar/icons/decrement_highlight = null
 VScrollBar/icons/decrement_hilite = null
 VScrollBar/icons/increment = null
 VScrollBar/icons/increment_highlight = null
 VScrollBar/icons/increment_hilite = null
-VScrollBar/styles/grabber = SubResource( 26 )
-VScrollBar/styles/grabber_highlight = SubResource( 27 )
-VScrollBar/styles/grabber_hilite = SubResource( 28 )
-VScrollBar/styles/grabber_pressed = SubResource( 29 )
-VScrollBar/styles/scroll = SubResource( 30 )
+VScrollBar/styles/grabber = SubResource( 27 )
+VScrollBar/styles/grabber_highlight = SubResource( 28 )
+VScrollBar/styles/grabber_hilite = SubResource( 29 )
+VScrollBar/styles/grabber_pressed = SubResource( 30 )
+VScrollBar/styles/scroll = SubResource( 31 )
 VScrollBar/styles/scroll_focus = null
 WindowDialog/colors/title_color = Color( 1, 1, 1, 1 )
 WindowDialog/constants/close_h_ofs = 22
@@ -340,5 +340,4 @@ WindowDialog/constants/titlebar_height = 18
 WindowDialog/fonts/title_font = null
 WindowDialog/icons/close = null
 WindowDialog/icons/close_hilite = null
-WindowDialog/styles/panel = SubResource( 31 )
-
+WindowDialog/styles/panel = SubResource( 32 )

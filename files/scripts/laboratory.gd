@@ -96,9 +96,12 @@ func _on_labstart_pressed(selected = null):
 			get_node("labmodpanel/ScrollContainer/primalmodlist/skin").visible = false
 		else:
 			get_node("labmodpanel/ScrollContainer/primalmodlist/skin").visible = true
-	if globals.state.mansionupgrades.mansionlab < 2:
+	if globals.state.mansionupgrades.mansionlab < 2 || selected == null:
 		$labmodpanel/ScrollContainer/primalmodlist/traitremove.disabled = true
 		$labmodpanel/ScrollContainer/primalmodlist/traitremove.hint_tooltip = 'Requires Laboratory Upgrade 2'
+	else:
+		$labmodpanel/ScrollContainer/primalmodlist/traitremove.disabled = false
+		$labmodpanel/ScrollContainer/primalmodlist/traitremove.hint_tooltip = ""
 	get_node("labmodpanel/modificationtext").set_bbcode(text)
 
 

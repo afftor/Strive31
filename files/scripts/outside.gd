@@ -377,7 +377,7 @@ func setcharacter(text):
 func slaveguild(guild = 'wimborn'):
 	mindread = false
 	var text = ''
-	sellslavelocation = guild
+	sellslavelocation = 'guild'
 	guildlocation = guild
 	if guild == 'wimborn':
 		slavearray = globals.guildslaves.wimborn
@@ -419,29 +419,30 @@ func slaveguild(guild = 'wimborn'):
 		if globals.state.sidequests.emily in [14,15]:
 			array.insert(1, {name = 'Search for Tisha', function = 'tishaquest'})
 		
+		array.append({name = 'Leave', function = 'togorn'})
 		#QMod - New Event System
 		if array.size() > 0:
-			buildbuttons(array)	
-		
-		var place = {'region' : 'gorn', 'area' : 'slaveGuild', 'location' : 'lobby'}
-		var placeEffects
-		var buttonCount = array.size() #ToFix - Keep an eye on this, links old quest button and new quest button counts.
-		
-		placeEffects = globals.events.call_events(place, 'trigger') #ToFix - Should a triggered event be able to create a 'hook' event as a follow-up?
-		if placeEffects.text != '':
-			text += '\n\n' + placeEffects.text
-			
-		placeEffects = globals.events.call_events(place, 'hook', {source = self, function = 'slaveguild'})
-		if placeEffects.text != '':
-			text += '\n\n' + placeEffects.text
-		var buttons = placeEffects.buttons
-		if buttons.size() > 0:
-			buildbuttons(buttons, globals.events, false, buttonCount)
-			buttonCount += buttons.size()
+			buildbuttons(array)
+#
+#		var place = {'region' : 'gorn', 'area' : 'slaveGuild', 'location' : 'lobby'}
+#		var placeEffects
+#		var buttonCount = array.size() #ToFix - Keep an eye on this, links old quest button and new quest button counts.
+#
+#		placeEffects = globals.events.call_events(place, 'trigger') #ToFix - Should a triggered event be able to create a 'hook' event as a follow-up?
+#		if placeEffects.text != '':
+#			text += '\n\n' + placeEffects.text
+#
+#		placeEffects = globals.events.call_events(place, 'hook', {source = self, function = 'slaveguild'})
+#		if placeEffects.text != '':
+#			text += '\n\n' + placeEffects.text
+#		var buttons = placeEffects.buttons
+#		if buttons.size() > 0:
+#			buildbuttons(buttons, globals.events, false, buttonCount)
+#			buttonCount += buttons.size()
 		# - End New Event System
 		
-		array = [{name = 'Leave', function = 'togorn'}]
-		buildbuttons(array, self, false, buttonCount)
+#		
+#		buildbuttons(array, self, false, buttonCount)
 	elif guild == 'frostford':
 		clearselection()
 		setcharacter('frostfordslaver')
@@ -753,8 +754,8 @@ func sellslavelist(type = 'guild'):
 func _on_slavesellcancel_pressed():
 	get_node("slavesellpanel").visible = false
 	clearselection()
-	if sellslavelocation in ['gorn','wimborn','frostford']:
-		slaveguild(sellslavelocation)
+	if sellslavelocation == 'guild':
+		slaveguild(guildlocation)
 	elif sellslavelocation == 'sebastian':
 		sebastian()
 	elif sellslavelocation == 'umbra':
@@ -2252,6 +2253,7 @@ func spellbackpackselect(spell):
 
 
 func useitem(item, person):
+	globals.items.person = person
 	globals.state.backpack.stackables[item.code] -= 1
 	if item.code == 'bandage':
 		globals.items.call(item.effect)

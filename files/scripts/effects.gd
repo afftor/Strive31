@@ -59,10 +59,10 @@ func degrading4(person):
 	person.obed += 20
 
 func animalistic1(person):
-	person.energy = 8
+	person.energy += 8
 
 func animalistic2(person):
-	person.energy = 16
+	person.energy += 16
 
 func animalistic3(person):
-	person.energy = 25
+	person.energy += 25

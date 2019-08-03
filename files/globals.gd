@@ -3,7 +3,7 @@ extends Node
 
 var effectdict = {}
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
-var gameversion = '0.5.23c'
+var gameversion = '0.5.24c'
 var state = progress.new()
 var developmode = false
 var gameloaded = false
@@ -11,7 +11,7 @@ var gameloaded = false
 var mainscreen = 'mainmenu'
 
 var filedir = 'res://files'
-var backupdir = 'res://backfup'
+var backupdir = 'res://backup'
 
 var resources = resource.new()
 var person = load("res://files/scripts/person/person.gd")
@@ -303,7 +303,7 @@ futa_chance = 10,
 children = false,
 noadults = false,
 slaverguildallraces = false,
-fontsize = 14,
+fontsize = 18,
 musicvol = 24,
 soundvol = 24,
 receiving = true,
@@ -724,8 +724,6 @@ func impregnation(mother, father = null, anyfather = false):
 	if (mother.race.find('Beastkin') >= 0 && father.race.find('Beastkin') < 0)|| (father.race.find('Beastkin') >= 0 && mother.race.find('Beastkin') < 0):
 		if father.race.find('Beastkin') >= 0 && mother.race in ['Human','Elf','Dark Elf','Drow','Demon','Seraph']:
 			babyrace = father.race.replace('Beastkin', 'Halfkin')
-		else:
-			babyrace = mother.race.replace('Beastkin', 'Halfkin')
 		
 	var baby = globals.newslave(babyrace, age, 'random', mother.origins)
 	baby.state = 'fetus'
@@ -1223,8 +1221,6 @@ func load_game(text):
 						k.stats.end_base = k.stats.end_cur
 					if k.has('stats') && k.stats.obed_mod <= 0:
 						k.stats.obed_mod = 1
-	if currentline.has('sebastianslave'):
-		currentline.sebastianslave['@subpath'] = 'person'
 	resources = dict2inst(currentline.resources)
 	player = dict2inst(currentline.player)
 	state = dict2inst(currentline.state)
@@ -1270,8 +1266,6 @@ func load_game(text):
 		newslave = person.new()
 		if i['@path'].find('.gdc'):
 			i['@path'] = i['@path'].replace('.gdc', '.gd')
-		if i['@subpath'] == '':
-			i['@subpath'] = 'person'
 		newslave = dict2inst(i)
 		if i.has('face'):
 			newslave.beautybase = round(i.face.beauty)

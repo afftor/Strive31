@@ -660,7 +660,7 @@ margin_right = 1277.0
 margin_bottom = 653.0
 
 [node name="RichTextLabel" type="RichTextLabel" parent="PopupPanel"]
-margin_right = 1073.0
+margin_right = 897.0
 margin_bottom = 589.0
 
 [node name="debug" type="Button" parent="."]
@@ -670,7 +670,6 @@ margin_top = 680.0
 margin_right = 510.0
 margin_bottom = 719.0
 text = "Debug"
-
 [connection signal="meta_clicked" from="Panel/sceneeffects1" to="." method="_on_sceneeffects1_meta_clicked"]
 [connection signal="pressed" from="Panel/stopbutton" to="." method="_on_stopbutton_pressed"]
 [connection signal="pressed" from="Panel/passbutton" to="." method="_on_passbutton_pressed"]

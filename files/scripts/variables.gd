@@ -1,97 +1,58 @@
 extends Node
-#warning-ignore:unused_class_variable
+#warning-ignore-all:unused_class_variable
 var basehealth = 50.0
-#warning-ignore:unused_class_variable
 var healthperend = 25.0
-#warning-ignore:unused_class_variable
 var geardropchance = 15.0
-#warning-ignore:unused_class_variable
 var enchantitemprice = 1.5
-#warning-ignore:unused_class_variable
 var sellingitempricemod = 0.2
-#warning-ignore:unused_class_variable
 var basefoodconsumption = 10.0
-#warning-ignore:unused_class_variable
 var skillpointsperlevel = 2.0
-#warning-ignore:unused_class_variable
 var timeforinteraction = 20.0
-#warning-ignore:unused_class_variable
 var consumerope = 1.0
-#warning-ignore:unused_class_variable
 var learnpointsperstat = 3.0
-#warning-ignore:unused_class_variable
 var attributepointsperupgradepoint = 1.0
 
 
-#warning-ignore:unused_class_variable
+
 var playerstartbeauty = 40.0
-#warning-ignore:unused_class_variable
 var characterstartbeauty = 40.0
-
-#warning-ignore:unused_class_variable
 var basesexactions = 1.0
-#warning-ignore:unused_class_variable
 var basenonsexactions = 1.0
-
-#warning-ignore:unused_class_variable
 var playerbonusstatpoint = 2.0
-
-#warning-ignore:unused_class_variable
 var banditishumanchance = 70.0
 
 #Pregnancies
-#warning-ignore:unused_class_variable
+
 var pregduration = 31.0
-#warning-ignore:unused_class_variable
 var growuptimechild = 15.0
-#warning-ignore:unused_class_variable
 var growuptimeteen = 20.0
-#warning-ignore:unused_class_variable
 var growuptimeadult = 25.0
-#warning-ignore:unused_class_variable
 var traitinheritchance = 80.0
-#warning-ignore:unused_class_variable
 var babynewtraitchance = 20.0
 
 #slave stats & combat
-#warning-ignore:unused_class_variable
+
 var damageperstr = 3.0
-#warning-ignore:unused_class_variable
 var speedperagi = 3.0
-#warning-ignore:unused_class_variable
 var speedbase = 10.0
-#warning-ignore:unused_class_variable
 var baseattack = 5.0
-#warning-ignore:unused_class_variable
 var basecarryweight = 10.0
-#warning-ignore:unused_class_variable
 var carryweightperstrplayer = 4.0
-#warning-ignore:unused_class_variable
 var baseslavecarryweight = 3.0
-#warning-ignore:unused_class_variable
 var slavecarryweightperstr = 5.0
 
 
 #slave prices constants
-#warning-ignore:unused_class_variable
+
 var priceperlevel = 40.0
-#warning-ignore:unused_class_variable
 var priceperbasebeauty = 2.5
-#warning-ignore:unused_class_variable
 var priceperbonusbeauty = 1.5
-#warning-ignore:unused_class_variable
 var pricebonusvirgin = 0.15
-#warning-ignore:unused_class_variable
 var pricebonusfuta = 0.1
-#warning-ignore:unused_class_variable
 var pricebonusbadtrait = -0.1
-#warning-ignore:unused_class_variable
 var pricebonustoxicity = -0.33
-#warning-ignore:unused_class_variable
 var priceuncivilized = -0.5
-#warning-ignore:unused_class_variable
 var priceminimum = 5.0
-#warning-ignore:unused_class_variable
 var priceminimumsell = 10.0
 
 #globals arrays
@@ -105,23 +66,23 @@ var priceminimumsell = 10.0
 
 
 #sidecharacters
-#warning-ignore:unused_class_variable
+
 var oldemily = false
 
-#warning-ignore:unused_class_variable
+
 var gradepricemod = { # grade and age mods will be added as bonus to base price which starts at 1 [baseprice*(1+value)]
 	"slave": -0.2, poor = 0, commoner = 0.2, rich = 0.5, noble = 1
 	}
-#warning-ignore:unused_class_variable
+
 var agepricemods = {
 	child = 0, teen = 0, adult = 0
 }
 
-#warning-ignore:unused_class_variable
+
 var luxuryreqs = {"slave" : 0, poor = 5, commoner = 15,rich = 25, noble = 40}
 
 
-#warning-ignore:unused_class_variable
+
 var list = {
 basehealth = {descript = "Character's health before modifiers", default = 50, min = 1, max = 1000},
 healthperend = {descript = "Bonus health per point of endurance",default = 25, min = 0, max = 1000},

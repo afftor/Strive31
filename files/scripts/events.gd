@@ -1984,13 +1984,10 @@ func caliproposal(stage = 0):
 			cali = i
 	if cali == null:
 		globals.state.sidequests.cali = 100
-		globals.main.close_dialogue()
 		return
 	if cali.vagvirgin == false || cali.loyal <= 50 || (stage == 0 && globals.state.decisions.has('caliproposalseen')):
-		globals.main.close_dialogue()
 		return
 	if cali.away.duration != 0:
-		globals.main.close_dialogue()
 		globals.state.upcomingevents.append({code = 'caliproposal', duration = cali.away.duration + 2})
 		return
 	

@@ -3,13 +3,16 @@ extends Node
 var dir = Directory.new()
 var file = File.new()
 var info = 'This is an inbuilt mod allowing user to access and edit constants from main menu. If your game experiences issues, please delete it to clear settings. \n\nAuthor: Maverik'
-var modversion = '0.2'
+var modversion = '0.3'
 
 
 func run(overwrite = false):
 	var modfolder = globals.modfolder
 	if dir.dir_exists(modfolder + 'Constants/') && overwrite == false: #check if folder exists
 		return
+	elif dir.dir_exists(modfolder + 'Constants/'):
+		for i in globals.dir_contents(modfolder+'Constants/'):
+			dir.remove(i)
 	var modsubfolder = modfolder + 'Constants/'
 	#making description txt
 	dir.make_dir(modsubfolder)

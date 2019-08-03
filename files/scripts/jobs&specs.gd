@@ -601,7 +601,7 @@ func library(person):
 
 func nurse(person):
 	var text = "$name is taking care of residents' health.\n"
-	if globals.player.health < globals.player.health_max:
+	if globals.player.health < globals.player.stats.health_max:
 		globals.player.health += person.wit/15+person.smaf*3
 		person.xp += rand_range(1,3)
 	for i in globals.slaves:

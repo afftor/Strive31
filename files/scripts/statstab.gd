@@ -41,10 +41,14 @@ func _on_trainingabils_pressed():
 			i.free()
 	
 	for i in ['cour','conf','wit','charm']:
-		get_node("trainingabilspanel/" +i ).text = globals.statsdict[i] + ": " + str(person[i]) + "/" + str(min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]))
-		get_node("trainingabilspanel/"+i+"/Button").disabled = !(person.stats[i+'_base'] < min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat)
-		get_node("trainingabilspanel/"+i+"/Button2").disabled = !(person.stats[i+'_base']+4 < min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat*5)
-		
+#		get_node("trainingabilspanel/" +i ).text = globals.statsdict[i] + ": " + str(person[i]) + "/" + str(min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]))
+#		get_node("trainingabilspanel/"+i+"/Button").disabled = !(person.stats[i+'_base'] < min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat)
+#		get_node("trainingabilspanel/"+i+"/Button2").disabled = !(person.stats[i+'_base']+4 < min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) && person.learningpoints >= variables.learnpointsperstat*5)
+		var bonus = max(0, person.stats[globals.maxstatdict[i]] - person.originvalue['noble'])
+		var statMax = min(person.stats[globals.maxstatdict[i]], person.originvalue[person.origins]) + bonus
+		get_node("trainingabilspanel/" +i ).text = globals.statsdict[i] + ": " + str(person[i]) + "/" + str(statMax)
+		get_node("trainingabilspanel/"+i+"/Button").disabled = !(person.stats[i+'_base'] < statMax && person.learningpoints >= variables.learnpointsperstat)
+		get_node("trainingabilspanel/"+i+"/Button2").disabled = !(person.stats[i+'_base']+4 < statMax && person.learningpoints >= variables.learnpointsperstat*5)
 	
 	$trainingabilspanel/learningpoints.text = "Free Learn Points: " + str(person.learningpoints)
 	get_node("trainingabilspanel/abilitytext").set_bbcode('')

@@ -241,7 +241,7 @@ func _process(delta):
 			i.get_node("en/Label").text = str(ceil(combatant.energy)) + "/" + str(combatant.energymax)
 		if i.has_node('stress') && combatant.person != globals.player:
 			i.get_node('stress').visible = true
-			i.get_node('stress/Label').text = str(combatant.stress)
+			i.get_node('stress/Label').text = str(floor(combatant.stress))
 			i.get_node('stress').value = round(float(combatant.stress)/combatant.stressmax*100)
 		
 	

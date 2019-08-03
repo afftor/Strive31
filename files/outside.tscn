@@ -1259,7 +1259,6 @@ size_flags_vertical = 2
 text = "Quicksell Captives"
 
 [node name="TabContainer" type="TabContainer" parent="playergroupdetails"]
-editor/display_folded = true
 margin_left = 23.0
 margin_top = 17.0
 margin_right = 496.0
@@ -1384,7 +1383,6 @@ texture = ExtResource( 51 )
 expand = true
 
 [node name="slavebuypanel" type="Control" parent="."]
-editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -1436,6 +1434,7 @@ margin_bottom = 31.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 6 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Maria Human"
 
 [node name="age" type="Label" parent="slavebuypanel/slavebuypanel/ScrollContainer/VBoxContainer/slavebutton"]
@@ -1446,6 +1445,7 @@ margin_bottom = 63.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 6 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Teen"
 
 [node name="price" type="Label" parent="slavebuypanel/slavebuypanel/ScrollContainer/VBoxContainer/slavebutton"]
@@ -1456,6 +1456,7 @@ margin_bottom = 72.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 6 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "150 gold"
 
 [node name="sex" type="TextureRect" parent="slavebuypanel/slavebuypanel/ScrollContainer/VBoxContainer/slavebutton"]
@@ -1746,6 +1747,7 @@ margin_bottom = 30.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 6 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Maria Human"
 
 [node name="price" type="Label" parent="slavesellpanel/ScrollContainer/VBoxContainer/slavebutton"]

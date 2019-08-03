@@ -4,6 +4,7 @@
 [ext_resource path="res://files/buttons/noimage.png" type="Texture" id=2]
 
 [node name="Panel" type="WindowDialog"]
+visible = true
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -169,8 +170,8 @@ dialog_hide_on_ok = true
 mode = 0
 access = 2
 filters = PoolStringArray( "*.jpg", "*.png" )
-current_dir = "D:/Program Files2/proj/GitHub/strive3.0"
-current_path = "D:/Program Files2/proj/GitHub/strive3.0/"
+current_dir = "C:/Users/1/Desktop/godot/strive3.1"
+current_path = "C:/Users/1/Desktop/godot/strive3.1/"
 
 [node name="selectfolders" type="WindowDialog" parent="."]
 margin_left = 132.0
@@ -243,10 +244,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 224.0
-margin_top = 122.0
-margin_right = -422.0
-margin_bottom = -213.0
+margin_left = -537.625
+margin_top = -359.702
+margin_right = -72.6252
+margin_bottom = -74.7017
 size_flags_horizontal = 2
 size_flags_vertical = 2
 window_title = "Open a Directory"

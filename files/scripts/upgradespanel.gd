@@ -22,8 +22,7 @@ func _ready():
 
 func show():
 	get_tree().get_current_scene()._on_mansion_pressed()
-	if OS.get_name() != 'HTML5':
-		yield(get_tree().get_current_scene(), 'animfinished')
+	yield(get_tree().get_current_scene(), 'animfinished')
 	self.visible = true
 	get_node("upgradepoints").set_text("Available upgrade points:"+str(globals.resources.upgradepoints))
 	selectedupgrade = null

@@ -123,7 +123,6 @@ var introText02 = "Although you have managed to dodge any sort of terrible fate,
 func _ready():
 	var constantsloader = load("res://files/constmodinstal.gd").new()
 	constantsloader.run()
-	
 	#System/OS + global checks and settings	
 	_ready_system_check()
 	
@@ -197,7 +196,7 @@ func _ready_music():
 func _ready_credits():
 	#Designers & game contributors
 	var credits = ''
-	credits = 'Game design, code and writing: Maverik\nArtist: Warm Tail\nArtist: Demona\n\nSex scenes: NK, Lamoli\n\nWriting and proofreading helpers: Kalderza, Shvan, Xero, Dr. Nobody, Anti-No\n\nPlease contact me if you helped me somewhere and I forgot to mention you.\n\nSpecial notion to all patreons:'
+	credits = 'Game design, code and writing: Maverik\nArtist: Warm Tail\nArtist: Demona\n\nSex scenes: NK, Lamoli\n\nWriting and proofreading helpers: Kalderza, Shvan, Xero, Dr. Nobody, Anti-No\nBug fixes: Ankmairdor\n\nPlease contact me if you helped me somewhere and I forgot to mention you.\n\nSpecial notion to all patreons:'
 	credits += '\n\n$10+ Supporters: [color=green]'
 	
 	#Patron '10' list
@@ -466,7 +465,7 @@ func _on_patreonbutton_pressed():
 	OS.shell_open('https://www.patreon.com/maverik')
 
 func _on_blogbutton_pressed():
-	OS.shell_open('https://strivefopower.blogspot.com')
+	OS.shell_open('https://discord.gg/VXSx9Zk')
 
 func _on_itchbutton_pressed():
 	OS.shell_open('https://strive4power.itch.io/strive-for-power')

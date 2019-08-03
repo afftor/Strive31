@@ -1299,6 +1299,7 @@ size_flags_vertical = 2
 theme = ExtResource( 3 )
 
 [node name="mansion" type="Panel" parent="MainScreen"]
+editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 1.0
@@ -2447,7 +2448,7 @@ custom_fonts/font = ExtResource( 45 )
 text = "Work on slaves"
 
 [node name="labmodpanel" type="Panel" parent="MainScreen/mansion/labpanel"]
-editor/display_folded = true
+visible = false
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -4510,7 +4511,6 @@ hint_tooltip = "Show full body image if available"
 text = "Show Full Body"
 
 [node name="customization" type="Panel" parent="MainScreen/slave_tab/stats"]
-editor/display_folded = true
 visible = false
 margin_left = 190.0
 margin_top = 169.0
@@ -4951,7 +4951,6 @@ size_flags_vertical = 0
 autowrap = true
 
 [node name="tattoopanel" type="Popup" parent="MainScreen/slave_tab/stats/customization"]
-editor/display_folded = true
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -4967,9 +4966,9 @@ size_flags_vertical = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 3.0
-margin_top = -87.0
+margin_top = 3.0
 margin_right = 3.0
-margin_bottom = -87.0
+margin_bottom = 3.0
 texture = ExtResource( 44 )
 expand = true
 
@@ -6618,6 +6617,7 @@ text = "Confirm"
 "blockmaininput",
 "blocknextdayevents",
 ]]
+editor/display_folded = true
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -8791,7 +8791,7 @@ bbcode_text = "A text test"
 text = "A text test"
 
 [node name="slavetooltip" type="Popup" parent="."]
-visible = true
+editor/display_folded = true
 margin_left = 484.0
 margin_top = 181.0
 margin_right = 1048.0
@@ -8958,7 +8958,6 @@ position = Vector2( 681, 385 )
 current = true
 
 [node name="Tween" type="Tween" parent="."]
-
 [connection signal="pressed" from="ResourcePanel/helpglossary" to="." method="_on_helpglossary_pressed"]
 [connection signal="pressed" from="ResourcePanel/menu" to="." method="_on_menu_pressed"]
 [connection signal="pressed" from="Navigation/mansion" to="." method="_on_mansionbutton_pressed"]
