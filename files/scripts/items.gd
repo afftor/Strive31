@@ -1633,15 +1633,21 @@ func equipitem(itemid, person = person, notplayer = false):
 			call(i.effect, i.effectvalue)
 	
 
-func unequipitem(itemid, person = person):
-	var item = globals.state.unstackables[itemid]
+func unequipitem(itemid, person = person, notplayer = false):
+	var item
+	if notplayer:
+		item = globals.main.get_node('explorationnode').enemygear[itemid]
+	else:
+		item = globals.state.unstackables[itemid]
 	self.person = person
 	
 	person.gear[item.type] = null
 	for i in item.effects:
 		if i.type == 'onequip':
 			call(i.effect, -i.effectvalue)
-	if backpack == true:
+	if notplayer:
+		globals.main.get_node('explorationnode').enemygear.erase(itemid)
+	elif backpack == true:
 		item.owner = 'backpack'
 	else:
 		item.owner = null

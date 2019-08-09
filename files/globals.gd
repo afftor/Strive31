@@ -1,9 +1,10 @@
 
+
 extends Node
 
 var effectdict = {}
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
-var gameversion = '0.5.24c'
+var gameversion = '0.5.25'
 var state = progress.new()
 var developmode = false
 var gameloaded = false
@@ -508,6 +509,7 @@ class progress:
 	farmcapacity = 0,
 	farmhatchery = 0,
 	farmtreatment = 0,
+	farmmana = 0,
 	foodcapacity = 0,
 	foodpreservation = 0,
 	jailcapacity = 1,
@@ -724,6 +726,9 @@ func impregnation(mother, father = null, anyfather = false):
 	if (mother.race.find('Beastkin') >= 0 && father.race.find('Beastkin') < 0)|| (father.race.find('Beastkin') >= 0 && mother.race.find('Beastkin') < 0):
 		if father.race.find('Beastkin') >= 0 && mother.race in ['Human','Elf','Dark Elf','Drow','Demon','Seraph']:
 			babyrace = father.race.replace('Beastkin', 'Halfkin')
+		else:
+			babyrace = mother.race.replace('Beastkin', 'Halfkin')
+
 		
 	var baby = globals.newslave(babyrace, age, 'random', mother.origins)
 	baby.state = 'fetus'
@@ -1194,11 +1199,9 @@ func load_game(text):
 					k['@subpath'] = ''
 	if currentline.resources['@subpath'] == '':
 		currentline.resources['@subpath'] = "resource"
-#		currentline.player['@subpath'] = 'person'
 		currentline.state['@subpath'] = 'progress'
 	if currentline.resources['@path'] == "res://globals.gd":
 		currentline.resources['@path'] = "res://files/globals.gd"
-#		currentline.player['@path'] = 'res://files/globals.gd'
 		currentline.state['@path'] = 'res://files/globals.gd'
 		for i in currentline.values():
 			if typeof(i) == TYPE_DICTIONARY:
@@ -1256,8 +1259,6 @@ func load_game(text):
 		newslave = person.new()
 		if i['@path'].find('.gdc') >= 0:
 			i['@path'] = i['@path'].replace('.gdc', '.gd')
-#		if i['@subpath'] == '':
-#			i['@subpath'] = 'person'
 		newslave = dict2inst(i)
 		if i.has('face'):
 			newslave.beautybase = round(i.face.beauty)
@@ -1387,7 +1388,7 @@ func addnonfurrycounterpart(array):
 			array.append(i.replace('Beastkin', 'Halfkin'))
 
 func removefurries(array):
-	for i in array:
+	for i in array.duplicate():
 		if i.find('Beastkin') >= 0:
 			array.erase(i)
 

@@ -243,6 +243,11 @@ func _ready_newgame_creator():
 	for i in get_tree().get_nodes_in_group("statdown"):
 		i.connect("pressed",self,'statdown',[i])
 	
+	#Connect slave name entry boxes
+	for i in ["TextureFrame/newgame/stage8/slavename", "TextureFrame/newgame/stage8/slavesurname"]:
+		var temp = get_node(i)
+		temp.connect("text_changed", self, '_slavename_text', [temp])
+
 	#Connect slave customization options
 	for i in get_tree().get_nodes_in_group("slaveoption"):  
 		i.connect("item_selected",self,'_slave_option', [i])
@@ -575,7 +580,36 @@ func _on_sandboxmode_pressed():
 func _on_customize_pressed():
 	get_node("TextureFrame/newgame/stagespanel/VBoxContainer/settings").set_text("Custom Start")
 	self.stage = 2
-	
+
+
+func quickstartStats():
+	var refStats = globals.races[player.race.replace('Halfkin', 'Beastkin')].stats.duplicate()
+	var stats = []
+	var count = 0
+	for i in refStats:
+		count += refStats[i]
+		stats.append( [i, refStats[i]] )
+	while count != 18:
+		var change = globals.weightedrandom(stats)
+		for i in stats:
+			if i[0] == change:
+				if count < 18:
+					if i[1] < 7:
+						i[1] += 1
+						count += 1
+					else:
+						player.stats[change] = i[1]
+						stats.erase(i)
+				elif i[1] > 2:
+					i[1] -= 1
+					count -= 1
+				else:
+					player.stats[change] = i[1]
+					stats.erase(i)
+				break
+	for i in stats:
+		player.stats[i[0]] = i[1]
+
 #QMod - Incompletely modified, a bit more random now, does not fully implement choice consequences 'properly'
 func _on_quickstart_pressed():
 	var ageArray = ['teen', 'adult']
@@ -598,6 +632,8 @@ func _on_quickstart_pressed():
 	
 	player.sex = sexArray[rand_range(0,sexArray.size())]
 	player.age = ageArray[rand_range(0,ageArray.size())]
+	regenerateplayer()
+	quickstartStats()
 	player.spec = playerSpecializationArray[rand_range(0, playerSpecializationArray.size())]
 	
 	#Generate random starting slave
@@ -990,6 +1026,9 @@ func _update_stage6():
 func _lookline_text(text, node):
 	makeoverPerson[node.get_name()] = node.get_text()
 	_update_stage6()
+
+func _slavename_text(text, node):
+	startSlave[node.get_name().right(5)] = text
 
 func _virgin_press():
 	if makeoverPerson.vagina == 'normal':

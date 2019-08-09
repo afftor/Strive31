@@ -81,6 +81,9 @@ var agepricemods = {
 
 var luxuryreqs = {"slave" : 0, poor = 5, commoner = 15,rich = 25, noble = 40}
 
+#upgrades
+
+var resident_farm_limit = [2,5,8,12]
 
 
 var list = {

@@ -322,7 +322,7 @@ func questarray():
 	code = '023',
 	questreq = true,
 	shortdescription = "An exquisite doll",
-	description = '',
+	description = 'An anonymous request has been made for a slave matching an exact specification. ',
 	reqs = [['obed','gte', 100],['beauty','gte',90], ['cour','lte',20], ['conf','lte',20]],
 	reqstemp = [['sex', 'eq', randsex()],['age','eq',randage()], ['haircolor','eq',randanyhaircolor()], ['eyecolor','eq', randanyeyecolor()]],
 	reqsfunc = [],

@@ -289,6 +289,13 @@ func enemyencounter():
 	mansion.maintext = text
 	enemyinfo()
 
+var guardRaces = {
+	'wimborn' : [['Human', 12],['Demon', 2],['Taurus', 2],['Cat', 1]],
+	'frostford' : [['Halfkin Wolf', 6],['Beastkin Wolf', 6],['Human', 5],['Halfkin Cat', 2],['Beastkin Cat', 2],['Halfkin Fox', 1],['Beastkin Fox', 1]],
+	'gorn' : [['Orc', 4],['Goblin', 2],['Centaur', 1],['Taurus', 1]],
+	'amberguard' : [['Elf', 12],['Dark Elf', 1],['Drow', 1]]
+}
+
 func buildslave(i):
 	var race = ''
 	var sex = ''
@@ -297,22 +304,28 @@ func buildslave(i):
 	var rand = 0
 	if currentzone != null && currentzone.has('races') == false:
 		currentzone.races = [['Human', 1]]
-	if i.capturerace.find('area') >= 0:
-		race = globals.weightedrandom(currentzone.races)
-	elif i.capturerace.find('any') >= 0:
-		race = globals.allracesarray[rand_range(0,globals.allracesarray.size())]
-	elif i.capturerace.find('bandits') >= 0:
-		if randf() <= variables.banditishumanchance/100:
-			race = 'Human'
-		else:
-			
-			race = globals.getracebygroup('bandits') #globals.banditraces[rand_range(0,globals.banditraces.size())]
-	else:
-		race = globals.weightedrandom(i.capturerace)
+	match i.capturerace[0]:
+		'area':
+			race = globals.weightedrandom(currentzone.races)
+
+		'any':
+			race = globals.allracesarray[rand_range(0,globals.allracesarray.size())]
+
+		'bandits':
+			if rand_range(0,100) <= variables.banditishumanchance:
+				race = 'Human'
+			else:
+
+				race = globals.getracebygroup('bandits') #globals.banditraces[rand_range(0,globals.banditraces.size())]
+
+		'amberguard', 'wimborn', 'frostford', 'gorn':
+			race = globals.weightedrandom( guardRaces[ i.capturerace[0] ] )
+		_:
+			race = globals.weightedrandom(i.capturerace)
 	race = globals.checkfurryrace(race)
 	
-	
-	
+
+
 	if i.capturesex.find('any') >= 0:
 		sex = 'random'
 	else:
@@ -328,25 +341,27 @@ func buildslave(i):
 	i.capture = slavetemp
 	
 	if i.has('gear'):
-		var gear = {}
+
 		for k in ['armor','weapon','costume','underwear','accessory']:
 			if k == 'armor' && globals.player.level < 2:
 				continue
 			if !combatdata.enemyequips[i.gear].has(k):
 				continue
-			gear[k] = globals.weightedrandom(combatdata.enemyequips[i.gear][k])
-			if gear[k] == 'nothing':
+			var item = globals.weightedrandom(combatdata.enemyequips[i.gear][k])
+			if item == 'nothing':
 				continue
 			var enchant = false
-			var item
-			if gear[k].find("+") >= 0:
+
+
+			if item.ends_with("+"):
 				enchant = true
-				gear[k] = gear[k].replace("+","")
-			item = globals.items.createunstackable(gear[k])
+				item = item.replace("+","")
+			item = globals.items.createunstackable(item)
 			if enchant:
 				globals.items.enchantrand(item)
 			enemygear[item.id] = item
 			globals.items.equipitem(item.id, slavetemp, true)
+		slavetemp.health = 10 #update max health
 		slavetemp.health = slavetemp.stats.health_max
 	return slavetemp
 
@@ -371,7 +386,7 @@ func enemyinfoclear():
 	outside.get_node("textpanelexplore/enemyinfo").set_bbcode('')
 
 func enemylevelup(person, levelarray):
-	var level = levelarray[randi()%levelarray.size()]
+	var level = round(rand_range(levelarray[0], levelarray[1]))
 	var statdict = ['sstr','sagi','smaf','send']
 	var skillpoints = (level-person.level)*variables.skillpointsperlevel
 	person.level = level
@@ -1003,7 +1018,8 @@ func captureslave(person):
 	if globals.races[person.race.replace("Halfkin", "Beastkin")].uncivilized == true:
 		person.add_trait('Uncivilized')
 	captureeffect(person)
-	if defeated.names[defeated.units.find(person)] == 'Captured':
+	var index = defeated.units.find(person)
+	if defeated.names[index] == 'Captured' || defeated.faction[index] in ['stranger','elf']:
 		if currentzone.tags.find("wimborn") >= 0:
 			location = 'wimborn'
 		elif currentzone.tags.find("frostford") >= 0:
@@ -1203,7 +1219,7 @@ func _on_confirmwinning_pressed(): #0 leave, 1 capture, 2 rape, 3 kill
 	else:
 		location = 'wimborn'
 	for i in range(0, defeated.units.size()):
-		if defeated.faction[i] == 'stranger' && defeated.names[i] != "Captured":
+		if defeated.faction[i] in ['stranger','elf'] && defeated.names[i] != "Captured":
 			globals.state.reputation[location] -= 1
 		if defeated.select[i] == 0:
 			if defeated.names[i] != 'Captured':
@@ -1419,7 +1435,7 @@ func gornyris():
 		text = globals.questtext.GornYrisRepeatMeet
 		if globals.resources.gold >= 200:
 			buttons.append({text = "Accept (200 Gold)", function = "gornyrisaccept", args = 2})
-			if globals.itemdict.deterrentpot.amount >= 1:
+			if globals.state.getCountStackableItem('deterrentpot','backpack') >= 1:
 				buttons.append({text = "Accept and use Deterrent potion (200 Gold)", function = "gornyrisaccept", args = 3})
 		else:
 			buttons.append({text = "Accept (200 Gold)", function = "gornyrisaccept", args = 2, disabled = true})
@@ -1428,7 +1444,7 @@ func gornyris():
 		globals.state.sidequests.yris += 1
 	elif globals.state.sidequests.yris in [4,5]:
 		text = globals.questtext.GornYrisOffer2Repeat
-		if globals.resources.gold < 1000 || globals.itemdict.deterrentpot.amount < 1 || globals.state.sidequests.yris < 5:
+		if globals.resources.gold < 1000 || globals.state.getCountStackableItem('deterrentpot','backpack') < 1 || globals.state.sidequests.yris < 5:
 			text += "\n\n[color=yellow]You decide, that you should prepare before putting your money on the table.[/color] "
 			if globals.state.sidequests.yris < 5:
 				text += "\n\nPerhaps, somebody skilled in alchemy might shine some light upon your previous finding. "
@@ -1479,14 +1495,14 @@ func gornyrisaccept(stage):
 		buttons.append({text = "Close", function = 'closescene'})
 		globals.charactergallery.yris.scenes[1].unlocked = true
 		globals.state.sidequests.yris += 1
-		globals.itemdict.deterrentpot.amount -= 1
+		globals.state.removeStackableItem('deterrentpot', 1, 'backpack')
 		state = true
 		globals.resources.mana += 25
 	elif stage == 4:
 		sprite = [['yrisshocknaked', 'pos1']]
 		globals.charactergallery.yris.scenes[2].unlocked = true
 		image = 'yrissex'
-		globals.itemdict.deterrentpot.amount -= 1
+		globals.state.removeStackableItem('deterrentpot', 1, 'backpack')
 		text = globals.questtext.GornYrisAccept3
 		buttons.append({text = "Reveal everything", function = 'gornyrisaccept', args = 5})
 		buttons.append({text = "Demand the gold", function = 'gornyrisaccept', args = 6})

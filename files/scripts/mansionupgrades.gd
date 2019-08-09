@@ -27,7 +27,14 @@ levels = 1,
 pointscost = 20,
 cost = 2500,
 },
-
+farmmana = {
+name = "Mana Squeezers", 
+code = 'farmmana',
+description = "Equips the farm with special equipment which seeps magic particles from the air, providing a small chance to generate some mana from every slave located there.", 
+levels = 1,
+pointscost = 25,
+cost = 3000,
+},
 foodcapacity = {
 name = "Food Storage Capacity",
 code = 'foodcapacity',

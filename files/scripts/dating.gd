@@ -338,6 +338,7 @@ func initiate(tempperson):
 	
 	
 	person = tempperson
+	person.lastinteractionday = globals.resources.day
 	if person.race == 'Human':
 		modFearObed = 1.5
 	else:
@@ -838,7 +839,7 @@ func punishaddedeffect():
 			self.stress += 4
 			for i in slavearray:
 				if i.race == 'Human':
-					i.fear += 6
+					i.fear += 4.5
 				else:
 					i.fear += 3
 				i.stress += 3

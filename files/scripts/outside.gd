@@ -2003,7 +2003,7 @@ func sebastianfarm():
 func sebastianfarmpurchase():
 	globals.state.farm = 3
 	globals.resources.gold -= 1000
-	mansion.maintext = "— Pleased to have business with you!\n\n[color=yellow]Your mansion has now been fitted with an underground farm.[/color]\n\n— Oh, and by the way, that is not the only method to utilize your servants. Have you heard about giant snails? Their eggs are quite a delicacy, but they are really picky about where they lay them. I’ve heard that you can make them lay some in a human's orifices. — he slyly winks you — It looks like a human’s body temperature makes them attractive nests."
+	mansion.maintext = "— Pleased to have business with you!\n\n[color=yellow]Your mansion has now been fitted with an underground farm.[/color]\n\n— Oh, and by the way, that is not the only method to utilize your servants. Have you heard about giant snails? Their eggs are quite a delicacy, but they are really picky about where they lay them. I’ve heard that you can make them lay some in a human's orifices. — he slyly winks you — It looks like a human’s body temperature makes them attractive nests.\n\n— I've heard they can be found in the woods north of Shaliq. Getting yourself one can be tricky, but fortunately they are quite tame once you sate their voracious appetite. "
 	var array = [{name = 'Return', function = 'sebastian'}]
 	buildbuttons(array)
 

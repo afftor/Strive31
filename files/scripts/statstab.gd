@@ -355,6 +355,7 @@ func callorder():
 	get_node("callorder").popup()
 	get_node("callorder/Label").set_text(person.dictionary("How $name should call you?"))
 	get_node("callorder/LineEdit").set_text(person.masternoun)
+	get_node("callorder/LineEdit").set_placeholder(person.getMasterNoun())
 
 func zoequest():
 	globals.state.removeStackableItem('teleportseal', 10)

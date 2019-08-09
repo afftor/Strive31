@@ -11,8 +11,8 @@ var selectedcharacter
 var targetskill
 var nocaptures = false
 var area
-var trapper = false
-var trappername
+var trapper = null
+
 var turns = 0
 var combatantnodes = []
 var enemyturn = false
@@ -45,7 +45,7 @@ var playerpaneltextures = {
 
 func _ready():
 	$grouppanel/skilline/skill.set_meta('skill', {})
-	$Tween.start()
+
 	if debug == true:
 		var scene = load("res://files/scripts/exploration.gd")
 		globals.main = self
@@ -117,7 +117,7 @@ func start_battle(nosound = false):
 	get_node("autowin").visible = get_parent().get_node("new slave button").visible
 	var _slave
 	var combatant
-	trapper = false
+	trapper = null
 	enemyturn = false
 	globals.main.get_node("outside").hide()
 	globals.main.get_node("ResourcePanel").hide()
@@ -135,6 +135,7 @@ func start_battle(nosound = false):
 	if nosound == false:
 		globals.main.music_set('combat')
 	self.visible = true
+	ongoinganimation = false
 	combatlog = ''
 	var slavearray = []
 	for i in globals.state.playergroup:
@@ -158,8 +159,8 @@ func start_battle(nosound = false):
 	
 	for i in playergroup:
 		if i.person.spec == 'trapper':
-			trapper = true
-			trappername = i.name
+			trapper = i
+
 
 	for i in currentenemies:
 		var newcombatant = self.combatant.new()
@@ -229,6 +230,7 @@ func _process(delta):
 		var hpPercent = (combatant.hp/combatant.hpmax)*100
 		if !i.get_node("hp").has_meta('hp') || i.get_node("hp").get_meta('hp') != hpPercent:
 			$Tween.interpolate_property(i.get_node("hp"), "value", i.get_node('hp').value, hpPercent, 0.6, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+			$Tween.start()
 			i.get_node("hp").set_meta('hp', hpPercent)
 			#i.get_node("hp").value = (combatant.hp/combatant.hpmax)*100
 		i.get_node("hp/Label").text = str(ceil(combatant.hp)) + "/" + str(combatant.hpmax)
@@ -603,7 +605,7 @@ class combatant:
 	func escape():
 		state = 'escaped'
 		if group == 'enemy':
-			scene.combatlog += scene.combatantdictionary(self, self,'[name1] has escaped.')
+			scene.combatlog += scene.combatantdictionary(self, self,'\n[name1] [color=aqua]has escaped.[/color]')
 		scene.escapeanimation(self)
 		yield(scene, 'escapefinished')
 		node.hide()
@@ -1002,14 +1004,20 @@ func removebuff(buffcode, target):
 		target.effects.erase(buffcode)
 	rebuildbuffs(target)
 
+func groupColoredName(combatant):
+	if combatant.group == 'player':
+		return "[color=lime]" + combatant.name + "[/color]"
+	else:
+		return "[color=#ec636a]" + combatant.name + "[/color]"
+
 
 func combatantdictionary(combatant, combatant2, text):
-	text = text.replace('[name1]', combatant.name)
+	text = text.replace('[name1]', groupColoredName(combatant))
 	if typeof(combatant2) == TYPE_ARRAY:
 		for i in range(0,combatant2.size()):
-			text = text.replace('[targetname'+str(i) + ']', combatant2[i].name)
+			text = text.replace('[targetname'+str(i) + ']', groupColoredName(combatant2[i]))
 	else:
-		text = text.replace('[targetname1]', combatant2.name)
+		text = text.replace('[targetname1]', groupColoredName(combatant2))
 	return text
 
 
@@ -1046,9 +1054,11 @@ func enemyturn():
 				if effect.code == 'escapeeffect':
 					if i.effects.has('stun'):
 						continue
-					if trapper == true && randf() > 0.5:
-						i.state = 'defeated'
-						self.combatlog += combatantdictionary(i, i,'[name1] has tried to escape but was caught in one of the traps... ')
+					if trapper != null && randf() > 0.5:
+
+						self.combatlog += combatantdictionary(trapper, i,"\n[color=aqua][targetname1] has tried to escape but was caught in one of [name1]'s traps...[/color] ")
+						i.defeat()
+						yield(self, 'defeat2finished')
 						continue
 					i.escape()
 				if effect.type == 'onendturn':

@@ -286,7 +286,7 @@ func name(group):
 		if group == givers:
 			text += '[color=yellow]'
 			if i.person == globals.player:
-				text += 'you'
+				text += 'You'
 			else:
 				text += i.name
 			text += '[/color]'
@@ -297,7 +297,7 @@ func name(group):
 		else:
 			text += '[color=aqua]'
 			if i.person == globals.player:
-				text += 'you'
+				text += 'You'
 			else:
 				if globals.getrelativename(givers[0].person, i.person) != null && randf() >= 0.5:
 					if givers[0].person == globals.player:
@@ -317,16 +317,24 @@ func name(group):
 func names(group):
 	var text = ''
 	for i in group:
+		if i.person == globals.player:
+			group.erase(i)
+			group.push_front(i)
+			break
+	for i in group:
 		#text += "%" + str(i.number)
 		if group == givers:
 			text += '[color=yellow]'
 			if i.person == globals.player:
-				if group.size() == 1:
-					text += 'your'
-				else:
-					text += 'you'
+				text += "Your"
+#				if group.size() == 1:
+#					text += 'your'
+#				else:
+#					text += 'you'
 			else:
 				text += i.name
+			if i.person != globals.player:
+				text += "'s"
 			text += '[/color]'
 			if i != givers.back() && givers.find(i) != givers.size()-2:
 				text += ', '
@@ -335,19 +343,16 @@ func names(group):
 		else:
 			text += '[color=aqua]'
 			if i.person == globals.player:
-				if group.size() == 1:
-					text += 'your'
-				else:
-					text += 'you'
+				text += "Your"
 			else:
 				text += i.name
+			if i.person != globals.player:
+				text += "'s"
 			text += '[/color]'
 			if i != takers.back() && takers.find(i) != takers.size()-2:
 				text += ', '
 			elif takers.find(i) == takers.size()-2:
 				text += ' and '
-		if i.person != globals.player:
-			text += "'s"
 	return text
 
 #no recursive functions allowed in godot so this looks semi-horrible, but whatever

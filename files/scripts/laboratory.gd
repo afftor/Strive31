@@ -20,7 +20,7 @@ func _on_lab_pressed(person = null):
 		main.hide_everything()
 		get_node("labstart").set_disabled(true)
 		get_node("chooseassist").set_text("Choose Assistant")
-		text = text + "\n[color=yellow]You need to assign a Lab Assistant before you can conduct any modifications. [/color]"
+		text += "\n[color=yellow]You need to assign a Lab Assistant before you can conduct any modifications.\nEfficiency grows with Wit and Magic Affinity.\nRequires grade of [color=aqua]Commoner[/color] or higher. [/color]"
 	else:
 		main.background_set('lab')
 		if OS.get_name() != 'HTML5':
@@ -38,7 +38,7 @@ func _on_lab_pressed(person = null):
 
 func _on_chooseassist_pressed():
 	if get_node("chooseassist").get_text() == ("Choose Assistant"):
-		get_tree().get_current_scene().selectslavelist(false,'_on_lab_pressed',self)
+		get_tree().get_current_scene().selectslavelist(false,'_on_lab_pressed',self,globals.jobs.jobdict.labassist.reqs)
 	else:
 		for i in globals.slaves:
 			if i.work == 'labassist':

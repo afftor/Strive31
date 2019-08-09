@@ -31,7 +31,7 @@ Elf = {
 	ears = ['pointy'],
 	haircolor = ['white', 'green', 'purple', 'blue', 'blond', 'red', 'auburn'],
 	description = "Elves are famous among the various races for the legends and stories of ancient times, when elves held a similar status to modern humans. These tales speak of elves as arrogant, and in command of powerful nature magic, but ultimately spelling their own downfall in some great act of folly.\n\nModern elves bear few connections to their ancestors beyond physical appearance and a close connection to nature. In stark contrast, their lives are often fairly humble and reclusive, generally staying deep within forests. There is no evidence to suggest any inherent magic found in modern elves, but this hardly impedes their popularity.",
-	details = "[color=aqua]Racial trait: Preferred role based on confidence level.[/color]\n\n[color=yellow]Stat potential: Strength - 3, Agility - 5, Magic - 4, Endurance - 3 [/color]",
+	details = "[color=aqua]Racial trait: Improves obedience when allowed to lead during sex sequence.[/color]\n\n[color=yellow]Stat potential: Strength - 3, Agility - 5, Magic - 4, Endurance - 3 [/color]",
 	pricemod = 1.5,
 	startingrace = true,
 	wimbornrace = true,

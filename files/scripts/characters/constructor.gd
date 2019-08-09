@@ -64,7 +64,7 @@ func newslave(race, age, sex, origins = 'slave'):
 		for ii in category.actions:
 			person.sexuals.actions[ii] = 0
 	person.memory = person.origins
-	person.masternoun = globals.state.defaultmasternoun
+	person.masternoun = ''
 	if randf() < 0.05:
 		var spec = globals.specarray[rand_range(0,globals.specarray.size())]
 		globals.currentslave = person

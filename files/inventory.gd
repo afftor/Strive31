@@ -161,7 +161,7 @@ func itemsinventory():
 			array.append([])
 			array[array.size()-1].append(i)
 	
-	#array.sort_custom(self, 'sortgear')
+	array.sort_custom(self, 'sortgear')
 	
 	for i in array:
 		button = get_node("ScrollContainer/GridContainer/Button").duplicate()
@@ -190,10 +190,15 @@ func itemsinventory():
 		itemgrid.add_child(button)
 
 func sortgear(first, second):
-	if first[0].name[0] < second[0].name[0]:
-		return second
+
+	first = first[0]
+	second = second[0]
+	var type = ['weapon','armor','costume','underwear','accessory']
+	var valCmp = type.find(first.type) - type.find(second.type)
+	if valCmp == 0:
+		return first.name < second.name
 	else:
-		return first
+		return valCmp < 0
 
 func itemsbackpack():
 	var itemgrid = get_node("ScrollContainer/GridContainer")

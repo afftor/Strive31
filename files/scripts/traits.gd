@@ -196,7 +196,8 @@ var traits = {
       "mental"
     ],
     "conflict": [
-      "Monogamous"
+      "Monogamous",
+      "Prude"
     ]
   },
   "Weak": {
@@ -226,7 +227,8 @@ var traits = {
       "physical"
     ],
     "conflict": [
-      "weak"
+
+      "Weak"
     ]
   },
   "Clumsy": {
@@ -601,7 +603,8 @@ var traits = {
       "mental",
     ],
     "conflict": [
-      ""
+
+      "Spoiled"
     ]    
   },
   "Spoiled": {

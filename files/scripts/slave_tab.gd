@@ -68,7 +68,7 @@ func buyattributepoint():
 		person.skillpoints -= variables.attributepointsperupgradepoint
 		globals.resources.upgradepoints += 1
 	else:
-		get_tree().get_root().get_node("Mansion").infotext("[color=red]Not enough attribute points[/color]")
+		get_tree().get_root().get_node("Mansion").infotext("Not enough attribute points", 'red')
 	upgradecostupdate()
 
 func slavetabopen():
@@ -207,7 +207,7 @@ func buildmetrics():
 	text += "Was forced: " + str(person.metrics.roughsex) + " time"+globals.fastif(person.metrics.roughsex == 1, '','s')+";\n"
 	#text += person.dictionary("Of those $he liked: ") + str(person.metrics.roughsexlike) + " time"+globals.fastif(person.metrics.roughsexlike == 1, '','s')+";\n"
 	text += "Had partners: " + str(person.sexexp.partners.size()) + " partner"+globals.fastif(person.sexexp.partners.size() == 1, '','s')+";\n"
-	if person.preg.has_womb == true:
+	if person.preg.has_womb == true || person.metrics.preg > 0:
 		text += "Was pregnant: " + str(person.metrics.preg) + " time"+globals.fastif(person.metrics.preg == 1, '','s')+";\n"
 		text += "Gave birth: " + str(person.metrics.birth) + " time"+globals.fastif(person.metrics.birth == 1, '','s')+";\n"
 	#text += "Participated in threesomes: " + str(person.metrics.threesome) + " time"+globals.fastif(person.metrics.threesome == 1, '','s')+";\n"

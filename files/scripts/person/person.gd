@@ -83,7 +83,7 @@ var luxury = 0
 
 var brand = 'none'
 var rules = {'silence':false, 'pet':false, 'contraception':false, 'aphrodisiac':false, 'masturbation':false, 'nudity':false, 'betterfood':false, 'personalbath':false,'cosmetics':false,'pocketmoney':false}
-var masternoun = 'Master'
+var masternoun = ''
 
 var work = 'rest'
 var farmoutcome = false
@@ -238,6 +238,12 @@ func trait_remove(trait):
 	if globals.get_tree().get_current_scene().has_node("infotext") && globals.slaves.find(self) >= 0 && away.at != 'hidden':
 		globals.get_tree().get_current_scene().infotext(text,'yellow')
 
+func getMasterNoun():
+	if masternoun == '':
+		return globals.state.defaultmasternoun
+	else:
+		return masternoun
+
 func levelupreqs_set(value):
 	levelupreqs = value
 
@@ -260,6 +266,8 @@ func levelup():
 	level += 1
 	skillpoints += variables.skillpointsperlevel
 	realxp = 0
+	if int(level) % 2 == 0:
+		self.health += 5
 	self.loyal += rand_range(5,10)
 	if self != globals.player:
 		globals.get_tree().get_current_scene().infotext(dictionary("$name has advanced to Level " + str(level)),'green')
@@ -655,7 +663,7 @@ func dictionary(text):
 	string = string.replace('$sir', globals.fastif(sex == 'male', 'Sir', "Ma'am"))
 	string = string.replace('$race', globals.decapitalize(race).replace('_', ' '))
 	string = string.replace('$playername', globals.player.name_short())
-	string = string.replace('$master', masternoun)
+	string = string.replace('$master', getMasterNoun())
 	string = string.replace('[haircolor]', haircolor)
 	string = string.replace('[eyecolor]', eyecolor)
 	return string

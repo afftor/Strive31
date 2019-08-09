@@ -8,7 +8,7 @@ mansion = {upgrades = ['mansioncommunal','mansionpersonal','mansionbed', 'mansio
 facilities = {upgrades = ['mansionalchemy', 'mansionlibrary', 'mansionparlor', 'mansionkennels', 'mansionnursery', 'mansionlab']},
 jail = {upgrades = ['jailcapacity','jailtreatment','jailincenses']},
 storage = {upgrades = ['foodcapacity', 'foodpreservation']},
-farm = {upgrades = ['farmcapacity', 'farmhatchery', 'farmtreatment']},
+farm = {upgrades = ['farmcapacity', 'farmhatchery', 'farmtreatment','farmmana']},
 }
 
 var purchaseupgrade

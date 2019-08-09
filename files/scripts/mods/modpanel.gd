@@ -100,14 +100,18 @@ func loadfromconfig():
 	removeduplicates()
 
 func removeduplicates():
+	var record = [] #record of unique entries
 	for i in loadorder.duplicate():
-		var counter = 0
-		for k in loadorder:
-			if k == i:
-				counter += 1
-		while counter > 1:
+
+
+
+
+
+		if i in record:
 			loadorder.erase(i)
-			counter -= 1
+
+		else:
+			record.append(i)
 
 func saveconfig():
 	var config = ConfigFile.new()
@@ -144,6 +148,7 @@ func storebackup(): #clears and restores backups
 
 func loadbackup():
 	print("Loading Backup...")
+	activemods.clear()
 	for i in file_dictionary:
 		var backup = File.new()
 		backup.open(i.replacen(filedir, backupdir), File.READ)
@@ -277,9 +282,10 @@ func get_mod(string):
 func apply_file_to_dictionary(file_name, string):
 	#print(file_dictionary)
 	if file_dictionary.has(file_name):
-		file.open(file_name, File.READ)
-		temp_mod_scripts[file_name] = file.get_as_text()
-		file.close()
+		if !temp_mod_scripts.has(file_name):
+			file.open(file_name, File.READ)
+			temp_mod_scripts[file_name] = file.get_as_text()
+			file.close()
 		var offset = 0
 		while offset != -1 :
 			offset = apply_next_element_to_dictionary(file_name, string, offset)
@@ -359,7 +365,16 @@ func apply_next_element_to_dictionary(key, string, offset):
 						temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), pool_string.join("\n"))
 					elif which_operation == "VAR":
 						var param_temp = param
-						for i in current_match.get_string(2).replacen("{", "").replacen("}", "").split("\n"):
+
+						var match_stripped = current_match.get_string(2)
+						#if matching brackets are found, strips the first and last brackets
+						var chrIdx1 = match_stripped.find("{")
+						if chrIdx1 >= 0:
+							var chrIdx2 = match_stripped.find_last("}") - 1
+							if chrIdx2 >= 0:
+								match_stripped.erase(chrIdx1, 1)
+								match_stripped.erase(chrIdx2, 1)
+						for i in match_stripped.split("\n"):
 							if i != "":
 								pool_string.insert(param_temp, i)
 								if param_temp > 0:
@@ -398,9 +413,8 @@ func apply_next_element_to_dictionary(key, string, offset):
 
 func _on_disablemods_pressed():
 	loadorder.clear()
-	activemods.clear()
-	saveconfig()
 	loadbackup()
+	saveconfig()
 	$restartpanel.show()
 
 func _on_closemods_pressed():
@@ -429,11 +443,14 @@ func _on_modhelp_pressed():
 
 
 func _on_openmodfolder_pressed():
-	OS.shell_open(modfolder)
+	if modfolder.begins_with("user://"):
+		OS.shell_open(modfolder.replace("user:/", OS.get_user_data_dir()))
+	else:
+		OS.shell_open(modfolder)
 
 
 func _on_activemods_pressed():
-	var text = ''
+	var text = '\n'
 	for i in activemods:
 		text += i + '\n'
 	$activemodlist.popup()

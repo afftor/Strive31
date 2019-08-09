@@ -396,10 +396,10 @@ func tishadecision(number):
 		text = textnode.TishaEmilyLeave
 		buttons.append(['Let them leave', 'tishadecision', 6])
 		if globals.resources.gold >= 50 && globals.resources.food >= 50:
-			buttons.append(['Help them with gold and provision', 'tishadecision', 7])		
+			buttons.append(['Help them with gold and provision', 'tishadecision', 7])
 		else:
 			buttons.append({text = 'Help them with gold and provisions',function = 'tishadecision',args = 7, disabled = true})
-			state = false
+		state = false
 	elif number == 2:
 		sprite = [['emily2normal','pos2'],['tishashocked','pos1']]
 		text = textnode.TishaEmilyStay
@@ -1575,6 +1575,7 @@ func zoesacrifice(person):
 	
 	text = person.dictionary(text) + "\n\n" + textnode.MainQuestFrostfordZoeHostage
 	globals.main.dialogue(state, self, text, buttons, sprite)
+	globals.main.exploration.zoneenter('frostfordoutskirts')
 
 func mountainelfcamp(stage = 0):
 	var state = false

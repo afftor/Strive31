@@ -212,7 +212,7 @@ func _on_chooseportraitolder_pressed():
 	get_node("folderdialogue").set_meta('meta', "portrait")
 	get_node("folderdialogue").popup()
 	if portraitspath.find('user://') >= 0:
-		get_node("folderdialogue").set_current_path(OS.get_data_dir() + '/' +portraitspath.replace("user://", ''))
+		get_node("folderdialogue").set_current_path(OS.get_user_data_dir() + '/' +portraitspath.replace("user://", ''))
 	else:
 		get_node("folderdialogue").set_current_path(portraitspath)
 	

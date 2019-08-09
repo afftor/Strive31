@@ -1421,7 +1421,7 @@ func characterspeech(scene, details = []):
 		text = ''
 	
 	if partner.person == globals.player || character.person.traits.has("Monogamous"):
-		text = text.replace('[name2]', character.person.masternoun)
+		text = text.replace('[name2]', character.person.getMasterNoun())
 	else:
 		text = text.replace('[name2]', partner.name)
 	
@@ -1912,7 +1912,8 @@ func askslaveforaction(chosen):
 	
 	
 	
-	
+	if chosen.person.race == 'Elf':
+		chosen.person.obed += rand_range(3,6)
 	
 	
 	debug += 'Chosing targets... \n'

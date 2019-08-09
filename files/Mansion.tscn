@@ -712,7 +712,6 @@ custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Menu"
 
 [node name="Navigation" type="TextureRect" parent="."]
-editor/display_folded = true
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -1299,7 +1298,6 @@ size_flags_vertical = 2
 theme = ExtResource( 3 )
 
 [node name="mansion" type="Panel" parent="MainScreen"]
-editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = 1.0
@@ -2395,6 +2393,25 @@ margin_right = 766.0
 margin_bottom = 597.0
 hint_tooltip = "Prevents pregnancy and impregnation"
 text = "Contraceptives"
+
+[node name="defaultMasterNoun" type="LineEdit" parent="MainScreen/mansion/selfinspect"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -229.0
+margin_top = -407.0
+margin_right = -18.0
+margin_bottom = -373.0
+text = "Master"
+placeholder_text = "Master"
+
+[node name="Label" type="Label" parent="MainScreen/mansion/selfinspect/defaultMasterNoun"]
+margin_left = 6.0
+margin_top = -25.0
+margin_right = 190.0
+margin_bottom = -5.0
+text = "Default Title"
 
 [node name="labpanel" type="Panel" parent="MainScreen/mansion"]
 editor/display_folded = true
@@ -4579,8 +4596,8 @@ text = "Luxury Rules"
 align = 1
 
 [node name="contraception" type="CheckBox" parent="MainScreen/slave_tab/stats/customization/rules" groups=[
-"slaverules",
 "prisondisable",
+"slaverules",
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -4600,8 +4617,8 @@ custom_colors/font_color_pressed = Color( 0.0921321, 0.644531, 0.0453186, 1 )
 text = "Herbal contraception"
 
 [node name="aphrodisiac" type="CheckBox" parent="MainScreen/slave_tab/stats/customization/rules" groups=[
-"slaverules",
 "prisondisable",
+"slaverules",
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -4696,8 +4713,8 @@ custom_colors/font_color_pressed = Color( 0.0921321, 0.644531, 0.0453186, 1 )
 text = "Partial Nudity"
 
 [node name="betterfood" type="CheckBox" parent="MainScreen/slave_tab/stats/customization/rules" groups=[
-"slaverules",
 "prisondisable",
+"slaverules",
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -4716,8 +4733,8 @@ custom_colors/font_color_pressed = Color( 0.0921321, 0.644531, 0.0453186, 1 )
 text = "Better food"
 
 [node name="personalbath" type="CheckBox" parent="MainScreen/slave_tab/stats/customization/rules" groups=[
-"slaverules",
 "prisondisable",
+"slaverules",
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -4736,8 +4753,8 @@ custom_colors/font_color_pressed = Color( 0.0921321, 0.644531, 0.0453186, 1 )
 text = "Personal Bath"
 
 [node name="cosmetics" type="CheckBox" parent="MainScreen/slave_tab/stats/customization/rules" groups=[
-"slaverules",
 "prisondisable",
+"slaverules",
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -4756,8 +4773,8 @@ custom_colors/font_color_pressed = Color( 0.0921321, 0.644531, 0.0453186, 1 )
 text = "Cosmetics"
 
 [node name="pocketmoney" type="CheckBox" parent="MainScreen/slave_tab/stats/customization/rules" groups=[
-"slaverules",
 "prisondisable",
+"slaverules",
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -5745,8 +5762,8 @@ theme = ExtResource( 3 )
 bbcode_enabled = true
 
 [node name="birthpanel" type="Panel" parent="." groups=[
-"blockmaininput",
 "blocknextdayevents",
+"blockmaininput",
 ]]
 editor/display_folded = true
 visible = false
@@ -6614,8 +6631,8 @@ custom_fonts/font = ExtResource( 45 )
 text = "Confirm"
 
 [node name="dialogue" type="Control" parent="." groups=[
-"blockmaininput",
 "blocknextdayevents",
+"blockmaininput",
 ]]
 editor/display_folded = true
 visible = false
@@ -6785,8 +6802,8 @@ size_flags_horizontal = 2
 size_flags_vertical = 2
 
 [node name="scene" type="Control" parent="." groups=[
-"blockmaininput",
 "blocknextdayevents",
+"blockmaininput",
 ]]
 editor/display_folded = true
 visible = false
@@ -7768,6 +7785,7 @@ bbcode_enabled = true
 [node name="imageselect" parent="." groups=[
 "blockmaininput",
 ] instance=ExtResource( 114 )]
+visible = false
 margin_left = -1033.0
 margin_top = -562.0
 margin_right = -149.0
@@ -8916,8 +8934,8 @@ expand = true
 stretch_mode = 7
 
 [node name="screenchange" type="TextureRect" parent="." groups=[
-"blockmaininput",
 "blockoutsideinput",
+"blockmaininput",
 ]]
 modulate = Color( 1, 1, 1, 0 )
 anchor_right = 1.0
@@ -8995,6 +9013,8 @@ current = true
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selflookspanel/selfskillclose" to="." method="_on_selfskillclose_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfabilitypanel/abilityclose" to="." method="_on_abilityclose_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfabilitypanel/abilitypurchase" to="." method="_on_abilitypurchase_pressed"]
+[connection signal="text_changed" from="MainScreen/mansion/selfinspect/defaultMasterNoun" to="." method="_on_defaultMasterNoun_text_changed"]
+[connection signal="text_entered" from="MainScreen/mansion/selfinspect/defaultMasterNoun" to="." method="_on_defaultMasterNoun_text_entered"]
 [connection signal="pressed" from="MainScreen/mansion/labpanel/chooseassist" to="MainScreen/mansion/labpanel" method="_on_chooseassist_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/labpanel/labstart" to="MainScreen/mansion/labpanel" method="_on_labstart_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/labpanel/labmodpanel/labcancel" to="MainScreen/mansion/labpanel" method="_on_labcancel_pressed"]
