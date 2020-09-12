@@ -34,7 +34,7 @@ onready var mansionStaff = get_node("joblist").mansionStaff
 
 func _ready():
 	get_node("music").set_meta('currentsong', 'none')
-	if OS.get_executable_path() == 'C:\\Users\\1\\Desktop\\godot\\Godot_v3.1.1-stable_win64.exe':
+	if OS.get_executable_path() == 'C:\\Users\\1\\Desktop\\godot\\Godot_v3.2.1-stable_win64.exe':
 		globals.developmode = true
 		debug = true
 		get_node("startcombat").show()

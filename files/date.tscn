@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://files/theme.tres" type="Theme" id=1]
 [ext_resource path="res://files/scripts/dating.gd" type="Script" id=2]
@@ -93,6 +93,9 @@ margin_right = 40.0
 margin_bottom = 40.0
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TextureRect" type="TextureRect" parent="."]
 material = SubResource( 1 )
@@ -167,7 +170,7 @@ custom_fonts/font = ExtResource( 9 )
 text = "Test"
 align = 1
 
-[node name="TextureRect" type="TextureRect" parent="textfield/Label" index="0"]
+[node name="TextureRect" type="TextureRect" parent="textfield/Label"]
 margin_left = -20.0
 margin_top = -2.0
 margin_right = 332.0
@@ -183,7 +186,6 @@ margin_bottom = 361.0
 custom_styles/panel = SubResource( 3 )
 
 [node name="categories" type="HBoxContainer" parent="panel"]
-editor/display_folded = true
 margin_left = 16.0
 margin_top = 12.0
 margin_right = 216.0
@@ -221,7 +223,6 @@ toggle_mode = true
 text = "Location"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="panel"]
-editor/display_folded = true
 margin_left = 16.0
 margin_top = 64.0
 margin_right = 920.0
@@ -284,7 +285,6 @@ valign = 1
 anims/fade = SubResource( 5 )
 
 [node name="fear" type="TextureProgress" parent="."]
-editor/display_folded = true
 margin_left = 878.0
 margin_top = 81.0
 margin_right = 910.0
@@ -318,7 +318,6 @@ valign = 1
 anims/fade = SubResource( 6 )
 
 [node name="stress" type="TextureProgress" parent="."]
-editor/display_folded = true
 margin_left = 913.0
 margin_top = 81.0
 margin_right = 945.0
@@ -352,7 +351,6 @@ valign = 1
 anims/fade = SubResource( 7 )
 
 [node name="turns" type="TextureRect" parent="."]
-editor/display_folded = true
 margin_left = 627.0
 margin_top = 702.0
 margin_right = 675.0
@@ -387,7 +385,6 @@ margin_bottom = 35.0
 text = "x10"
 
 [node name="supply" type="TextureRect" parent="."]
-editor/display_folded = true
 margin_left = 158.0
 margin_top = 702.0
 margin_right = 206.0
@@ -405,7 +402,6 @@ margin_bottom = 35.0
 text = "x10"
 
 [node name="gold" type="TextureRect" parent="."]
-editor/display_folded = true
 margin_left = 28.0
 margin_top = 702.0
 margin_right = 76.0
@@ -423,7 +419,6 @@ margin_bottom = 35.0
 text = "x10"
 
 [node name="end" type="Panel" parent="."]
-editor/display_folded = true
 visible = false
 margin_left = 410.0
 margin_top = 80.0
@@ -451,7 +446,6 @@ margin_bottom = 361.0
 bbcode_enabled = true
 
 [node name="sexswitch" type="Panel" parent="."]
-editor/display_folded = true
 visible = false
 margin_left = 410.0
 margin_top = 80.0
@@ -484,7 +478,6 @@ margin_top = 67.0
 margin_right = 540.0
 margin_bottom = 361.0
 bbcode_enabled = true
-
 [connection signal="pressed" from="panel/categories/Actions" to="." method="selectcategory" binds= [ "Actions" ]]
 [connection signal="pressed" from="panel/categories/P&P" to="." method="selectcategory" binds= [ "P&P" ]]
 [connection signal="pressed" from="panel/categories/Items" to="." method="selectcategory" binds= [ "Items" ]]

@@ -1897,7 +1897,7 @@ func endencounter():
 	get_node("Control/Panel/RichTextLabel").set_bbcode(text)
 
 func mformula(gain, mana):
-    return mana + gain * max(0, mana/(mana-300)+1)
+	return mana + gain * max(0, mana/(mana-300)+1)
 
 
 

@@ -850,7 +850,7 @@ func getscene(sexaction, person, consensual, hole):
 				check = false
 		if i.has('hole'):
 			if i.hole != hole:
- 				check = false
+				check = false
 		if i.has('function') && check == true:
 			array.append(call(i.function, person))
 		elif check == true:
