@@ -10,6 +10,8 @@ const takerpart = ''
 const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
+const givertags = []
+const takertags = []
 
 func getname(state = null):
 	return "Wear Strap-on"
@@ -31,7 +33,4 @@ func requirements():
 
 
 func initiate():
-	if givers.size() < 2:
-		return "[name1] put[s/1] on a strap-on dildo."
-	else:
-		return "[name1] put[s/1] on strap-on dildos."
+	return "[name1] put[s/1] on [a /1]strap-on dildo[/s1]."

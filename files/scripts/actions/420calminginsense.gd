@@ -5,18 +5,24 @@ const code = 'relaxinginsense'
 const order = 12
 var givers
 var takers
-const canlast = false
+const canlast = true
 const giverpart = ''
 const takerpart = ''
 const virginloss = false
 const giverconsent = 'basic'
 const takerconsent = 'any'
-const givertags = []
-const takertags = []
+const givertags = ['noorgasm']
+const takertags = ['noorgasm']
 
 func getname(state = null):
-	return "Relaxing Insense"
+	return "Arousing Incense"
 
+func getongoingname(givers, takers):
+	return "[name1] use[s/1] arousing incense on [name2]."
+
+func getongoingdescription(givers, takers):
+	return ""
+	
 func requirements():
 	var valid = true
 	if takers.size() < 1 || givers.size() < 1:
@@ -27,7 +33,7 @@ func requirements():
 
 func givereffect(member):
 	var result
-	var effects = {lust = 0}
+	var effects = {lust = 25, sens = 10}
 	if member.consent == true || (member.person.traits.find("Likes it rough") >= 0 && member.lewd >= 10):
 		result = 'good'
 	elif member.person.traits.find("Likes it rough") >= 0:
@@ -38,7 +44,7 @@ func givereffect(member):
 
 func takereffect(member):
 	var result
-	var effects = {lust = 50, sens = 90}
+	var effects = {lust = 75, sens = 20}
 	if member.consent == true || (member.person.traits.find("Likes it rough") >= 0 && member.lewd >= 10):
 		result = 'good'
 	elif member.person.traits.find("Likes it rough") >= 0:
@@ -50,28 +56,28 @@ func takereffect(member):
 func initiate():
 	var text = ''
 	var temparray = []
-	temparray += ["[name1] {^take:place:shove:stick}[s/1] [names2] nipples into [his1] mouth[/s1]"]
-	temparray += ["[name1] latch[es/1] onto [names2] nipples"]
+	temparray += ["[name1] {^take:place:shove:stick:hold}[s/1] [names2] face[/s2] {^close to:near} the incense"]
+	temparray += ["[name1] activate[s/1] the incense under [names2] nose[/s2]"]
 	text += temparray[randi()%temparray.size()]
 	temparray.clear()
-	temparray += [", {^licking:teasing} and {^kissing:sucking on} them."]
-	temparray += [", {^lightly:gently} {^nibbling at:stimulating} them with [his1] teeth."]
-	temparray += [", {^greedily slurping at them:nursing} like [a /1]bab[y/ies1]."]
+	temparray += [", {^whispering to:teasing} [him2] about the effects."]
+	temparray += [", {^moving:waving} it beneath [his2] nose[/s2]."]
+	temparray += [", so that [he2] {^sniff:inhale}[s/2] the {^aroma:scent:odor:perfume.}"]
 	text += temparray[randi()%temparray.size()]
 	return text
 
 func reaction(member):
 	var text = ''
 	if member.energy == 0:
-		text = "[name2] lie[s/2] unconscious, {^trembling:twitching} {^slightly :}as [his2] nipples {^respond:react} to {^the stimulation:[names1] suckling:[names1] teasing}."
+		text = "[name2] lie[s/2] unconscious, {^trembling:twitching} {^slightly:weakly} as [his2] {^nose[/s2]:nostrils} [is2] {^flooded:consumed:invaded} with the {^scent:incense:smell}."
 	#elif member.consent == false:
 		#TBD
 	elif member.sens < 100:
-		text = "[name2] {^show:give}[s/2] little {^response:reaction} to [his2] nipples being {^stimulated:teased:sucked on:suckled}."
+		text = "[name2] {^show:give}[s/2] little {^response:reaction} to the {^incense:aroma:perfume}."
 	elif member.sens < 400:
-		text = "[name2] {^begin:start}[s/2] to {^respond:react} as [his2] nipples are {^stimulated:teased:sucked on:suckled}."
+		text = "[name2] {^begin:start}[s/2] to {^respond:react} as the {^scent:smell:fragrance} is breathed in."
 	elif member.sens < 800:
-		text = "[name2] {^moans[s/2]:crie[s/2] out} in {^pleasure:arousal:extacy} as [his2] nipples are {^stimulated:teased:sucked on:suckled}."
+		text = "[name2] {^shiver[s/2]:shudder[s/2]:relax[es/2]} in {^pleasure:arousal:extacy} as the incense {^fills:invades:spreads through} [his2] sinuses."
 	else:
-		text = "[names2] body {^trembles:quivers} {^at the slightest movement of [names1] tongue[/s1]:in response to [names1] suckling}{^ as [he2] rapidly near[s/2] orgasm: as [he2] approach[es/2] orgasm: as [he2] edge[s/2] toward orgasm:}."
+		text = "[names2] bod[y/ies2] {^tremble:quiver}[s/2] {^as the incense permeates [his2] senses:in response to [names2] inhaling}{^ as [he2] rapidly near[s/2] orgasm: as [he2] approach[es/2] orgasm: as [he2] edge[s/2] toward orgasm:}."
 	return text

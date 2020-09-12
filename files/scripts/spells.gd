@@ -12,230 +12,230 @@ func spellsynchronize():
 			print('spellsynchroned')
 
 var spelllist = {
-#mindread = { Spell entry
-#	code = 'mindread', # spell entry reference
-#	name = 'Mind Reading', # Displayed name
-#	description = 'Enhances your mind to be more cunning towards others. Allows to get accurate information about other characters. ', #description
-#	effect = 'mindreadeffect', #effect called on activation
-#	manacost = 3, #mana cost
-#	req = 0, #requirements (mansion alchemy upgrade)
-#	price = 100, #gold cost to learn
-#	personal = true, #can be used on another slave
-#	combat = true, #has a corresponding combat ability
-#	learned = false, #when learned, will be saved and loaded
-#	type = 'control', #category
-#	flavor = "Bonus description",
+#	mindread = { Spell entry
+#		code = 'mindread', # spell entry reference
+#		name = 'Mind Reading', # Displayed name
+#		description = 'Enhances your mind to be more cunning towards others. Allows to get accurate information about other characters. ', #description
+#		effect = 'mindreadeffect', #effect called on activation
+#		manacost = 3, #mana cost
+#		req = 0, #requirements (mansion alchemy upgrade)
+#		price = 100, #gold cost to learn
+#		personal = true, #can be used on another slave
+#		combat = true, #has a corresponding combat ability
+#		learned = false, #when learned, will be saved and loaded
+#		type = 'control', #category
+#		flavor = "Bonus description",
 #	},
-mindread = {
-	code = 'mindread',
-	name = 'Mind Reading',
-	description = 'Enhances your mind to be more cunning towards others. Allows to get accurate information about other characters. ',
-	effect = 'mindreadeffect',
-	manacost = 3,
-	req = 0,
-	price = 100,
-	personal = true,
-	combat = true,
-	learned = false,
-	type = 'control',
-	flavor = "Reading other person's thoughts hardly worth the effort: way too often they are just chaotic streams changing one after another. Nevertheless, you can grasp some understanding how others think by devoting your time to them. ",
+	mindread = {
+		code = 'mindread',
+		name = 'Mind Reading',
+		description = 'Enhances your mind to be more cunning towards others. Allows to get accurate information about other characters. ',
+		effect = 'mindreadeffect',
+		manacost = 3,
+		req = 0,
+		price = 100,
+		personal = true,
+		combat = true,
+		learned = false,
+		type = 'control',
+		flavor = "Reading other person's thoughts hardly worth the effort: way too often they are just chaotic streams changing one after another. Nevertheless, you can grasp some understanding how others think by devoting your time to them. ",
 	},
-sedation = {
-	code = 'sedation',
-	name = 'Sedation',
-	description = "Eases target's stress and fear.",
-	effect = 'sedationeffect',
-	manacost = 10,
-	req = 0,
-	price = 200,
-	personal = true,
-	combat = true,
-	learned = false,
-	type = 'control',
-	flavor = "Ability to calm down another person is invaluable in many situations. ",
+	sedation = {
+		code = 'sedation',
+		name = 'Sedation',
+		description = "Eases target's stress and fear.",
+		effect = 'sedationeffect',
+		manacost = 10,
+		req = 0,
+		price = 200,
+		personal = true,
+		combat = true,
+		learned = false,
+		type = 'control',
+		flavor = "Ability to calm down another person is invaluable in many situations. ",
 	},
-heal = {
-	code = 'heal',
-	name = 'Heal',
-	description = 'Heals physical wounds. ',
-	effect = 'healeffect',
-	manacost = 10,
-	req = 0,
-	price = 200,
-	personal = true,
-	combat = true,
-	learned = false,
-	type = 'defensive',
-	flavor = "Regeneration is a part of every living being.",
+	heal = {
+		code = 'heal',
+		name = 'Heal',
+		description = 'Heals physical wounds. ',
+		effect = 'healeffect',
+		manacost = 10,
+		req = 0,
+		price = 200,
+		personal = true,
+		combat = true,
+		learned = false,
+		type = 'defensive',
+		flavor = "Regeneration is a part of every living being.",
 	},
-dream = {
-	code = 'dream',
-	name = 'Dream',
-	description = 'Puts target into deep, restful sleep. ',
-	effect = 'dreameffect',
-	manacost = 20,
-	req = 0,
-	price = 350,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'control',
+	dream = {
+		code = 'dream',
+		name = 'Dream',
+		description = 'Puts target into deep, restful sleep. ',
+		effect = 'dreameffect',
+		manacost = 20,
+		req = 0,
+		price = 350,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'control',
 	},
-entrancement = {
-	code = 'entrancement',
-	name = 'Entrancement',
-	description = 'Makes target more susceptible to suggestions and easier to acquire various kinks.',
-	effect = 'entrancementeffect',
-	manacost = 15,
-	req = 10,
-	price = 400,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'control',
+	entrancement = {
+		code = 'entrancement',
+		name = 'Entrancement',
+		description = 'Makes target more susceptible to suggestions and easier to acquire various kinks.',
+		effect = 'entrancementeffect',
+		manacost = 15,
+		req = 10,
+		price = 400,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'control',
 	},
-fear = {
-	code = 'fear',
-	name = 'Fear',
-	description = 'Invokes subconscious feel of terror onto the target. Can be effective punishment. ',
-	effect = 'feareffect',
-	manacost = 10,
-	req = 0,
-	price = 250,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'control',
+	fear = {
+		code = 'fear',
+		name = 'Fear',
+		description = 'Invokes subconscious feel of terror onto the target. Can be effective punishment. ',
+		effect = 'feareffect',
+		manacost = 10,
+		req = 0,
+		price = 250,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'control',
 	},
-domination = {
-	code = 'domination',
-	name = 'Domination',
-	description = 'Attempts to overwhelm  the target′s mind and instill unwavering obedience. May cause irreversible mental trauma. ',
-	effect = 'dominationeffect',
-	manacost = 40,
-	req = 10,
-	price = 500,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'control',
+	domination = {
+		code = 'domination',
+		name = 'Domination',
+		description = 'Attempts to overwhelm  the target′s mind and instill unwavering obedience. May cause irreversible mental trauma. ',
+		effect = 'dominationeffect',
+		manacost = 40,
+		req = 10,
+		price = 500,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'control',
 	},
-mutate = {
-	code = 'mutate',
-	name = 'Mutation',
-	description = 'Enforces mutation onto target. Results may vary drastically. ',
-	effect = 'mutateeffect',
-	manacost = 15,
-	req = 2,
-	price = 400,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'utility',
+	mutate = {
+		code = 'mutate',
+		name = 'Mutation',
+		description = 'Enforces mutation onto target. Results may vary drastically. ',
+		effect = 'mutateeffect',
+		manacost = 15,
+		req = 2,
+		price = 400,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'utility',
 	},
-barrier = {
-	code = 'barrier',
-	name = 'Barrier',
-	description = "Creates a magical barrier around target, raising it's armor. ",
-	effect = '',
-	manacost = 12,
-	req = 1,
-	price = 200,
-	personal = false,
-	combat = true,
-	learned = false,
-	type = 'defensive',
+	barrier = {
+		code = 'barrier',
+		name = 'Barrier',
+		description = "Creates a magical barrier around target, raising it's armor. ",
+		effect = '',
+		manacost = 12,
+		req = 1,
+		price = 200,
+		personal = false,
+		combat = true,
+		learned = false,
+		type = 'defensive',
 	},
-shackle = {
-	code = 'shackle',
-	name = 'Shackle',
-	description = "Ties single target to ground making escape impossible. ",
-	effect = '',
-	manacost = 10,
-	req = 1,
-	price = 200,
-	personal = false,
-	combat = true,
-	learned = false,
-	type = 'utility',
+	shackle = {
+		code = 'shackle',
+		name = 'Shackle',
+		description = "Ties single target to ground making escape impossible. ",
+		effect = '',
+		manacost = 10,
+		req = 1,
+		price = 200,
+		personal = false,
+		combat = true,
+		learned = false,
+		type = 'utility',
 	},
-acidspit = {
-	code = 'acidspit',
-	name = 'Acid Spit',
-	description = "Turns your saliva into highly potent corrosive substance for a short time. \nDeals spell damage to single target enemy and reduces it's armor. ",
-	effect = '',
-	manacost = 6,
-	req = 2,
-	price = 400,
-	personal = false,
-	combat = true,
-	learned = false,
-	type = 'offensive',
+	acidspit = {
+		code = 'acidspit',
+		name = 'Acid Spit',
+		description = "Turns your saliva into highly potent corrosive substance for a short time. \nDeals spell damage to single target enemy and reduces it's armor. ",
+		effect = '',
+		manacost = 6,
+		req = 2,
+		price = 400,
+		personal = false,
+		combat = true,
+		learned = false,
+		type = 'offensive',
 	},
-mindblast = {
-	code = 'mindblast',
-	name = 'Mind Blast',
-	description = "Simple mind attack which can be utilized in combat. While not terribly effective on its own, can eventually break the enemy. \nDeals spell damage to single target enemy. ",
-	effect = '',
-	manacost = 5,
-	req = 1,
-	price = 100,
-	personal = false,
-	combat = true,
-	learned = false,
-	type = 'offensive',
+	mindblast = {
+		code = 'mindblast',
+		name = 'Mind Blast',
+		description = "Simple mind attack which can be utilized in combat. While not terribly effective on its own, can eventually break the enemy. \nDeals spell damage to single target enemy. ",
+		effect = '',
+		manacost = 5,
+		req = 1,
+		price = 100,
+		personal = false,
+		combat = true,
+		learned = false,
+		type = 'offensive',
 	},
-invigorate = {
-	code = 'invigorate',
-	name = 'Invigorate',
-	description = "Restores caster's and target's energy by using mana and target body's potential. Builds up target's stress. Can be used in wild. ",
-	effect = 'invigorateeffect',
-	manacost = 5,
-	req = 2,
-	price = 300,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'utility',
+	invigorate = {
+		code = 'invigorate',
+		name = 'Invigorate',
+		description = "Restores caster's and target's energy by using mana and target body's potential. Builds up target's stress. Can be used in wild. ",
+		effect = 'invigorateeffect',
+		manacost = 5,
+		req = 2,
+		price = 300,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'utility',
 	},
-summontentacle = {
-	code = 'summontentacle',
-	name = 'Summon Tentacle',
-	description = 'Summons naughty tentacles from the otherworld for a short time. Can make up for a very effective punishment.',
-	effect = 'tentacleeffect',
-	manacost = 35,
-	req = 10,
-	price = 650,
-	personal = true,
-	combat = false,
-	learned = false,
-	type = 'utility',
+	summontentacle = {
+		code = 'summontentacle',
+		name = 'Summon Tentacle',
+		description = 'Summons naughty tentacles from the otherworld for a short time. Can make up for a very effective punishment.',
+		effect = 'tentacleeffect',
+		manacost = 35,
+		req = 10,
+		price = 650,
+		personal = true,
+		combat = false,
+		learned = false,
+		type = 'utility',
 	},
-guidance = {
-	code = 'guidance',
-	name = 'Guidance',
-	description = "An utility spell which helps to find shortest and safest paths among the wilds. \nEffect grows with Magic Affinity. \n[color=yellow]Effect reduced in enclosed spaces[/color] ",
-	effect = 'guidanceeffect',
-	manacost = 8,
-	req = 2,
-	price = 250,
-	personal = false,
-	combat = false,
-	learned = false,
-	type = 'utility',
+	guidance = {
+		code = 'guidance',
+		name = 'Guidance',
+		description = "An utility spell which helps to find shortest and safest paths among the wilds. \nEffect grows with Magic Affinity. \n[color=yellow]Effect reduced in enclosed spaces[/color] ",
+		effect = 'guidanceeffect',
+		manacost = 8,
+		req = 2,
+		price = 250,
+		personal = false,
+		combat = false,
+		learned = false,
+		type = 'utility',
 	},
-mark = {
-	code = 'mark',
-	name = 'Mark',
-	description = "An utility spell, leaving a permanent mark on the location, allowing to return to it from portal room later on. Only 1 mark at the time is allowed. ",
-	effect = 'markeffect',
-	manacost = 10,
-	req = 2,
-	price = 500,
-	personal = false,
-	combat = false,
-	learned = false,
-	type = 'utility',
+	mark = {
+		code = 'mark',
+		name = 'Mark',
+		description = "An utility spell, leaving a permanent mark on the location, allowing to return to it from portal room later on. Only 1 mark at the time is allowed. ",
+		effect = 'markeffect',
+		manacost = 10,
+		req = 2,
+		price = 500,
+		personal = false,
+		combat = false,
+		learned = false,
+		type = 'utility',
 	},
 }
 
@@ -253,7 +253,7 @@ func mindreadeffect():
 	text += "\nStrength: " + str(person.sstr) + ", Agility: " + str(person.sagi) + ", Magic Affinity: " + str(person.smaf) + ", Endurance: " + str(person.send)
 	text += "\nBase Beauty: " + str(person.beautybase) + ', Temporal Beauty: ' + str(person.beautytemp)
 	if person.effects.has('captured') == true:
-		text = text + "\n$name doesn't accept $his new life in your domain. Strength : " + str(person.effects.captured.duration)
+		text = text + "\n$name doesn't accept $his new life in your domain. (Rebelling: " + str(person.effects.captured.duration) + ")"
 	if person.traits.size() >= 0:
 		text += '\n$name has corresponding traits:'
 		for i in person.traits:
@@ -271,7 +271,7 @@ func sedationeffect():
 	var spell = globals.spelldict.sedation
 	globals.resources.mana -= spellcost(spell)
 	if person.effects.has('sedated'):
-		text = "You cast Sedation spell on the $name but it appears $he is already under its effect. "
+		text = "You cast Sedation spell on $name, but it appears $he is already under its effect. "
 		return person.dictionary(text)
 	person.add_effect(globals.effectdict.sedated)
 	person.stress -= rand_range(20,30) + globals.player.smaf*6
@@ -295,7 +295,7 @@ func healeffect():
 		else:
 			text = "After you finish casting the healing spell, your wounds close up. "
 	else:
-		text = "It does not seems like $name was injured in first place. "
+		text = "It seems like $name was not injured in first place. "
 	text = person.dictionary(text)
 	return text
 
@@ -304,6 +304,7 @@ func dreameffect():
 	var spell = globals.spelldict.dream
 	globals.resources.mana -= spellcost(spell)
 	person.away.duration = 1
+	person.away.at = 'rest'
 	person.energy = person.stats.energy_max
 	person.stress -= rand_range(25,35) + caster.smaf*5
 	text = 'You cast sleep on $name, putting $him into deep rest until the next day. '
@@ -330,7 +331,7 @@ func entrancementeffect():
 		text = "Light gradually fades from $name's eyes, and $his gaze becomes downcast. $He seems ready to accept whatever you tell $him. "
 		person.add_effect(globals.effectdict.entranced)
 	else:
-		text = "It seems, $name is already entranced. "
+		text = "It seems like $name is already entranced. "
 	return person.dictionary(text)
 
 func feareffect():
@@ -338,7 +339,7 @@ func feareffect():
 	var spell = globals.spelldict.fear
 	globals.resources.mana -= spellcost(spell)
 	person.fear += 20+caster.smaf*10
-	person.stress += 20-caster.smaf*3
+	person.stress += max(5, 20-caster.smaf*3)
 	if person.effects.has('captured') == true:
 		text += "\n[color=green]$name becomes less rebellious towards you.[/color]"
 		person.effects.captured.duration -= 1+globals.player.smaf
@@ -430,19 +431,19 @@ func mutate(power=2, silent = false):
 	var temp
 	while power >= 1:
 		person.stress += rand_range(5,15)
-		line = array[rand_range(0,array.size())]
+		line = globals.randomfromarray(array)
 		if line == 'height':
 			text += "$name's height has changed. "
-			person.height = globals.heightarray[rand_range(0,globals.heightarray.size())]
+			person.height = globals.randomfromarray(globals.heightarray)
 		elif line == 'tits':
 			text += "$name's chest size has changed. "
-			person.titssize = globals.sizearray[rand_range(0,globals.sizearray.size())]
+			person.titssize = globals.randomfromarray(globals.sizearray)
 		elif line == 'traitadd':
 			text += "$name has received a new trait. "
 			person.add_trait(globals.origins.traits('any').name)
 		elif line == 'ass':
 			text += "$name's butt size has changed. "
-			person.asssize = globals.sizearray[rand_range(0,globals.sizearray.size())]
+			person.asssize = globals.randomfromarray(globals.sizearray)
 		elif line == 'penis':
 			if (globals.rules.futa == false && person.sex != 'male'):
 				power += 1
@@ -452,13 +453,13 @@ func mutate(power=2, silent = false):
 				text += "$name has grown a dick. "
 			else:
 				text += "$name's dick size has changed. "
-				person.penis = globals.genitaliaarray[rand_range(0,globals.genitaliaarray.size())]
+				person.penis = globals.randomfromarray(globals.genitaliaarray)
 		elif line == 'penistype':
 			if person.penis == 'none':
 				power += 1
 			else:
 				text += "$name's dick shape has changed. "
-				person.penistype = globals.penistypearray[rand_range(0,globals.penistypearray.size())]
+				person.penistype = globals.randomfromarray(globals.penistypearray)
 		elif line == "balls":
 			if (globals.rules.futaballs == false && person.sex != 'male'):
 				power += 1
@@ -467,14 +468,14 @@ func mutate(power=2, silent = false):
 				person.balls = 'small'
 				text += "$name has grown a scrotum. "
 			else:
-				person.balls = globals.genitaliaarray[rand_range(0,globals.genitaliaarray.size())]
+				person.balls = globals.randomfromarray(globals.genitaliaarray)
 				text += "$name's scrotum size has changed. "
 		elif line == 'skin':
 			text += "$name's skin color has changed. "
 			person.skin = globals.assets.getrandomskincolor()
 		elif line == 'skincov':
 			text += "$name's skin coverage has changed. "
-			person.skincov = globals.skincovarray[rand_range(0,globals.skincovarray.size())]
+			person.skincov = globals.randomfromarray(globals.skincovarray)
 			person.furcolor = globals.assets.getrandomfurcolor()
 		elif line == 'eyecolor':
 			text += "$name's eye color has changed. "
@@ -505,16 +506,16 @@ func mutate(power=2, silent = false):
 				text += "$name has grown a tail. "
 			else:
 				text += "$name's tail has changed in shape. " 
-			person.tail = globals.alltails[rand_range(0,globals.alltails.size())]
+			person.tail = globals.randomfromarray(globals.alltails)
 		elif line == "wings":
 			if person.wings == 'none':
 				text += "$name has grown a pair of wings. "
 			else:
 				text += "$name's wings has changed in shape. " 
-			person.wings = globals.allwings[rand_range(0, globals.allwings.size())]
+			person.wings = globals.randomfromarray(globals.allwings)
 		elif line == "ears":
 			text += "$name's ears shape has changed. "
-			person.ears = globals.allears[rand_range(0, globals.allears.size())]
+			person.ears = globals.randomfromarray(globals.allears)
 		elif line == "beauty":
 			text += "$name's face has drastically changed. "
 			person.beautybase = round(rand_range(10, 90))

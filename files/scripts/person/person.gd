@@ -106,7 +106,7 @@ var fromguild = false
 var memory = ''
 
 var attention = 0
-var lastinteractionday = 0
+var lastinteractionday = {'day' : 0, 'count' : 0}
 var lastsexday = 0
 var relations = {}
 var metrics = {ownership = 0, jail = 0, mods = 0, brothel = 0, sex = 0, partners = [], randompartners = 0, item = 0, spell = 0, orgy = 0, threesome = 0, win = 0, capture = 0, goldearn = 0, foodearn = 0, manaearn = 0, birth = 0, preg = 0, vag = 0, anal = 0, oral = 0, roughsex = 0, roughsexlike = 0, orgasm = 0}
@@ -118,7 +118,7 @@ var beautytemp = 0
 var fear_mod = 1
 
 var lewdness = 0 setget lewdness_set
-var asser = 0
+var asser = 0 setget asser_set
 
 var stats = {
 	str_max = 0,
@@ -250,6 +250,9 @@ func levelupreqs_set(value):
 func lewdness_set(value):
 	lewdness = clamp(round(value), 0, 120)
 
+func asser_set(value):
+	asser = clamp(value, 0, 100)
+
 func fear_set(value):
 	var difference = value - fear
 	if difference > 0:
@@ -274,9 +277,27 @@ func levelup():
 	else:
 		globals.get_tree().get_current_scene().infotext(dictionary("You have advanced to Level " + str(level)),'green')
 
+#interactions functions added to manage transistion from storing day of last interaction to storing a dictionary
+func recordInteraction():
+	if typeof(lastinteractionday) != TYPE_DICTIONARY:
+		lastinteractionday = {'day' : globals.resources.day, 'count' : float(lastinteractionday == globals.resources.day)}
+	elif lastinteractionday.day == globals.resources.day:
+		lastinteractionday.count += 1
+	else:
+		lastinteractionday = {'day' : globals.resources.day, 'count' : 1}
+
+func getRemainingInteractions():
+	if typeof(lastinteractionday) == TYPE_DICTIONARY:
+		return variables.dailyactionsperslave - float(lastinteractionday.day == globals.resources.day) * lastinteractionday.count
+	else:
+		return variables.dailyactionsperslave - float(lastinteractionday == globals.resources.day)
+
+func canInteract():
+	return getRemainingInteractions() > 0
+
 func xp_set(value):
 	var difference = value - realxp
-	realxp += max(difference/max(level,1),1)
+	realxp += max(float(difference)/max(level,1),1)
 	realxp = round(clamp(realxp, 0, 100))
 	if realxp >= 100 && self == globals.player:
 		levelup()
@@ -471,7 +492,7 @@ func tox_set(value):
 func energy_set(value):
 	value = round(value)
 	var difference = value - stats.energy_cur
-	stats.energy_cur = clamp(stats.energy_cur + difference*(1 + stats.energy_mod/100), 0, stats.energy_max)
+	stats.energy_cur = clamp(stats.energy_cur + difference*(1 + stats.energy_mod/100.0), 0, stats.energy_max)
 	if self == globals.player:
 		globals.resources.energy = 0
 
@@ -493,7 +514,7 @@ func charm_set(value):
 func lust_set(value):
 	var difference = value - stats.lust_cur
 	if difference > 0:
-		stats.lust_cur = clamp(stats.lust_cur + difference*(1 + stats.lust_mod/100),stats.lust_min,stats.lust_max)
+		stats.lust_cur = clamp(stats.lust_cur + difference*(1 + stats.lust_mod/100.0),stats.lust_min,stats.lust_max)
 	else:
 		stats.lust_cur = clamp(stats.lust_cur + difference,stats.lust_min,stats.lust_max)
 
@@ -601,9 +622,9 @@ func health_icon():
 
 func obed_icon():
 	var obed
-	if float(stats.obed_cur)/stats.obed_max > 0.75: 
+	if stats.obed_cur > 80: 
 		obed = load("res://files/buttons/icons/obedience/2.png")
-	elif float(stats.obed_cur)/stats.obed_max > 0.4:
+	elif stats.obed_cur > 40:
 		obed = load("res://files/buttons/icons/obedience/1.png")
 	else:
 		obed = load("res://files/buttons/icons/obedience/3.png")
@@ -649,19 +670,32 @@ func dictionary(text):
 	var string = text
 	string = string.replace('$name', name_short())
 	string = string.replace('$surname', surname)
-	string = string.replace('$penis', globals.fastif(penis == 'none', 'strapon', '$his cock'))
-	string = string.replace('$child', globals.fastif(sex == 'male', 'boy', 'girl'))
 	string = string.replace('$sex', sex)
-	string = string.replace('$He', globals.fastif(sex == 'male', 'He', 'She'))
-	string = string.replace('$he', globals.fastif(sex == 'male', 'he', 'she'))
-	string = string.replace('$His', globals.fastif(sex == 'male', 'His', 'Her'))
-	string = string.replace('$his', globals.fastif(sex == 'male', 'his', 'her'))
-	string = string.replace('$him', globals.fastif(sex == 'male', 'him', 'her'))
-	string = string.replace('$son', globals.fastif(sex == 'male', 'son', 'daughter'))
-	string = string.replace('$sibling', globals.fastif(sex == 'male', 'brother', 'sister'))
-	string = string.replace('$parent', globals.fastif(sex == 'male', 'father', 'mother'))
-	string = string.replace('$sir', globals.fastif(sex == 'male', 'Sir', "Ma'am"))
-	string = string.replace('$race', globals.decapitalize(race).replace('_', ' '))
+	if sex == 'male':
+		string = string.replace('$penis', 'strapon' if (penis == 'none') else 'his cock')
+		string = string.replace('$child', 'boy')
+		string = string.replace('$He', 'He')
+		string = string.replace('$he', 'he')
+		string = string.replace('$His', 'His')
+		string = string.replace('$his', 'his')
+		string = string.replace('$him', 'him')
+		string = string.replace('$son', 'son')
+		string = string.replace('$sibling', 'brother')
+		string = string.replace('$parent', 'father')
+		string = string.replace('$sir', 'Sir')
+	else:
+		string = string.replace('$penis', 'strapon' if (penis == 'none') else 'her cock')
+		string = string.replace('$child', 'girl')
+		string = string.replace('$He', 'She')
+		string = string.replace('$he', 'she')
+		string = string.replace('$His', 'Her')
+		string = string.replace('$his', 'her')
+		string = string.replace('$him', 'her')
+		string = string.replace('$son', 'daughter')
+		string = string.replace('$sibling', 'sister')
+		string = string.replace('$parent', 'mother')
+		string = string.replace('$sir', "Ma'am")
+	string = string.replace('$race', race.to_lower())
 	string = string.replace('$playername', globals.player.name_short())
 	string = string.replace('$master', getMasterNoun())
 	string = string.replace('[haircolor]', haircolor)
@@ -672,21 +706,28 @@ func dictionaryplayer(text):
 	var string = text
 	string = string.replace('[Playername]', globals.player.name_short())
 	string = string.replace('$name', name_short())
-	string = string.replace('$penis', globals.fastif(penis == 'none', 'strapon', '$his cock'))
-	string = string.replace('$child', globals.fastif(sex == 'male', 'boy', 'girl'))
 	string = string.replace('$sex', sex)
 	string = string.replace('$He', 'You')
 	string = string.replace('$he', 'you')
 	string = string.replace('$His', 'Your')
 	string = string.replace('$his', 'your')
 	string = string.replace('$him', 'your')
-	string = string.replace('$child', globals.fastif(sex == 'male', 'son', 'daughter'))
-	string = string.replace('$sibling', globals.fastif(sex == 'male', 'brother', 'sister'))
-	string = string.replace('$sir', globals.fastif(sex == 'male', 'Sir', "Ma'am"))
-	string = string.replace('$master', globals.fastif(sex == 'male', 'Master', "Mistress"))
+	string = string.replace('$master', getMasterNoun())
+	if sex == 'male':
+		string = string.replace('$penis', globals.fastif(penis == 'none', 'strapon', 'his cock'))
+		string = string.replace('$child', 'boy')
+		string = string.replace('$child', 'son')
+		string = string.replace('$sibling', 'brother')
+		string = string.replace('$sir', 'Sir')
+	else:
+		string = string.replace('$penis', globals.fastif(penis == 'none', 'strapon', 'her cock'))
+		string = string.replace('$child', 'girl')
+		string = string.replace('$child', 'daughter')
+		string = string.replace('$sibling', 'sister')
+		string = string.replace('$sir', "Ma'am")
 	string = string.replace('[haircolor]', haircolor)
 	string = string.replace('[eyecolor]', eyecolor)
-	string = string.replace('$race', globals.decapitalize(race).replace('_', ' '))
+	string = string.replace('$race', race.to_lower())
 	return string
 
 func dictionaryplayerplus(text):

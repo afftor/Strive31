@@ -38,7 +38,7 @@ func _on_lab_pressed(person = null):
 
 func _on_chooseassist_pressed():
 	if get_node("chooseassist").get_text() == ("Choose Assistant"):
-		get_tree().get_current_scene().selectslavelist(false,'_on_lab_pressed',self,globals.jobs.jobdict.labassist.reqs)
+		get_tree().get_current_scene().selectslavelist(false,'_on_lab_pressed',self,globals.jobs.jobdict.labassist.reqs+" && globals.currentslave.sleep != 'farm'")
 	else:
 		for i in globals.slaves:
 			if i.work == 'labassist':
@@ -118,127 +118,125 @@ func _on_labselect_pressed():
 		get_node("labmodpanel/labselect").set_text('Select Subject')
 
 var horns = {
-type = 'cosmetics',
-description = '',
-options =  ['none','short', 'long_straight', 'curved'],
-target = 'horns',
-price = {mana = 50, gold = 200},
-items = {magicessenceing = 1, taintedessenceing = 3},
-time = 2
+	type = 'cosmetics',
+	description = '',
+	options =  ['none','short', 'long_straight', 'curved'],
+	target = 'horns',
+	price = {mana = 50, gold = 200},
+	items = {magicessenceing = 1, taintedessenceing = 3},
+	time = 2,
 }
 var ears = {
-type = 'cosmetics',
-description = '',
-options =  ['human','pointy','short_furry','long_pointy_furry','long_round_furry','long_droopy_furry','feathery','fins'],
-target = 'ears',
-price = {mana = 40, gold = 200},
-items = {natureessenceing = 2},
-time = 3
+	type = 'cosmetics',
+	description = '',
+	options =  ['human','pointy','short_furry','long_pointy_furry','long_round_furry','long_droopy_furry','feathery','fins'],
+	target = 'ears',
+	price = {mana = 40, gold = 200},
+	items = {natureessenceing = 2},
+	time = 3,
 }
 var tail = {
-type = 'cosmetics',
-description = '',
-options = ['none','demon','dragon', 'scruffy', 'bird', 'cat', 'fox', 'wolf', 'bunny', 'racoon','fish'],
-target = 'tail',
-price = {mana = 65, gold = 300},
-items = {bestialessenceing = 3},
-time = 5
+	type = 'cosmetics',
+	description = '',
+	options = ['none','demon','dragon', 'scruffy', 'bird', 'cat', 'fox', 'wolf', 'bunny', 'racoon','fish'],
+	target = 'tail',
+	price = {mana = 65, gold = 300},
+	items = {bestialessenceing = 3},
+	time = 5,
 }
 var wings = {
-type = 'cosmetics',
-description = '',
-options = ['none', 'insect','feathered_black', 'feathered_white', 'feathered_brown', 'leather_black', 'leather_red'],
-target = 'wings',
-price = {mana = 80, gold = 350},
-items = {bestialessenceing = 2, magicessenceing = 4},
-time = 7
+	type = 'cosmetics',
+	description = '',
+	options = ['none', 'insect','feathered_black', 'feathered_white', 'feathered_brown', 'leather_black', 'leather_red'],
+	target = 'wings',
+	price = {mana = 80, gold = 350},
+	items = {bestialessenceing = 2, magicessenceing = 4},
+	time = 7,
 }
 var skin = {
-type = 'cosmetics',
-description = '',
-options =['pale', 'fair', 'olive', 'tan', 'brown','dark','blue','pale blue','green', 'red', 'purple', 'teal'],
-target = 'skin',
-price = {mana = 50, gold = 250},
-items = {magicessenceing = 2},
-time = 5
+	type = 'cosmetics',
+	description = '',
+	options =['pale', 'fair', 'olive', 'tan', 'brown','dark','blue','pale blue','green', 'red', 'purple', 'teal'],
+	target = 'skin',
+	price = {mana = 50, gold = 250},
+	items = {magicessenceing = 2},
+	time = 5,
 }
 var traitremove = {
-code = 'traitremove',
-type = 'custom',
-description = '',
-options =[''],
-target = 'skin',
-data = {
-price = {mana = 50, gold = 100}, items = {claritypot = 1}, time = 3},
+	code = 'traitremove',
+	type = 'custom',
+	description = '',
+	options =[''],
+	target = 'skin',
+	data = {price = {mana = 50, gold = 100}, items = {claritypot = 1}, time = 3,},
 }
 var penis = {
-code = 'penis',
-type = 'custom',
-description = '',
-options = [''],
-target = '',
-data = {
-grow = {price = {mana = 100, gold = 250}, items = {majoruspot = 1}, time = 3},
-remove = {price = {mana = 50, gold = 150}, items = {taintedessenceing = 2}, time = 4},
-humanshape = {price = {mana = 40, gold = 200}, items = {magicessenceing = 2}, time = 3},
-felineshape = {price = {mana = 60, gold = 300}, items = {bestialessenceing = 2}, time = 4},
-canineshape = {price = {mana = 60, gold = 350}, items = {bestialessenceing = 2}, time = 4},
-equineshape = {price = {mana = 60, gold = 400}, items = {bestialessenceing = 2}, time = 6},
-pussy = {price = {mana = 50, gold = 300}, items = {natureessenceing = 2, fluidsubstanceing = 2}, time = 5},
-removepussy = {price = {mana = 50, gold = 300}, items = {taintedessenceing = 2}, time = 4},
-},
+	code = 'penis',
+	type = 'custom',
+	description = '',
+	options = [''],
+	target = '',
+	data = {
+		grow = {price = {mana = 100, gold = 250}, items = {majoruspot = 1}, time = 3},
+		remove = {price = {mana = 50, gold = 150}, items = {taintedessenceing = 2}, time = 4},
+		humanshape = {price = {mana = 40, gold = 200}, items = {magicessenceing = 2}, time = 3},
+		felineshape = {price = {mana = 60, gold = 300}, items = {bestialessenceing = 2}, time = 4},
+		canineshape = {price = {mana = 60, gold = 350}, items = {bestialessenceing = 2}, time = 4},
+		equineshape = {price = {mana = 60, gold = 400}, items = {bestialessenceing = 2}, time = 6},
+		pussy = {price = {mana = 50, gold = 300}, items = {natureessenceing = 2, fluidsubstanceing = 2}, time = 5},
+		removepussy = {price = {mana = 50, gold = 300}, items = {taintedessenceing = 2}, time = 4},
+	},
 }
 
 var balls = {
-code = 'balls',
-type = 'custom',
-description = '',
-options = [''],
-target = '',
-data = {
-grow = {price = {mana = 75, gold = 250}, items = {majoruspot = 1}, time = 3},
-remove = {price = {mana = 50, gold = 150}, items = {taintedessenceing = 2}, time = 4},},
+	code = 'balls',
+	type = 'custom',
+	description = '',
+	options = [''],
+	target = '',
+	data = {
+		grow = {price = {mana = 75, gold = 250}, items = {majoruspot = 1}, time = 3},
+		remove = {price = {mana = 50, gold = 150}, items = {taintedessenceing = 2}, time = 4},
+	},
 }
 var tits = {
-code = 'tits',
-type = 'custom',
-description = '',
-options = [''],
-target = 'titssize',
-data = {
-developtits = {price = {mana = 120, gold = 500}, items = {maturingpot = 2}, time = 6},
-reversetits = {price = {mana = 60, gold = 300}, items = {youthingpot = 1}, time = 4},
-addnipples = {price = {mana = 40, gold = 200}, items = {natureessenceing = 2, bestialessenceing = 2}, time = 2},
-removenipples = {price = {mana = 25, gold = 200}, items = {taintedessenceing = 2}, time = 2},
-maximizenipples = {price = {mana = 100, gold = 500}, items = {natureessenceing = 5, bestialessenceing = 5}, time = 5},
-minimizenipples = {price = {mana = 50, gold = 200}, items = {taintedessenceing = 5}, time = 5},
-hollownipples = {price = {mana = 100, gold = 400}, items = {natureessenceing = 2, fluidsubstanceing = 2, magicessenceing = 2}, time = 7}
-},
+	code = 'tits',
+	type = 'custom',
+	description = '',
+	options = [''],
+	target = 'titssize',
+	data = {
+		developtits = {price = {mana = 120, gold = 500}, items = {maturingpot = 2}, time = 6},
+		reversetits = {price = {mana = 60, gold = 300}, items = {youthingpot = 1}, time = 4},
+		addnipples = {price = {mana = 40, gold = 200}, items = {natureessenceing = 2, bestialessenceing = 2}, time = 2},
+		removenipples = {price = {mana = 25, gold = 200}, items = {taintedessenceing = 2}, time = 2},
+		maximizenipples = {price = {mana = 100, gold = 500}, items = {natureessenceing = 5, bestialessenceing = 5}, time = 5},
+		minimizenipples = {price = {mana = 50, gold = 200}, items = {taintedessenceing = 5}, time = 5},
+		hollownipples = {price = {mana = 100, gold = 400}, items = {natureessenceing = 2, fluidsubstanceing = 2, magicessenceing = 2}, time = 7},
+	},
 }
 var mods = {
-code = 'mod',
-type = 'custom',
-description = '',
-options = [''],
-target = '',
-data = {
-tongue = {price = {mana = 75, gold = 250}, items = {natureessenceing = 3, magicessenceing = 1}, time = 3},
-fur = {price = {mana = 100, gold = 250}, items = {natureessenceing = 2, magicessenceing = 2}, time = 6},
-scales = {price = {mana = 100, gold = 250}, items = {natureessenceing = 2, magicessenceing = 2}, time = 6},
-hearing = {price = {mana = 50, gold = 150}, items = {bestialessenceing = 1, magicessenceing = 1}, time = 4},
-"str" : {price = {mana = 75, gold = 200}, items = {bestialessenceing = 2, magicessenceing = 2}, time = 5},
-"agi" : {price = {mana = 75, gold = 200}, items = {bestialessenceing = 2, natureessenceing = 2}, time = 5},
-"beauty" : {price = {mana = 50, gold = 300}, items = {magicessenceing = 2, natureessenceing = 2, beautypot = 1}, time = 5},
-},}
+	code = 'mod',
+	type = 'custom',
+	description = '',
+	options = [''],
+	target = '',
+	data = {
+		tongue = {price = {mana = 75, gold = 250}, items = {natureessenceing = 3, magicessenceing = 1}, time = 3},
+		fur = {price = {mana = 100, gold = 250}, items = {natureessenceing = 2, magicessenceing = 2}, time = 6},
+		scales = {price = {mana = 100, gold = 250}, items = {natureessenceing = 2, magicessenceing = 2}, time = 6},
+		hearing = {price = {mana = 50, gold = 150}, items = {bestialessenceing = 1, magicessenceing = 1}, time = 4},
+		"str" : {price = {mana = 75, gold = 200}, items = {bestialessenceing = 2, magicessenceing = 2}, time = 5},
+		"agi" : {price = {mana = 75, gold = 200}, items = {bestialessenceing = 2, natureessenceing = 2}, time = 5},
+		"beauty" : {price = {mana = 50, gold = 300}, items = {magicessenceing = 2, natureessenceing = 2, beautypot = 1}, time = 5},
+	},
+}
 var eyecolor = {
-code = 'eyecolor',
-type = 'custom',
-description = '',
-options = [''],
-data = {target = 'eyecolor',
-price = {mana = 40, gold = 100},
-items = {natureessenceing = 1},
-time = 2}
+	code = 'eyecolor',
+	type = 'custom',
+	description = '',
+	options = [''],
+	data = {target = 'eyecolor', price = {mana = 40, gold = 100}, items = {natureessenceing = 1}, time = 2},
 }
 
 func labbuttonselected(string):
@@ -562,7 +560,7 @@ func customenh(dict, action):
 		text = "$name will have $his testicles moved inside his body cavity, hiding them from sight (does not impact fertility). \n\nRequirements:"
 	elif modification.code == 'mod' && action == 'fur':
 		text = "$name's fur will be magically augmented to provide better protection. \n\nRequirements:"
-	elif modification.code == 'mod' && action == 'scale':
+	elif modification.code == 'mod' && action == 'scales':
 		text = "$name's scales will be magically augmented to provide better protection. \n\nRequirements:"
 	elif modification.code == 'mod' && action == 'tongue':
 		text = "$name's tongue will be elongated allowing better performance during oral sex. \n\nRequirements:"
@@ -721,7 +719,3 @@ func _on_labconfirm_pressed():
 	labperson = null
 	get_tree().get_current_scene().rebuild_slave_list()
 	get_node("labmodpanel").visible = false
-
-
-
-

@@ -2,385 +2,450 @@
 extends Node
 
 var jobdict = {
-rest = {
-code = 'rest',
-name = "Rest",
-type = 'basic',
-description = "$name will rest for today",
-workline = "$name will be taking a rest for today.",
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 0,
-order = 1,
-location = 'mansion',
-tags = ['mansion'],
-},forage = {
-code = 'forage',
-name = 'Forage',
-type = 'basic',
-description = "$name will be looking around for edible berries and fungi.\n\n[color=yellow]Efficiency grows with Wit. Penalty affected by Courage. Strength and Endurance affect carrying weight. [/color]",
-workline = '$name will be foraging in the nearby woods.',
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 0,
-order = 2,
-location = 'wild',
-tags = ['wild','physical'],
-},hunt = {
-code = 'hunt',
-name = "Hunt",
-type = 'basic',
-description = '$name will try hunting wild animals.\n\n[color=yellow]Efficiency grows Agility and Endurance. Penalty affected by Courage. Strength and Endurance affect carrying weight. [/color]',
-workline = '$name will be hunting in the nearby woods.',
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 0,
-order = 3,
-location = 'wild',
-tags = ['wild','physical'],
-},library = {
-code = 'library',
-name = "Library",
-type = 'basic',
-description = '$name will manage the library and study.\n\n[color=yellow]Provides Experience and Learning Points based on Wit and Library level.\nExperience efficiency decreases with level.[/color]',
-workline = "$name will be studying in the library.",
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 0,
-order = 6,
-location = 'mansion',
-tags = ['mansion'],
-},cooking = {
-code = 'cooking',
-name = "Cooking",
-type = 'basic',
-description = '$name will cook for the other residents and buy food from the market when it runs short.\n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher. \n\nEfficiency grows with Agility and Wit. [/color]',
-workline = "$name will be cooking for residents.",
-reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 1',
-unlockreqs = 'true',
-maxnumber = 1,
-order = 5,
-location = 'mansion',
-tags = ['mansion','physical'],
-},maid = {
-code = 'maid',
-name = "Cleaning",
-type = 'basic',
-description = '$name will dedicate $his time to tidying your mansion. \n\n[color=yellow]Efficiency grows with Agility and Endurance.[/color]',
-workline = "$name will spend $his day dedicated to cleaning your mansion.",
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 0,
-order = 4,
-location = 'mansion',
-tags = ['mansion','physical'],
-},nurse = {
-code = 'nurse',
-name = "Nurse",
-type = 'basic',
-description = '$name will help residents maintain and recover their health.\n\n[color=yellow]Efficiency grows with Wit and Magic Affinity.[/color]',
-workline = "$name will be watching over residents' health.",
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 1,
-order = 7,
-location = 'mansion',
-tags = ['mansion'],
-},whorewimborn = {
-code = 'whorewimborn',
-name = "W - Prostitution",
-type = 'sexual',
-description = "$name will be assigned to the town's brothel as a common whore.\n\n[color=yellow]Efficiency grows with Charm, Endurance, Beauty and basic sexual actions. \n\nRequires unlocked sex actions for sufficient performance.[/color]",
-workline = "$name will whore $himself at the brothel.",
-reqs = "true",
-unlockreqs = 'globals.state.sidequests.brothel >= 2',
-maxnumber = 0,
-order = 10,
-location = 'wimborn',
-tags = ['sex', 'wimborn', 'social'],
-},
-escortwimborn = {
-code = 'escortwimborn',
-name = "W - Escort",
-type = 'sexual',
-description = "$name will be assigned to the town's brothel as a high class whore for rich men. \n\n[color=yellow]Requires grade of a [color=aqua]Commoner[/color] or higher. \n\nEfficiency grows with Charm, Confidence, Beauty and your reputation. [/color]",
-workline = "$name will be earning money as an escort for rich people.",
-reqs = "globals.originsarray.find(globals.currentslave.origins) >= 2",
-unlockreqs = 'globals.state.sidequests.brothel >= 2',
-maxnumber = 0,
-order = 11,
-location = 'wimborn',
-tags = ['sex', 'wimborn', 'social'],
-},fucktoywimborn = {
-code = 'fucktoywimborn',
-name = "W - Exotic Whore",
-type = 'sexual',
-description = "$name will be used by the most deviant men in the brothel. \n\n[color=yellow]Efficiency grows with Courage, Endurance, Beauty, and advanced sex actions. \n\nRequires unlocked advanced sex actions for sufficient performance. [/color]",
-workline = "$name will be earning money by offering $his body for all sorts of deviant plays.",
-reqs = "true",
-unlockreqs = 'globals.state.sidequests.brothel >= 2',
-maxnumber = 0,
-order = 12,
-location = 'wimborn',
-tags = ['sex', 'wimborn', 'social'],
-},fucktoy = {
-code = 'fucktoy',
-name = "U - Fucktoy",
-type = 'sexual',
-description = "$name will be subjugated and abused by all sorts of criminals in Umbra without $his consent. \n\n[color=yellow]Builds obedience in exchange for mental degeneration. Income is based on your negative reputation. [/color]",
-workline = "$name will be subjugated and abused by all sorts of criminals in Umbra without $his consent. ",
-reqs = "true",
-unlockreqs = 'globals.state.portals.umbra.enabled == true',
-maxnumber = 0,
-order = 12,
-location = 'umbra',
-tags = ['sex', 'umbra'],
-},storewimborn = {
-code = 'storewimborn',
-name = "W - Market",
-type = 'social',
-description = "$name will attempt to sell excessive supplies or will try to make some profit by speculating with cheap products. \n\n[color=yellow]Efficiency grows with Charm, Wit and Grade. [/color]",
-workline = "$name will be working at the town's market.",
-reqs = 'true',
-unlockreqs = 'true',
-maxnumber = 0,
-order = 8,
-location = 'wimborn',
-tags = ['wimborn','vocal', 'social','physical'],
-},assistwimborn = {
-code = 'assistwimborn',
-name = "W - Mage Order Assistant",
-type = 'social',
-description = "$name will work as a staff member on various guild assignments. \n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. \n\nEfficiency grows with Magic Affinity, Wits and your reputation.[/color]",
-workline = "$name will be working for the Mage's Order.",
-reqs = "globals.originsarray.find(globals.currentslave.origins) >= 2 && globals.currentslave.traits.has('Mute') == false ",
-unlockreqs = 'globals.state.rank >= 2',
-maxnumber = 0,
-order = 10,
-location = 'wimborn',
-tags = ['wimborn','social','physical'],
-},artistwimborn = {
-code = 'artistwimborn',
-name = "W - Public Entertainer",
-type = 'social',
-description = "$name will earn money by doing dances, shows and other stage performances. \n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. \n\nEfficiency grows with Charm, Courage, Agility and beauty.[/color]",
-workline = "$name will be working as a public entertainer.",
-reqs = "globals.originsarray.find(globals.currentslave.origins) >= 2 && globals.currentslave.traits.has('Mute') == false",
-unlockreqs = 'true',
-maxnumber = 0,
-order = 9,
-location = 'wimborn',
-tags = ['wimborn','vocal','social'],
-},lumberer = {
-code = 'lumberer',
-name = "F - Lumberer",
-type = 'social',
-description = "$name will be cutting down trees near Frostford for a woodcutting company. [color=yellow]\n\nEfficiency grows with Strength and Endurance.[/color]",
-workline = "$name will be cutting down trees near Frostford.",
-reqs = "true",
-unlockreqs = 'true',
-maxnumber = 0,
-order = 9,
-location = 'frostford',
-tags = ['frostford','physical'],
-},ffprostitution = {
-code = 'ffprostitution',
-name = "F - Prostitution",
-type = 'sexual',
-description = "$name will be serving lone customers with $his body at Frostford. \n\n[color=yellow]\n\nEfficiency grows with Charm and beauty.[/color]",
-workline = "$name will be serving lone customers with $his body in the streets of Frostford.",
-reqs = "globals.currentslave.tags.find('nosex') < 0",
-unlockreqs = 'true',
-maxnumber = 0,
-order = 9,
-location = 'frostford',
-tags = ['sex','frostford','social'],
-},guardian = {
-code = 'guardian',
-name = "G - Guardian",
-type = 'social',
-description = "$name will be patrolling streets with Gorn's city guard. \n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher. \n\nEfficiency grows with Strength, Courage.[/color]",
-workline = "$name will be patrolling streets with Gorn's city guard.",
-reqs = "globals.originsarray.find(globals.currentslave.origins) >= 1 && globals.currentslave.traits.has('Mute') == false",
-unlockreqs = 'true',
-maxnumber = 0,
-order = 9,
-location = 'gorn',
-tags = ['gorn','social'],
-},research = {
-code = 'research',
-name = "U - Research Subject",
-type = 'social',
-description = "$name will be used in harsh experiments in Umbra. \n\n[color=yellow]\n\nWill earn a lot of money, but quickly deteriorate physical and mental health.[/color] \n[color=#ff4949]Can have negative consequences and even sometimes kill the servant. [/color]",
-workline = "$name will be used in harsh experiments in Umbra.",
-reqs = "true",
-unlockreqs = 'globals.state.portals.umbra.enabled == true',
-maxnumber = 0,
-order = 9,
-location = 'umbra',
-tags = ['umbra'],
-},slavecatcher = {
-code = 'slavecatcher',
-name = "G - Slave Catcher",
-type = 'social',
-description = "$name will be joining slaver parties and help catching and transporting slaves. \n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher.[/color] \n\nEfficiency grows with Agility, Strength and Courage.[/color]",
-workline = "$name will be joining slaver parties and help catching and transporting slaves around Gorn.",
-reqs = "globals.originsarray.find(globals.currentslave.origins) >= 1",
-unlockreqs = 'true',
-maxnumber = 0,
-order = 9,
-location = 'gorn',
-tags = ['gorn','social','physical'],
-},headgirl = {
-code = 'headgirl',
-name = "Headgirl",
-type = 'social',
-description = "$name will watch over other servants, improving their behavior.\n\nEfficiency grows with Charm(Patronage) or Confidence(Strict).\n\n[color=yellow]Requires grade of [color=aqua]Rich[/color] or higher. [/color]",
-workline = "$name will be directing and managing other residents.",
-reqs = "globals.originsarray.find(globals.currentslave.origins) >= 3 && globals.currentslave.traits.has('Mute') == false ",
-unlockreqs = 'globals.slaves.size() >= 8',
-maxnumber = 1,
-order = 12,
-location = 'mansion',
-tags = ['mansion','management'],
-},jailer = {
-code = 'jailer',
-name = "Jailer",
-type = 'social',
-description = "$name will be feeding and watching over your prisoners.\n\nEfficiency grows with Confidence, Charm, and Wit.\n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher. [/color]",
-workline = "$name will be managing prisoners.",
-reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 1',
-unlockreqs = 'true',
-maxnumber = 1,
-order = 12,
-location = 'mansion',
-tags = ['mansion','management'],
-},farmmanager = {
-code = 'farmmanager',
-name = "Farm Manager",
-type = 'basic',
-description = "$name will be managing your farm and slaves assigned to it.\n\nEfficiency grows with Confidence and Wit. Stress gained by slaves can be reduced by Charm.\n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. [/color]",
-workline = "$name will be looking over your farm and collect its income.",
-reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 2',
-unlockreqs = 'globals.state.farm >= 3',
-maxnumber = 1,
-order = 13,
-location = 'mansion',
-tags = ['mansion','management'],
-},labassist = {
-code = 'labassist',
-name = "Laboratory Assistant",
-type = 'basic',
-description = "$name will be helping out and managing your laboratory operations.\n\nEfficiency grows with Wit and Magic Affinity.\n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher.[/color]",
-workline = "$name will be assisting you in the laboratory.",
-reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 2',
-unlockreqs = 'globals.state.mansionupgrades.mansionlab >= 1',
-maxnumber = 1,
-order = 14,
-location = 'mansion',
-tags = ['mansion'],
-},
-
+	rest = {
+		code = 'rest',
+		name = "Rest",
+		type = 'basic',
+		description = "$name will rest for today",
+		workline = "$name will be taking a rest for today.",
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 1,
+		location = 'mansion',
+		tags = ['mansion'],
+	},
+	forage = {
+		code = 'forage',
+		name = 'Forage',
+		type = 'basic',
+		description = "$name will be looking around for edible berries and fungi.\n\n[color=yellow]Efficiency grows with Wit. Penalty affected by Courage. Strength and Endurance affect carrying weight. [/color]",
+		workline = '$name will be foraging in the nearby woods.',
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 2,
+		location = 'wild',
+		tags = ['wild','physical'],
+	},
+	hunt = {
+		code = 'hunt',
+		name = "Hunt",
+		type = 'basic',
+		description = '$name will try hunting wild animals.\n\n[color=yellow]Efficiency grows Agility and Endurance. Penalty affected by Courage. Strength and Endurance affect carrying weight. [/color]',
+		workline = '$name will be hunting in the nearby woods.',
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 3,
+		location = 'wild',
+		tags = ['wild','physical'],
+	},
+	library = {
+		code = 'library',
+		name = "Library",
+		type = 'basic',
+		description = '$name will manage the library and study.\n\n[color=yellow]Provides Experience and Learning Points based on Wit and Library level.\nExperience efficiency decreases with level.[/color]',
+		workline = "$name will be studying in the library.",
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 6,
+		location = 'mansion',
+		tags = ['mansion'],
+	},
+	cooking = {
+		code = 'cooking',
+		name = "Cooking",
+		type = 'basic',
+		description = '$name will cook for the other residents and buy food from the market when it runs short.\n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher. \n\nEfficiency grows with Agility and Wit. [/color]',
+		workline = "$name will be cooking for residents.",
+		reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 1',
+		unlockreqs = 'true',
+		maxnumber = 1,
+		order = 5,
+		location = 'mansion',
+		tags = ['mansion','physical'],
+	},
+	maid = {
+		code = 'maid',
+		name = "Cleaning",
+		type = 'basic',
+		description = '$name will dedicate $his time to tidying your mansion. \n\n[color=yellow]Efficiency grows with Agility and Endurance.[/color]',
+		workline = "$name will spend $his day dedicated to cleaning your mansion.",
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 4,
+		location = 'mansion',
+		tags = ['mansion','physical'],
+	},
+	nurse = {
+		code = 'nurse',
+		name = "Nurse",
+		type = 'basic',
+		description = '$name will help residents maintain and recover their health.\n\n[color=yellow]Efficiency grows with Wit and Magic Affinity.[/color]',
+		workline = "$name will be watching over residents' health.",
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 1,
+		order = 7,
+		location = 'mansion',
+		tags = ['mansion'],
+	},
+	whorewimborn = {
+		code = 'whorewimborn',
+		name = "W - Prostitution",
+		type = 'sexual',
+		description = "$name will be assigned to the town's brothel as a common whore.\n\n[color=yellow]Efficiency grows with Charm, Endurance, Beauty and basic sexual actions. \n\nRequires unlocked sex actions for sufficient performance.[/color]",
+		workline = "$name will whore $himself at the brothel.",
+		reqs = "true",
+		unlockreqs = 'globals.state.sidequests.brothel >= 2',
+		maxnumber = 0,
+		order = 10,
+		location = 'wimborn',
+		tags = ['sex', 'wimborn', 'social'],
+	},
+	escortwimborn = {
+		code = 'escortwimborn',
+		name = "W - Escort",
+		type = 'sexual',
+		description = "$name will be assigned to the town's brothel as a high class whore for rich men. \n\n[color=yellow]Requires grade of a [color=aqua]Commoner[/color] or higher. \n\nEfficiency grows with Charm, Confidence, Beauty and your reputation. [/color]",
+		workline = "$name will be earning money as an escort for rich people.",
+		reqs = "globals.originsarray.find(globals.currentslave.origins) >= 2",
+		unlockreqs = 'globals.state.sidequests.brothel >= 2',
+		maxnumber = 0,
+		order = 11,
+		location = 'wimborn',
+		tags = ['sex', 'wimborn', 'social'],
+	},
+	fucktoywimborn = {
+		code = 'fucktoywimborn',
+		name = "W - Exotic Whore",
+		type = 'sexual',
+		description = "$name will be used by the most deviant men in the brothel. \n\n[color=yellow]Efficiency grows with Courage, Endurance, Beauty, and advanced sex actions. \n\nRequires unlocked advanced sex actions for sufficient performance. [/color]",
+		workline = "$name will be earning money by offering $his body for all sorts of deviant plays.",
+		reqs = "true",
+		unlockreqs = 'globals.state.sidequests.brothel >= 2',
+		maxnumber = 0,
+		order = 12,
+		location = 'wimborn',
+		tags = ['sex', 'wimborn', 'social'],
+	},
+	fucktoy = {
+		code = 'fucktoy',
+		name = "U - Fucktoy",
+		type = 'sexual',
+		description = "$name will be subjugated and abused by all sorts of criminals in Umbra without $his consent. \n\n[color=yellow]Builds obedience in exchange for mental degeneration. Income is based on your negative reputation. [/color]",
+		workline = "$name will be subjugated and abused by all sorts of criminals in Umbra without $his consent. ",
+		reqs = "true",
+		unlockreqs = 'globals.state.portals.umbra.enabled == true',
+		maxnumber = 0,
+		order = 12,
+		location = 'umbra',
+		tags = ['sex', 'umbra'],
+	},
+	storewimborn = {
+		code = 'storewimborn',
+		name = "W - Market",
+		type = 'social',
+		description = "$name will attempt to sell excessive supplies or will try to make some profit by speculating with cheap products. \n\n[color=yellow]Efficiency grows with Charm, Wit and Grade. [/color]",
+		workline = "$name will be working at the town's market.",
+		reqs = 'true',
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 8,
+		location = 'wimborn',
+		tags = ['wimborn','vocal', 'social','physical'],
+	},
+	assistwimborn = {
+		code = 'assistwimborn',
+		name = "W - Mage Order Assistant",
+		type = 'social',
+		description = "$name will work as a staff member on various guild assignments. \n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. \n\nEfficiency grows with Magic Affinity, Wits and your reputation.[/color]",
+		workline = "$name will be working for the Mage's Order.",
+		reqs = "globals.originsarray.find(globals.currentslave.origins) >= 2 && globals.currentslave.traits.has('Mute') == false ",
+		unlockreqs = 'globals.state.rank >= 2',
+		maxnumber = 0,
+		order = 10,
+		location = 'wimborn',
+		tags = ['wimborn','social','physical'],
+	},
+	artistwimborn = {
+		code = 'artistwimborn',
+		name = "W - Public Entertainer",
+		type = 'social',
+		description = "$name will earn money by doing dances, shows and other stage performances. \n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. \n\nEfficiency grows with Charm, Courage, Agility and beauty.[/color]",
+		workline = "$name will be working as a public entertainer.",
+		reqs = "globals.originsarray.find(globals.currentslave.origins) >= 2 && globals.currentslave.traits.has('Mute') == false",
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 9,
+		location = 'wimborn',
+		tags = ['wimborn','vocal','social'],
+	},
+	lumberer = {
+		code = 'lumberer',
+		name = "F - Lumberer",
+		type = 'social',
+		description = "$name will be cutting down trees near Frostford for a woodcutting company. [color=yellow]\n\nEfficiency grows with Strength and Endurance.[/color]",
+		workline = "$name will be cutting down trees near Frostford.",
+		reqs = "true",
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 9,
+		location = 'frostford',
+		tags = ['frostford','physical'],
+	},
+	ffprostitution = {
+		code = 'ffprostitution',
+		name = "F - Prostitution",
+		type = 'sexual',
+		description = "$name will be serving lone customers with $his body at Frostford. \n\n[color=yellow]\n\nEfficiency grows with Charm and beauty.[/color]",
+		workline = "$name will be serving lone customers with $his body in the streets of Frostford.",
+		reqs = "globals.currentslave.tags.find('nosex') < 0",
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 9,
+		location = 'frostford',
+		tags = ['sex','frostford','social'],
+	},
+	guardian = {
+		code = 'guardian',
+		name = "G - Guardian",
+		type = 'social',
+		description = "$name will be patrolling streets with Gorn's city guard. \n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher. \n\nEfficiency grows with Strength, Courage.[/color]",
+		workline = "$name will be patrolling streets with Gorn's city guard.",
+		reqs = "globals.originsarray.find(globals.currentslave.origins) >= 1 && globals.currentslave.traits.has('Mute') == false",
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 9,
+		location = 'gorn',
+		tags = ['gorn','social'],
+	},
+	research = {
+		code = 'research',
+		name = "U - Research Subject",
+		type = 'social',
+		description = "$name will be used in harsh experiments in Umbra. \n\n[color=yellow]\n\nWill earn a lot of money, but quickly deteriorate physical and mental health.[/color] \n[color=#ff4949]Can have negative consequences and even sometimes kill the servant. [/color]",
+		workline = "$name will be used in harsh experiments in Umbra.",
+		reqs = "true",
+		unlockreqs = 'globals.state.portals.umbra.enabled == true',
+		maxnumber = 0,
+		order = 9,
+		location = 'umbra',
+		tags = ['umbra'],
+	},
+	slavecatcher = {
+		code = 'slavecatcher',
+		name = "G - Slave Catcher",
+		type = 'social',
+		description = "$name will be joining slaver parties and help catching and transporting slaves. \n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher.[/color] \n\nEfficiency grows with Agility, Strength and Courage.[/color]",
+		workline = "$name will be joining slaver parties and help catching and transporting slaves around Gorn.",
+		reqs = "globals.originsarray.find(globals.currentslave.origins) >= 1",
+		unlockreqs = 'true',
+		maxnumber = 0,
+		order = 9,
+		location = 'gorn',
+		tags = ['gorn','social','physical'],
+	},
+	headgirl = {
+		code = 'headgirl',
+		name = "Headgirl",
+		type = 'social',
+		description = "$name will watch over other servants, improving their behavior.\n\nEfficiency grows with Charm(Patronage) or Confidence(Strict).\n\n[color=yellow]Requires grade of [color=aqua]Rich[/color] or higher. [/color]",
+		workline = "$name will be directing and managing other residents.",
+		reqs = "globals.originsarray.find(globals.currentslave.origins) >= 3 && globals.currentslave.traits.has('Mute') == false ",
+		unlockreqs = 'globals.slaves.size() >= 8',
+		maxnumber = 1,
+		order = 12,
+		location = 'mansion',
+		tags = ['mansion','management'],
+	},
+	jailer = {
+		code = 'jailer',
+		name = "Jailer",
+		type = 'social',
+		description = "$name will be feeding and watching over your prisoners.\n\nEfficiency grows with Confidence, Charm, and Wit.\n\n[color=yellow]Requires grade of [color=aqua]Poor[/color] or higher. [/color]",
+		workline = "$name will be managing prisoners.",
+		reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 1',
+		unlockreqs = 'true',
+		maxnumber = 1,
+		order = 12,
+		location = 'mansion',
+		tags = ['mansion','management'],
+	},
+	farmmanager = {
+		code = 'farmmanager',
+		name = "Farm Manager",
+		type = 'basic',
+		description = "$name will be managing your farm and slaves assigned to it.\n\nEfficiency grows with Confidence and Wit. Stress gained by slaves can be reduced by Charm.\n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. [/color]",
+		workline = "$name will be looking over your farm and collect its income.",
+		reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 2',
+		unlockreqs = 'globals.state.farm >= 3',
+		maxnumber = 1,
+		order = 13,
+		location = 'mansion',
+		tags = ['mansion','management'],
+	},
+	labassist = {
+		code = 'labassist',
+		name = "Laboratory Assistant",
+		type = 'basic',
+		description = "$name will be helping out and managing your laboratory operations.\n\nEfficiency grows with Wit and Magic Affinity.\n\n[color=yellow]Requires grade of [color=aqua]Commoner[/color] or higher. [/color]",
+		workline = "$name will be assisting you in the laboratory.",
+		reqs = 'globals.originsarray.find(globals.currentslave.origins) >= 2',
+		unlockreqs = 'globals.state.mansionupgrades.mansionlab >= 1',
+		maxnumber = 1,
+		order = 14,
+		location = 'mansion',
+		tags = ['mansion'],
+	},
 }
 
 var specs = {
-geisha = {
-name = "Geisha",
-code = 'geisha',
-descript = "A Geisha is an adept of love. They are trained to please both men and women, not only with sex but also in companionship. They are genuinely pleasant to have around as they try their best to feel what a potential partner might want. ",
-descriptbonus = "+25% gold and half stress from escort and prostitution, no penalties for same-sex, opposite dominance or perverted actions",
-descriptreqs = "Charm 75+, Beauty 60+, grade Commoner or above, unlocked sex.",
-reqs = "person.charm >= 75 && person.beautybase >= 60 && !person.origins in ['slave','poor'] && person.consent == true"
-},
-ranger = {
-name = "Ranger",
-code = 'ranger',
-descript = "Rangers are quick and resourceful individuals who are at home in any natural environment.. Not only do they have an eye for better opportunities, but also can spot richer preys. ",
-descriptbonus = "+40% drop rate from combat encounters, forage and hunt efficiency + 25%, scouting bonus",
-descriptreqs = "Wit 75+, Endurance 3+.",
-reqs = "person.wit >= 75 && person.send >= 3"
-},
-executor = {
-name = "Executor",
-code = 'executor',
-descript = "Executors are trained to work with people in a most efficient way. Their commands are always straight and on-point and their attitude is met with respect. ",
-descriptbonus = "At least 100 confidence for Management-related tasks. Obedience can't drop below 50.",
-descriptreqs = "Conf 75+, Wit 50+, grade Rich or above",
-reqs = "person.conf >= 75 && person.wit >= 50 && person.origins in ['rich', 'noble']"
-},
-bodyguard = {
-name = "Bodyguard",
-code = 'bodyguard',
-descript = "A Bodyguard is trained to put their Master’s life before their own. Not only are they capable of taking down threats on their own, but are also substantially more effective at protecting others. ",
-descriptbonus = "+ 4 Armor, +40 Maximum Health, 'Protect' action doubles the amount of reduced damage.",
-descriptreqs = "Courage 60+, agility 3+, strength 4+, loyalty 50+",
-reqs = "person.cour >= 60 && person.sagi >= 3 && person.sstr >= 4 && person.loyal >= 50"
-},
-assassin = {
-name = "Assassin",
-code = 'assassin',
-descript = "Assassins are trained to act swiftly and decisively, when required. They prefer efficiency over show and offence to defence.  ",
-descriptbonus = "Speed +5, Damage +5",
-descriptreqs = "Agility 5+, Wit 65+",
-reqs = "person.wit >= 65 && person.sagi >= 5"
-},
-housekeeper = {
-name = "Housekeeper",
-code = 'housekeeper',
-descript = "Housekeepers are experts at supplying and taking care of the living quarters. ",
-descriptbonus = "Will clean the house on stationary jobs (half effect of normal cleaning). Personal daily expenses are cut in half.",
-descriptreqs = "None",
-reqs = "true"
-},
-trapper = {
-name = "Trapper",
-code = 'trapper',
-descript = "Trappers are generally common professionals you can find in any slavers party. They are also reasonably well trained in hunting. ",
-descriptbonus = "Bonus hunting +20%, 50% chance to automatically capture escaping person, bonus capture rate. ",
-descriptreqs = "Wit 50+, Grade: Commoner and above ",
-reqs = "person.wit >= 50 && !person.origins in ['slave','poor']"
-},
-nympho = {
-name = "Nympho",
-code = 'nympho',
-descript = "Nymphos devote their life entirely to the lewdness. They are ready for anything and everything and want more. It's common practice to make such slaves into tools and toys for their owners. ",
-descriptbonus = "+1 mana from sex actions, +25% to fucktoy, half stress from other sexual jobs, no penalties from any sex activities.",
-descriptreqs = "Grade: Commoner and below, Unlocked sex, Charm and Courage 50+ ",
-reqs = "person.origins in ['slave','poor','commoner'] && person.consent == true && person.cour >= 50 && person.charm >= 50"
-},
-merchant = {
-name = "Merchant",
-code = 'merchant',
-descript = "People with a talent for bargains, not only profitable to keep around, but also good at connecting with others. ",
-descriptbonus = "Bonus to market job, 25% bonus to non-gear item selling while in party (does not stack).",
-descriptreqs = "Wit and Charm 50+ ",
-reqs = "person.wit >= 50 && person.charm >= 50"
-},
-tamer = {
-name = "Tamer",
-code = 'tamer',
-descript = "Tamers are trained to work with wild animals and savagely behaving individuals. By utilizing many simple lessons they will eventually bring their true potential out of those. ",
-descriptbonus = "Uncivilized races become more obedient and can lose that trait while a Tamer is resting, managing or working on the same occupation. ",
-descriptreqs = "Confidence and charm 50+, Grade: Commoner and above, not Uncivilized",
-reqs = "person.conf >= 50 && person.charm >= 50 && person.origins in ['commoner','rich','noble'] && !person.traits.has('Uncivilized')"
-},
+	geisha = {
+		name = "Geisha",
+		code = 'geisha',
+		descript = "A Geisha is an adept of love. They are trained to please both men and women, not only with sex but also in companionship. They are genuinely pleasant to have around as they try their best to feel what a potential partner might want. ",
+		descriptbonus = "+25% gold and half stress from escort and prostitution, no penalties for same-sex, opposite dominance or perverted actions",
+		descriptreqs = "Charm 75+, Beauty 60+, grade Commoner or above, unlocked sex.",
+		reqs = "person.charm >= 75 && person.beautybase >= 60 && !person.origins in ['slave','poor'] && person.consent == true"
+	},
+	ranger = {
+		name = "Ranger",
+		code = 'ranger',
+		descript = "Rangers are quick and resourceful individuals who are at home in any natural environment.. Not only do they have an eye for better opportunities, but also can spot richer preys. ",
+		descriptbonus = "+40% drop rate from combat encounters, forage and hunt efficiency + 25%, scouting bonus",
+		descriptreqs = "Wit 75+, Endurance 3+.",
+		reqs = "person.wit >= 75 && person.send >= 3"
+	},
+	executor = {
+		name = "Executor",
+		code = 'executor',
+		descript = "Executors are trained to work with people in a most efficient way. Their commands are always straight and on-point and their attitude is met with respect. ",
+		descriptbonus = "At least 100 confidence for Management-related tasks. Obedience can't drop below 50.",
+		descriptreqs = "Conf 75+, Wit 50+, grade Rich or above",
+		reqs = "person.conf >= 75 && person.wit >= 50 && person.origins in ['rich', 'noble']"
+	},
+	bodyguard = {
+		name = "Bodyguard",
+		code = 'bodyguard',
+		descript = "A Bodyguard is trained to put their Master’s life before their own. Not only are they capable of taking down threats on their own, but are also substantially more effective at protecting others. ",
+		descriptbonus = "+ 4 Armor, +40 Maximum Health, 'Protect' action doubles the amount of reduced damage.",
+		descriptreqs = "Courage 60+, agility 3+, strength 4+, loyalty 50+",
+		reqs = "person.cour >= 60 && person.sagi >= 3 && person.sstr >= 4 && person.loyal >= 50"
+	},
+	assassin = {
+		name = "Assassin",
+		code = 'assassin',
+		descript = "Assassins are trained to act swiftly and decisively, when required. They prefer efficiency over show and offence to defence.  ",
+		descriptbonus = "Speed +5, Damage +5",
+		descriptreqs = "Agility 5+, Wit 65+",
+		reqs = "person.wit >= 65 && person.sagi >= 5"
+	},
+	housekeeper = {
+		name = "Housekeeper",
+		code = 'housekeeper',
+		descript = "Housekeepers are experts at supplying and taking care of the living quarters. ",
+		descriptbonus = "Will clean the house on stationary jobs (half effect of normal cleaning). Personal daily expenses are cut in half.",
+		descriptreqs = "None",
+		reqs = "true"
+	},
+	trapper = {
+		name = "Trapper",
+		code = 'trapper',
+		descript = "Trappers are generally common professionals you can find in any slavers party. They are also reasonably well trained in hunting. ",
+		descriptbonus = "Bonus hunting +20%, 50% chance to automatically capture escaping person, bonus capture rate. ",
+		descriptreqs = "Wit 50+, Grade: Commoner and above ",
+		reqs = "person.wit >= 50 && !person.origins in ['slave','poor']"
+	},
+	nympho = {
+		name = "Nympho",
+		code = 'nympho',
+		descript = "Nymphos devote their life entirely to the lewdness. They are ready for anything and everything and want more. It's common practice to make such slaves into tools and toys for their owners. ",
+		descriptbonus = "+1 mana from sex actions, +25% to fucktoy, half stress from other sexual jobs, no penalties from any sex activities.",
+		descriptreqs = "Grade: Commoner and below, Unlocked sex, Charm and Courage 50+ ",
+		reqs = "person.origins in ['slave','poor','commoner'] && person.consent == true && person.cour >= 50 && person.charm >= 50"
+	},
+	merchant = {
+		name = "Merchant",
+		code = 'merchant',
+		descript = "People with a talent for bargains, not only profitable to keep around, but also good at connecting with others. ",
+		descriptbonus = "Bonus to market job, 25% bonus to non-gear item selling while in party (does not stack).",
+		descriptreqs = "Wit and Charm 50+ ",
+		reqs = "person.wit >= 50 && person.charm >= 50"
+	},
+	tamer = {
+		name = "Tamer",
+		code = 'tamer',
+		descript = "Tamers are trained to work with wild animals and savagely behaving individuals. By utilizing many simple lessons they will eventually bring their true potential out of those. ",
+		descriptbonus = "Uncivilized races become more obedient and can lose that trait while a Tamer is resting, managing or working on the same occupation. ",
+		descriptreqs = "Confidence and charm 50+, Grade: Commoner and above, not Uncivilized",
+		reqs = "person.conf >= 50 && person.charm >= 50 && person.origins in ['commoner','rich','noble'] && !person.traits.has('Uncivilized')"
+	},
 }
 
 var leveluprequests = {
-weakitem = {reqs = 'true', speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ", descript = '$name needs a [color=aqua]$item[/color] to advance $his level.  ', execfunc = 'weakitem'},
-multitem = {reqs = 'true', speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ", descript = '$name needs a [color=aqua]$item[/color] to advance $his level.  ', execfunc = 'multitem'},
-gearitem = {reqs = 'true', speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ", descript = '$name needs a [color=aqua]$item[/color] to advance $his level.  ', execfunc = 'gearitem'},
-ingreditem = {reqs = 'true', speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ", descript = '$name needs [color=aqua]$item[/color] to advance $his level. ', execfunc = 'ingreditem'},
-vacation = {reqs = 'true', speech = "you should provide $name with [color=aqua]3 free days[/color] to furtherly unlock $his potential.", descript = '$name needs a [color=aqua]vacation[/color] to advance $his level. ', execfunc = 'vacationshort'},
-relationship = {reqs = "person.consent == false && person.tags.find('nosex') < 0", speech = "you should unlock [color=aqua]intimacy[/color] with $name to unlock $his potential.", descript = "$name needs to have [color=aqua]intimacy unlocked[/color] to advance $his level. ", execfunc = 'startrelationship'},
-wincombat = {reqs = 'true', speech = "you should let $name to [color=aqua]win in a fight[/color] to unlock $his potential.", descript = "$name needs to [color=aqua]win in a fight[/color] to advance $his level. ", execfunc = 'wincombat'},
-improvegrade = {reqs = 'globals.originsarray.find(person.origins) <= 3', speech = "you should raise $name's [color=aqua]grade[/color] to unlock $his potential.", descript = "$name needs to [color=aqua]raise $his grade[/color] to advance $his level. ", execfunc = 'raisegrade'},
-specialization = {reqs = 'person.spec == null && person.level >= 4', speech = "you should let $name's [color=aqua]learn a specialization[/color] to unlock $his potential.", descript = "$name needs to [color=aqua]learn a specialization[/color] to advance $his level. ", execfunc = 'getspec'},
+	weakitem = {
+		reqs = 'true',
+		speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ",
+		descript = '$name needs a [color=aqua]$item[/color] to advance $his level.  ',
+		execfunc = 'weakitem'
+	},
+	multitem = {
+		reqs = 'true',
+		speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ",
+		descript = '$name needs a [color=aqua]$item[/color] to advance $his level.  ',
+		execfunc = 'multitem'
+	},
+	gearitem = {
+		reqs = 'true',
+		speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ",
+		descript = '$name needs a [color=aqua]$item[/color] to advance $his level.  ',
+		execfunc = 'gearitem'
+	},
+	ingreditem = {
+		reqs = 'true',
+		speech = "you will need a [color=aqua]$item[/color] to unlock $his potential. ",
+		descript = '$name needs [color=aqua]$item[/color] to advance $his level. ',
+		execfunc = 'ingreditem'
+	},
+	vacation = {
+		reqs = 'true',
+		speech = "you should provide $name with [color=aqua]3 free days[/color] to furtherly unlock $his potential.",
+		descript = '$name needs a [color=aqua]vacation[/color] to advance $his level. ',
+		execfunc = 'vacationshort'
+	},
+	relationship = {
+		reqs = "person.consent == false && person.tags.find('nosex') < 0",
+		speech = "you should unlock [color=aqua]intimacy[/color] with $name to unlock $his potential.",
+		descript = "$name needs to have [color=aqua]intimacy unlocked[/color] to advance $his level. ",
+		execfunc = 'startrelationship'
+	},
+	wincombat = {
+		reqs = 'true',
+		speech = "you should let $name to [color=aqua]win in a fight[/color] to unlock $his potential.",
+		descript = "$name needs to [color=aqua]win in a fight[/color] to advance $his level. ",
+		execfunc = 'wincombat'
+	},
+	improvegrade = {
+		reqs = 'globals.originsarray.find(person.origins) <= 3',
+		speech = "you should raise $name's [color=aqua]grade[/color] to unlock $his potential.",
+		descript = "$name needs to [color=aqua]raise $his grade[/color] to advance $his level. ",
+		execfunc = 'raisegrade'
+	},
+	specialization = {
+		reqs = 'person.spec == null && person.level >= 4',
+		speech = "you should let $name's [color=aqua]learn a specialization[/color] to unlock $his potential.",
+		descript = "$name needs to [color=aqua]learn a specialization[/color] to advance $his level. ",
+		execfunc = 'getspec'
+	},
 }
 
 var requestsbylevel = {
-easy = ['weakitem', 'ingreditem', 'vacation', 'relationship', 'wincombat', 'improvegrade'],
-medium = ['multitem','specialization','gearitem','improvegrade'],
+	easy = ['weakitem', 'ingreditem', 'vacation', 'relationship', 'wincombat', 'improvegrade'],
+	medium = ['multitem','specialization','gearitem','improvegrade'],
 }
 
 
@@ -390,6 +455,7 @@ var ingredlist = ['bestialessenceing', 'natureessenceing','taintedessenceing','m
 
 func vacation(person):
 	person.away.duration = int(person.levelupreqs.value)
+	person.away.at = 'vacation'
 	globals.get_tree().get_current_scene()._on_mansion_pressed()
 	globals.get_tree().get_current_scene().popup(person.dictionary("You've sent $name on vacation, boosting $his mood with this sudden reward. "))
 	person.levelup()
@@ -422,7 +488,7 @@ func vacationshort(person):
 	return text
 
 func weakitem(person):
-	var item = globals.itemdict[weakitemslist[rand_range(0,weakitemslist.size())]]
+	var item = globals.itemdict[globals.randomfromarray(weakitemslist)]
 	var text = person.dictionary(leveluprequests.weakitem.speech)
 	text = text.replace('$item', item.name)
 	var descript = person.dictionary(leveluprequests.weakitem.descript).replace('$item', item.name)
@@ -440,7 +506,7 @@ func multitem(person):
 		if !(i in ['fluidsubstanceing','taintedessenceing'] && globals.state.mainquest < 17):
 			array.append(i)
 	while count < array.size():
-		array.remove(rand_range(0,array.size()))
+		array.remove(randi() % array.size())
 	for i in array:
 		item = globals.itemdict[i]
 		itemnumber = round(rand_range(1,3))
@@ -470,7 +536,7 @@ func multitemlevelup(person):
 		person.levelup()
 
 func gearitem(person):
-	var item = globals.itemdict[gearitemslist[rand_range(0,gearitemslist.size())]]
+	var item = globals.itemdict[globals.randomfromarray(gearitemslist)]
 	var text = person.dictionary(leveluprequests.gearitem.speech)
 	text = text.replace('$item', item.name)
 	var descript = person.dictionary(leveluprequests.gearitem.descript).replace('$item', item.name)
@@ -495,7 +561,7 @@ func ingreditem(person):
 			itemarray.append(i)
 	while ingnumber >= 1:
 		ingnumber -= 1
-		item = itemarray[rand_range(0,itemarray.size())]
+		item = globals.randomfromarray(itemarray)
 		finalitems[item] = round(rand_range(ingrange[0], ingrange[1]))
 	for i in finalitems:
 		item = globals.itemdict[i]
@@ -531,7 +597,7 @@ func getrequest(person):
 		for i in requestsbylevel.medium:
 			if globals.evaluate(leveluprequests[i].reqs) == true:
 				array.append(leveluprequests[i])
-	var request = array[rand_range(0, array.size())]
+	var request = globals.randomfromarray(array)
 	var text = call(request.execfunc, person)
 	return text
 
@@ -555,7 +621,7 @@ func forage(person):
 	if person.smaf * 3 + 2 >= rand_range(0,100):
 		text += "$name has found nature's essence. \n"
 		globals.itemdict.natureessenceing.amount += 1
-	food = min(food, (person.sstr+person.send)*20+25)
+	food = min(food, max(person.sstr+person.send, -1)*20+25)
 	if person.spec == 'ranger':
 		food *= 1.25
 	food = round(food)
@@ -575,7 +641,7 @@ func hunt(person):#agility, strength, endurance, courage
 		food = food*1.3
 	if person.spec in ['ranger','trapper']:
 		food *= 1.25
-	food = round(min(food, (person.sstr+person.send)*30+40))
+	food = round(min(food, max(person.sstr+person.send, -1)*30+40))
 	globals.itemdict.supply.amount += round(food/12)
 	person.xp += food/7
 	text += "In the end $he brought [color=aqua]" + str(round(food)) + "[/color] food and [color=yellow]" + str(round(food/12)) + "[/color] supplies. \n"
@@ -601,16 +667,19 @@ func library(person):
 
 func nurse(person):
 	var text = "$name is taking care of residents' health.\n"
+	var count = 0
 	if globals.player.health < globals.player.stats.health_max:
 		globals.player.health += person.wit/15+person.smaf*3
-		person.xp += rand_range(1,3)
+		person.xp += 1
+		count += 1
 	for i in globals.slaves:
 		if i.away.duration == 0 && i.health < i.stats.health_max:
+			count += 1
 			if globals.itemdict.supply.amount > 0:
 				i.health += person.wit/25+person.smaf*3
 			else:
 				i.health += person.wit/35+person.smaf*3
-			person.xp += rand_range(1,3)
+	person.xp += count * 8
 	
 	var dict = {text = text}
 	return dict
@@ -619,7 +688,7 @@ func cooking(person):
 	var text = ''
 	var gold = 0
 	var food = 0
-	person.xp += globals.slaves.size()
+	person.xp += globals.slavecount() * 2
 	if globals.resources.food < 200:
 		if globals.resources.gold >= globals.state.foodbuy/2:
 			text = '$name went to purchase groceries and brought back new food supplies.\n'
@@ -780,7 +849,7 @@ func storewimborn(person):
 		bonus += 0.3
 		supplyPrice += 1
 	var gold = rand_range(1,5) + (person.charm + person.wit) / 2
-	gold = round(gold * min(0.30 * (globals.originsarray.find(person.origins) + 1), 1) * bonus)
+	gold = round(gold * min(0.10 * (globals.originsarray.find(person.origins) + 7), 1) * bonus)
 
 	var supplySold = min(floor(gold / supplyPrice), globals.itemdict.supply.amount - globals.state.supplykeep)
 	if supplySold > 0:
@@ -793,11 +862,13 @@ func storewimborn(person):
 		globals.itemdict.supply.amount += supplySold
 		text += "With the money earned $he purchased [color=yellow]" + str(supplySold) + "[/color] supply units. "
 		supplySold = -supplySold
+	else:
+		supplySold = 0
 
 	gold = round(gold)
 	person.xp += gold / 4
 	person.stress += rand_range(5,10)
-	text = text + "$He earned "+str(gold)+" gold by the end of day.\n"
+	text += "$He returned with [color=yellow]"+str(gold)+"[/color] gold by the end of day.\n"
 	var dict = {text = text, gold = gold, supplies = -supplySold}
 	return dict
 
@@ -969,7 +1040,7 @@ func fucktoywimborn(person):
 
 func maid(person):
 	var text = ""
-	var temp = 5.5 + (person.sagi+person.send)*6
+	var temp = 5.5 + max(0, person.sagi+person.send)*6
 	person.xp += temp/4
 	globals.state.condition = temp
 	text = "$name spent the day cleaning around the mansion. \n"

@@ -1,168 +1,492 @@
 extends Panel
 
-var run_once = false
 
-
-var file_dictionary = [] #main files data paths
-var mods_dictionary = {} #mod folder data
-
+var gameDir = globals.gameDir
 var modfolder = globals.setfolders.mods
-var filedir = globals.filedir
-var backupdir = globals.backupdir
+var filedir = globals.fileDir
+var backupdir = globals.backupDir
+var detailsFile = gameDir + "details.ini"
+var saveID = ''
+
+var backupExtensions = ['gd','tscn','scn']
+
+var op_regex_dict = {}
+var tag_regex
+var file_tag_regex
+var tag_add_to = "AddTo"
+var tag_remove_from = "RemoveFrom"
+var tag_file_new = "CustomFile"
+var tag_file_mod = "ModFile"
 
 var temp_mod_scripts = {} #variable to store all original + mod script data before overwrite
+
+var curMod = ''
+var scriptEdits = {}  # {'file' : {'header' : [ [startLine, endLine, change, 'mod'] ]} } #zero change is replace 
+var logOverlaps = PoolStringArray()
+var logErrors = PoolStringArray()
+var logUnmatched = PoolStringArray()
+var logPatches = {} # {'file' : 'firstMod'}
+var retCode #lazy def to avoid many def
 
 
 var loadorder = []
 var activemods = []
+var newFiles = PoolStringArray()
+var backupVersion = ''
 
+var dir = Directory.new()
 
 func _ready():
 #	if globals.developmode == true:
 #		return
-	var dir = Directory.new()
 	var file = File.new()
-	var files = globals.dir_contents(filedir)
-	for i in files: #collects file_dictionary data and makes a backup
-		if (i.find(".gd") != -1):
-			dir.open(i.replacen(filedir, backupdir).get_base_dir ())
-			if !dir.dir_exists(i.replacen(filedir, backupdir).get_base_dir ()):
-				dir.make_dir_recursive(i.replacen(filedir, backupdir).get_base_dir ())
-			file_dictionary.append(i)
-	for i in scanfolder() : #collects mod_dictionary data
-		if !file.file_exists(i +"/info.txt"): #makes info.txt to store mod description
-			file.open(i+'/info.txt', File.WRITE)
-			file.store_line("There's no information on this mod.")
-			file.close()
-			var check = false
-			print(scanfolder())
-			for k in globals.dir_contents(i):
-				if k.find('.gd') != -1:
-					check = true
-			
-			if check == false:
-				continue
-			
-			
-		
-		dir.open(i)
-		mods_dictionary[i] = get_mod(i)
-	if !dir.dir_exists(backupdir) || globals.dir_contents(backupdir).size() <= 0:
-		storebackup()
-	
-#	order config file management
-	
+	for mod in scanfolder():
+		if !file.file_exists(mod +"/info.txt"): #makes info.txt to store mod description
+			retCode = file.open(mod +'/info.txt', File.WRITE)
+			if retCode == OK:
+				file.store_line("There's no information on this mod.")
+				file.close()
+			else:
+				handleError("Creating default info.txt for " + mod, retCode)
+
 	loadfromconfig()
-	
-	file.open(backupdir + "/version", File.READ)
-	var text = file.get_as_text()
-	file.close()
-	
-	if str(text).strip_edges() != str(globals.gameversion):
+	if !dir.dir_exists(backupdir) || str(globals.gameversion) != backupVersion || globals.dir_contents(backupdir).size() <= 0:
 		storebackup()
+	initRegexs()
+
+func initRegexs():
+	var regex_string_dictionary = {
+		"FUNC" : "(#.*\\R)*(?<header>(?<!\\V)(static\\h+)?func\\h+\\w+).*\\R(?<body>((\\t.*|#.*)?\\R)*(\\t+\\S.*(\\R|\\Z)))?",
+		"VAR" : "(#.*\\R)*(?<header>(?<!\\V)(const|enum|onready\\h+var|var)\\h*\\w+)(?<body>(\\h*:?=\\h*[\\{\\[](.*?[\\}\\]]\\h*(#.*)?|(?<inner>.*(\\R.*)+?)?\\R[\\}\\]](?!\\h*[,\\}\\]]).*)|.*)(\\R|\\Z))",
+		"SIGN" : "(#.*\\R)*(?<header>(?<!\\V)signal\\h.*(\\R|\\Z))",
+		"CLASS" : "(#.*\\R)*(?<header>(?<!\\V)class\\h+\\w+).*\\R(?<body>((\\t.*|#.*)?\\R)*(\\t+\\S.*(\\R|\\Z)))?",
+	}
+	var tag_regex_string = "(?<!\\V)<(\\w+)(\\h+\\-?\\d+)?(\\h+\\-?\\d+)?>"
+	var file_tag_regex_string = "(?<!\\V)###\\h*<(\\w+)>\\h*###(\\R|\\Z)"
+
+	for key in regex_string_dictionary:
+		var newRegex = RegEx.new()
+		retCode = newRegex.compile(regex_string_dictionary[key]) 
+		if retCode == OK:
+			op_regex_dict[key] = newRegex
+		else:
+			handleError("Compiling '"+key+"' regex", retCode)
+
+	tag_regex = RegEx.new()
+	retCode = tag_regex.compile(tag_regex_string)
+	handleError("Compiling tag regex", retCode)
+	file_tag_regex = RegEx.new()
+	retCode = file_tag_regex.compile(file_tag_regex_string)
+	handleError("Compiling file tag regex", retCode)
 
 
 func scanfolder(): #makes an array of all folders in modfolder
-	var target = modfolder
-	var dir = Directory.new()
 	var array = []
 	if dir.dir_exists(modfolder) == false:
-		dir.make_dir(modfolder)
-	if dir.open(target) == OK:
-		dir.list_dir_begin()
-		
-		var file_name = dir.get_next()
-		while file_name != "":
-			if dir.current_is_dir() && !file_name in ['.','..',null]:
-				array.append(target + file_name)
-			file_name = dir.get_next()
-		return array
+		retCode = dir.make_dir(modfolder)
+		handleError("Making mod directory " + str(modfolder), retCode)
+	retCode = dir.open(modfolder)
+	if retCode == OK:
+		retCode = dir.list_dir_begin(true)
+		if retCode == OK:
+			var file_name = dir.get_next()
+			while file_name != "":
+				if dir.current_is_dir() && !file_name in ['.','..',null]:
+					array.append(modfolder + file_name)
+				file_name = dir.get_next()
+		else:
+			handleError("Scanning mod directory " + str(modfolder), retCode)
+	else:
+		handleError("Opening mod directory " + str(modfolder), retCode)
+	return array
+
+
+
+func loadfromconfig():
+	if !dir.file_exists(detailsFile):
+		return
+	var config = ConfigFile.new()
+	retCode = config.load(detailsFile)
+	if retCode == OK:
+		loadorder = config.get_value("Mods", "LoadOrder", [])
+		activemods = config.get_value("Mods", "ActiveMods", [])
+		newFiles = config.get_value("Backup", "NewFiles", PoolStringArray())
+		backupVersion = config.get_value("Backup", "Version", '')
+		saveID = config.get_value("Saves", "ID", '')
+		if saveID.empty():
+			globals.saveDir = globals.saveDirDefault
+		else:
+			globals.saveDir = globals.saveDirDefault.insert(globals.saveDirDefault.length() - 1, "_" + saveID) 
+	else:
+		handleError("Opening config file " + str(detailsFile), retCode)
+	var record = [] #record of unique entries
+	for i in loadorder.duplicate():
+		if !dir.dir_exists(modfolder + str(i)):
+			loadorder.erase(i)
+		if i in record:
+			loadorder.erase(i)
+		else:
+			record.append(i)
+
+func saveconfig():
+	var config = ConfigFile.new()
+	config.set_value("Mods", "LoadOrder", loadorder)
+	config.set_value("Mods", "ActiveMods", activemods)
+	config.set_value("Backup", "Version", str(globals.gameversion))
+	config.set_value("Backup", "NewFiles", newFiles)
+	config.set_value("Saves", "ID", saveID)
+	retCode = config.save(detailsFile)
+	handleError("Saving config file " + detailsFile, retCode)
+
+func storebackup(): #clears and creates backups
+	print("Making Backup...")
+	if dir.dir_exists(backupdir):
+		for path in globals.dir_contents(backupdir):
+			retCode = dir.remove(path)
+			handleError("Deleting file " + str(path), retCode)
+	for path in globals.dir_contents(filedir):
+		if !path.get_extension() in backupExtensions:
+			continue
+		var destPath = path.replacen(gameDir, backupdir)
+		if !dir.dir_exists( destPath.get_base_dir()):
+			dir.make_dir_recursive( destPath.get_base_dir())
+		retCode = dir.copy(path, destPath)
+		handleError("Copying backup file " + str(path), retCode)
+	newFiles = PoolStringArray()
+	saveconfig()
+	print("Backup finished.")
+
+
+func loadbackup():
+	if !dir.dir_exists(backupdir):
+		return true
+	print("Removing New Files...")
+	for path in newFiles:
+		retCode = dir.remove(path)
+		handleError("Deleting new file " + path, retCode)
+	activemods.clear()
+	newFiles = PoolStringArray()
+	saveconfig()
+
+	print("Remove Finished\nLoading Backup...")
+	var errorFree = true
+	for path in globals.dir_contents(backupdir):
+		var destPath = path.replacen(backupdir, gameDir)
+		retCode = dir.copy(path, destPath)
+		if retCode != OK:
+			handleError("Resetting file " + destPath, retCode)
+			errorFree = false	
+	print("Load Finished")
+	return errorFree
+
+func handleError(msg, code):
+	if code != OK:
+		if curMod.empty():
+			logErrors.append("ERROR: " + msg + " (" + globals.errorText[code] + ")")
+		else:
+			logErrors.append("ERROR("+ curMod +"): " + msg + " (" + globals.errorText[code] + ")")
+		globals.printErrorCode(msg, code)
+
+func displayReport(afterMod = true):
+	var text 
+	if afterMod:
+		text = "Mod list has been changed. Game must close for changes to take effect."
+	else:
+		text = "Errors in the mod system have been detected."
+	if logErrors.size() == 0:
+		text += "\n\n[color=green]No errors recorded.[/color]"
+	else:
+		text += "\n\n[color=red]The following errors were recorded:[/color]\n" + logErrors.join('\n')
+		logErrors = PoolStringArray()
+
+	var textAdd = ''
+	if logUnmatched.size() > 0:
+		textAdd += "\nScript files unique to mod (these scripts have a new relative path compared to game files):\n" + logUnmatched.join('\n')
+		logUnmatched = PoolStringArray()
+	if logOverlaps.size() > 0:
+		textAdd += "\n\n[color=orange]The following overlaps were recorded:[/color]\n" + logOverlaps.join('\n')
+		logOverlaps = PoolStringArray()
+	if newFiles.size() > 0:
+		textAdd += "\n\n[color=orange]The following new files were added by patches:[/color]\n" + newFiles.join('\n')
+
+	if !textAdd.empty():
+		text += "\n\n[color=#6680ff]Additional Mod Installation Information:\nThese are not errors, but may indicate the source of install problems.[/color]" + textAdd
+	$restartpanel/RichTextLabel.bbcode_text = text
+	$restartpanel.show()
+
+func _on_applymods_pressed():
+	if !globals.developmode:
+		if !loadbackup():
+			saveconfig()
+			displayReport(false)
+			return
+	for mod in loadorder:
+		var modPath = modfolder + mod + "/"
+		if dir.dir_exists(modPath):
+			activemods.append(mod)
+			curMod = mod
+			apply_mod_to_dictionary(modPath)
+	scriptEdits = {}
+	curMod = ''
+	apply_mod_dictionary()
+	saveconfig()
+	displayReport()
+
+func apply_mod_dictionary():
+	for i in temp_mod_scripts:
+		var core_file = File.new()
+		retCode = core_file.open(i, File.WRITE)
+		if retCode == OK:
+			core_file.store_string(temp_mod_scripts[i])
+			core_file.close()
+		else:
+			handleError("Modding file " + str(i), retCode)
+	temp_mod_scripts.clear()
+
+func patchFile(sourcePath, destPath):
+	if destPath.ends_with(".gd"):
+		temp_mod_scripts.erase(destPath)
+	elif destPath == "res://modList":
+		handleError("Patching '" + destPath + "' has been blocked for safety.", ERR_FILE_NO_PERMISSION)
+		return
+	if logPatches.has(destPath):
+		logOverlaps.append("Patches: " + destPath + "\n     " + logPatches[destPath] + ", " + curMod)
+	else:
+		logPatches[destPath] = curMod
+	if dir.file_exists(destPath):
+		if !destPath.get_extension() in backupExtensions && !destPath in newFiles:
+			retCode = dir.copy(destPath, destPath.replacen(gameDir, backupdir))
+			handleError("Copying backup file " + str(destPath), retCode)
+	else:
+		newFiles.append(destPath)
+	retCode = dir.copy(sourcePath, destPath)
+	handleError("Patching file " + destPath, retCode)
+
+func apply_mod_to_dictionary(modPath):
+	var file = File.new()
+	var patchSource = modPath + "patch/"
+	for path in globals.dir_contents(modPath):
+		if path.begins_with(patchSource):
+			patchFile(path, path.replacen(patchSource, gameDir))
+		elif path.ends_with(".gd"):
+			var curFileTag = null
+			var modText = ''
+			retCode = file.open(path, File.READ)
+			if retCode == OK:
+				modText = file.get_as_text()
+				file.close()
+			else:
+				handleError("Reading mod script " + str(path), retCode)
+
+			var tag = file_tag_regex.search(modText)
+			if tag != null:
+				if tag.get_string(1) == tag_file_new || tag.get_string(1) == tag_file_mod:
+					curFileTag = tag.get_string(1)
+				else:
+					handleError("ERROR: '" + str(tag.get_string(1)) + "' file tag not supported.", ERR_BUG)
+
+			var destPath = path.replacen(modPath, filedir)
+			if !modText.empty() && file.file_exists(destPath):
+				apply_file_to_dictionary(destPath, modText)
+				if curFileTag == tag_file_new:
+					handleError("Relative path for file '" +str(path)+ "' tagged as '"+tag_file_new+"' matches a game file", ERR_FILE_BAD_PATH)
+			else:
+				if curFileTag == tag_file_mod:
+					handleError("Relative path for file '" +str(path)+ "' tagged as '"+tag_file_mod+"' does not match a game file", ERR_FILE_BAD_PATH)
+				elif curFileTag == null:
+					logUnmatched.append(str(path))
+
+# returns [lineNumber, column] for the given offset of given string, the start point can be altered through lineNum and startOffset
+func getLinePos(string, endOffset, lineNum = 1, startOffset = -1):
+	while true:
+		var temp = string.find('\n', startOffset + 1)
+		if temp == -1 || temp > endOffset:
+			return [lineNum, endOffset - startOffset]
+		else:
+			startOffset = temp
+			lineNum += 1
+
+func apply_file_to_dictionary(file_name, string):
+	if !temp_mod_scripts.has(file_name):
+		var file = File.new()
+		retCode = file.open(file_name, File.READ)
+		if retCode == OK:
+			temp_mod_scripts[file_name] = file.get_as_text()
+			file.close()
+		else:
+			handleError("Reading file " + str(file_name), retCode)
+	var offset = 0
+	while offset != -1 :
+		var newOffset = apply_next_element_to_dictionary(file_name, string, offset)
+		if newOffset == null:
+			var pos = getLinePos(string, offset)
+			handleError("WARNING: error occurred while modding file " + str(file_name) + ", skipped rest of file. Ended on line: " + str(pos[0]) + ", Column: " + str(pos[1]), ERR_BUG)
+			return
+		else:
+			offset = newOffset
+
+func replaceOnce(strFile, matchTarget, newText):
+	strFile.erase(matchTarget.get_start(), matchTarget.get_string().length())
+	return strFile.insert(matchTarget.get_start(), newText)
+
+func changeToText(change):
+	if change == 0:
+		return "Replace all"
+	if change > 0:
+		return "Add " + str(change)
+	else:
+		return "Remove " + str(-change)
+
+#var scriptEdits = {}  # {'file' : {'header' : [ [startLine, endLine, change, 'mod'] ]} } #zero change is replace
+func addEditRecord(file, header, startLine, endLine, change):
+	if !scriptEdits.has(file):
+		scriptEdits[file] = {header : []}
+	elif !scriptEdits[file].has(header):
+		scriptEdits[file][header] = []
+	var ref = scriptEdits[file][header]
+	for entry in ref:
+		if endLine >= entry[0] && startLine <= entry[1] && curMod != entry[3]:
+			logOverlaps.append(file + ": " + header + "\n     " + curMod + ": line " + str(startLine - 1) + ", " + changeToText(change) + "\n     " + entry[3] + ": line "+ str(entry[0] - 1) + ", " + changeToText(entry[2]))
+	ref.append([startLine, endLine, change, curMod])
+
+func adjustForEdit(file, header, startLine):
+	var ref = scriptEdits.get(file, {}).get(header)
+	if ref == null:
+		return startLine
+	for entry in ref:
+		if startLine >= entry[0] && entry[2] != 0: #overlap is undefined, after is simple add
+			if startLine > entry[1] || entry[2] > 0:
+				startLine += entry[2]
+			else: # startLine has been removed, move back to first line still present
+				startLine = entry[0]
+	return startLine
+
+#fixes the gain of an extra line from normal split + join of string for add or remove tags
+#second arg determines whether the front or the back is checked for extra line
+func customSplit(string, front = false):
+	var pool_string = string.split('\n')
+	var idx = 0 if front else pool_string.size() - 1
+	if pool_string[idx].empty():
+		pool_string.remove(idx)
+	return pool_string
+
+func apply_next_element_to_dictionary(path, modText, offset):
+	var has_next = false
+	var which_operation = "NULL"
+	var current_match
+	var new_offset = 0
+	
+	for op in op_regex_dict:
+		var next_match = op_regex_dict[op].search(modText, offset)
+		if next_match != null && (new_offset == 0 || new_offset > next_match.get_start()) && next_match.get_start() > -1:
+			new_offset = next_match.get_start()
+			current_match = next_match
+			which_operation = op
+			has_next = true
+	
+	var next_tag = tag_regex.search(modText, offset)
+	if has_next && (next_tag == null || new_offset <= next_tag.get_start() || next_tag.get_start() == -1):
+		var found_match = false
+		for nested_match in op_regex_dict[which_operation].search_all(temp_mod_scripts[path]):
+			if(current_match.get_string("header") == nested_match.get_string("header")):
+				addEditRecord(path, nested_match.get_string("header"), 0, getLinePos(current_match.get_string(), current_match.get_string().length()), 0)
+				temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, current_match.get_string())
+				found_match = true
+		if !found_match:
+			temp_mod_scripts[path] = temp_mod_scripts[path] + "\n\n" + current_match.get_string()
+	elif has_next:
+		if next_tag.get_string(1) == tag_add_to:
+			var param = max(0, next_tag.get_string(2).to_int() + 1)
+			if param == 0:
+				param = -1
+			
+			for nested_match in op_regex_dict[which_operation].search_all(temp_mod_scripts[path]):
+				if current_match.get_string("header") != nested_match.get_string("header"):
+					continue
+				var pool_string = nested_match.get_string().split('\n')
+				var startSize = pool_string.size()
+				var startLine = param
+				if which_operation in ["FUNC",'CLASS']:
+					if param > 0:
+						param = adjustForEdit(path, nested_match.get_string("header"), param)
+					if param < 0 || param >= pool_string.size():
+						startLine = pool_string.size() - 1
+						for i in customSplit(current_match.get_string("body")):
+							pool_string.append(i)
+					else:
+						for i in customSplit(current_match.get_string("body")):
+							pool_string.insert(param, i)
+							param += 1
+					addEditRecord(path, nested_match.get_string("header"), startLine, startLine, pool_string.size() - startSize)
+					temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, pool_string.join("\n"))
+				elif which_operation == "VAR":
+					var match_stripped = current_match.get_string("body")
+					var pos = match_stripped.find('\n')
+					if pos != -1 && pos < match_stripped.length() - 1:
+						match_stripped = current_match.get_string("inner")
+
+					if param > 0:
+						param = adjustForEdit(path, nested_match.get_string("header"), param)
+					if pool_string.size() > 2:
+						if param == -1 || param > pool_string.size() - 2:
+							param = pool_string.size() - 2
+					elif param == -1 || param > pool_string.size() - 1:
+						param = pool_string.size() - 1
+
+					for i in customSplit(match_stripped, true):
+						pool_string.insert(param, i)
+						param += 1
+					addEditRecord(path, nested_match.get_string("header"), startLine, startLine, pool_string.size() - startSize)
+					temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, pool_string.join("\n"))
+				#else: operation not supported
+				break
+		elif next_tag.get_string(1) == tag_remove_from:
+			var param = max(1, next_tag.get_string(2).to_int() + 1)
+			var param_2 = max(1, next_tag.get_string(3).to_int() + 1)
+			var startLine = param
+			for nested_match in op_regex_dict[which_operation].search_all(temp_mod_scripts[path]):
+				if current_match.get_string("header") != nested_match.get_string("header"):
+					continue
+				param = adjustForEdit(path, nested_match.get_string("header"), param)
+				param_2 = adjustForEdit(path, nested_match.get_string("header"), param_2)
+				var new_string = nested_match.get_string().split('\n')
+				var startSize = new_string.size()
+				for i in range(0, param_2 - param + 1):
+					if param < new_string.size():
+						new_string.remove(param)
+				addEditRecord(path, nested_match.get_string("header"), startLine, startLine + startSize - new_string.size() - 1, new_string.size() - startSize)
+				temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, new_string.join("\n"))
+				break
+		elif next_tag.get_string(1) == tag_file_new || next_tag.get_string(1) == tag_file_mod:
+			handleError("ERROR: '" + str(next_tag.get_string(1)) + "' is a file tag, not a mod operation tag", ERR_BUG)
+			return next_tag.get_end()
+		else:
+			# operation not supported
+			handleError("ERROR: '" + str(next_tag.get_string(1)) + "' tag not supported.", ERR_BUG)
+			return next_tag.get_end()
+	if has_next:
+		 return current_match.get_end()
+	else:
+		 return -1
+
+func _on_disablemods_pressed():
+	loadorder.clear()
+	var result = loadbackup()
+	saveconfig()
+	displayReport(result)
 
 
 func _on_Mods_pressed():
 	self.visible = !self.visible
 	show()
 
-
-
-var dir = Directory.new()
-var file = File.new()
-
-func loadfromconfig():
-	var config = ConfigFile.new()
-	var err = config.load(modfolder + "FileOrder.ini")
-	if err == OK:
-		loadorder = config.get_value("Mods", "LoadOrder", [])
-		activemods = config.get_value("Mods", "ActiveMods", []) 
-	for i in loadorder.duplicate():
-		if !dir.dir_exists(modfolder + str(i)):
-			loadorder.erase(i)
-	removeduplicates()
-
-func removeduplicates():
-	var record = [] #record of unique entries
-	for i in loadorder.duplicate():
-
-
-
-
-
-		if i in record:
-			loadorder.erase(i)
-
-		else:
-			record.append(i)
-
-func saveconfig():
-	var config = ConfigFile.new()
-	config.load(modfolder + "FileOrder.ini")
-	config.set_value("Mods", "LoadOrder", loadorder)
-	config.set_value("Mods", "ActiveMods", activemods)
-	config.save(modfolder + "FileOrder.ini")
-
-func storebackup(): #clears and restores backups
-	var file = File.new()
-	var dir = Directory.new()
-	
-#	if globals.developmode == true:
-#		print("Debug mode: No backup stored.")
-#		return
-	
-	print("Making Backup...")
-	for i in globals.dir_contents(backupdir):
-		dir.remove(i)
-	
-	for i in file_dictionary:
-		var backup = File.new()
-		if !backup.file_exists(i.replacen(filedir, backupdir)):
-			file.open(i, File.READ)
-			backup.open(i.replacen(filedir, backupdir), File.WRITE)
-			backup.store_string(file.get_as_text())
-			file.close()
-			backup.close()
-	file.open(backupdir + "/version", File.WRITE)
-	file.store_line(str(globals.gameversion))
-	file.close()
-	print("Backup finished.")
-
-
-func loadbackup():
-	print("Loading Backup...")
-	activemods.clear()
-	for i in file_dictionary:
-		var backup = File.new()
-		backup.open(i.replacen(filedir, backupdir), File.READ)
-		var file_string = backup.get_as_text()
-		backup.close()
-		backup.open(i, File.WRITE)
-		backup.store_string(file_string)
-		backup.close()
-	print("Load Finished")
-
 func show():
 	modfolder = globals.setfolders.mods
-	$modfolder.text =  modfolder
-	$modfolder.hint_tooltip = modfolder
+	$modfolder.text = modfolder
+	$modfolder.hint_tooltip = "Select new location for mod folder. Current location:\n" + ProjectSettings.globalize_path(modfolder)
+
+	$saveFolderID.text = saveID
+	$saveFolderID.hint_tooltip = "Current save folder:\n" + ProjectSettings.globalize_path(globals.saveDir)
 	
 	for i in $allmodscontainer/VBoxContainer.get_children():
 		if i.name != 'Button':
@@ -170,10 +494,9 @@ func show():
 			i.queue_free()
 	var array = []
 	for i in scanfolder():
-		array.append(i)
+		array.append(i.replacen(modfolder,""))
 	array.sort_custom(self, 'sortmods')
 	for i in array:
-		i = i.replace(modfolder,"")
 		var modactive = loadorder.has(i)
 		var newbutton = $allmodscontainer/VBoxContainer/Button.duplicate()
 		$allmodscontainer/VBoxContainer.add_child(newbutton)
@@ -189,25 +512,27 @@ func show():
 			newbutton.get_node("down").connect("pressed",self,'moddown',[i])
 		newbutton.connect("mouse_entered", self, 'moddescript',[i])
 		newbutton.connect("pressed",self, 'togglemod', [i])
+	if logErrors.size() > 0:
+		displayReport(false)
 
 func sortmods(first,second):
-	if loadorder.has(first.replace(modfolder,"")):
-		if loadorder.has(second.replace(modfolder,"")):
-			if loadorder.find(first.replace(modfolder,"")) < loadorder.find(second.replace(modfolder,"")):
-				return true
-			else:
-				return false
-		else:
-			return true
-		return true
-	else:
-		return false
+	var index1 = loadorder.find(first)
+	var index2 = loadorder.find(second)
+	if index1 == index2:
+		return first < second
+	if index1 < index2:
+		return index1 != -1
+	return index2 == -1
 
 func moddescript(mod):
-	var text
-	file.open(modfolder + mod + '/info.txt', File.READ)
-	text = file.get_as_text()
-	file.close()
+	var text = ''
+	var file = File.new()
+	retCode = file.open(modfolder + mod + '/info.txt', File.READ)
+	if retCode == OK:
+		text = file.get_as_text()
+		file.close()
+	else:
+		handleError("Reading file " + str(modfolder + mod + '/info.txt'), retCode)
 	if text == '':
 		text = "There's no information on this mod."
 	text = '[center][color=aqua]' + mod + '[/color][/center]\n' + text
@@ -219,8 +544,6 @@ func togglemod(mod):
 	else:
 		loadorder.append(mod)
 	show()
-	saveconfig()
-
 
 func modup(mod):
 	var order = loadorder.find(mod)
@@ -229,7 +552,6 @@ func modup(mod):
 		loadorder.insert(order, mod)
 	else:
 		loadorder.insert(order-1, mod)
-	saveconfig()
 	show()
 
 func moddown(mod):
@@ -239,224 +561,58 @@ func moddown(mod):
 		loadorder.append(mod)
 	else:
 		loadorder.insert(order+1, mod)
-	saveconfig()
 	show()
-
-
-func _on_applymods_pressed():
-	if !globals.developmode:
-		loadbackup()
-	for i in loadorder:
-		if dir.dir_exists(modfolder + i):
-			activemods.append(i)
-			apply_mod_to_dictionary(modfolder + i)
-	apply_mod_dictionary()
-	saveconfig()
-	$restartpanel.show()
-
-func apply_mod_dictionary():
-	for i in temp_mod_scripts:
-		var core_file = File.new()
-		core_file.open(i, File.WRITE)
-		core_file.store_string(temp_mod_scripts[i])
-		core_file.close()
-
-func apply_mod_to_dictionary(mod):
-	var dict = get_mod(mod)
-	
-	for file in dict.keys():
-		apply_file_to_dictionary(file, dict[file])
-
-func get_mod(string):
-	var mods = globals.dir_contents(string)
-	var mod = {}
-	string = string.replace(modfolder, '')
-	for i in mods:
-		if(i.find(".gd") != -1):
-			var modfile = File.new()
-			modfile.open(i, File.READ)
-			mod[i.replace(modfolder, filedir).replace(string, '')] = modfile.get_as_text()
-			modfile.close()
-	return mod
-
-func apply_file_to_dictionary(file_name, string):
-	#print(file_dictionary)
-	if file_dictionary.has(file_name):
-		if !temp_mod_scripts.has(file_name):
-			file.open(file_name, File.READ)
-			temp_mod_scripts[file_name] = file.get_as_text()
-			file.close()
-		var offset = 0
-		while offset != -1 :
-			offset = apply_next_element_to_dictionary(file_name, string, offset)
-
-func apply_next_element_to_dictionary(key, string, offset):
-	var regex_string_dictionary = {}
-	regex_string_dictionary["FUNC"] = "(func\\s+[\\w][\\w\\d]*).*(([\r\n]*[\\t#]+.*)*)"
-	#regex_string_dictionary["VAR"] = "(var.*=)\\s([{]([^\\{\\}]*[\r\n]*)*[}])?([^\\{\\}\\s]*)"
-	regex_string_dictionary["VAR"] = "(var.*=)\\s+(([\\{\\[][\n\r]+[\\S\\s]*?[\r\n]+[\\}\\]]([\r\n]+|\\Z))|([^\n\r]*))"
-	regex_string_dictionary["SIGN"] = "(signal\\s.*)"
-	regex_string_dictionary["ONREADY"] = "(onready\\svar.*=).*([\\{]([^\\{\\}]*[\r\n]*)*[\\}])?"
-	regex_string_dictionary["CLASS"] = "(class\\s+[\\w][\\w\\d]*).*(([\r\n]*[\\t#]+.*)*)"
-	
-	var tag_regex = "<(\\w*)(\\s+[0-9\\-]+)?(\\s[0-9\\-]+)?>"
-	var add_to = "AddTo"
-	var remove_from = "RemoveFrom"
-	
-	var full_tag = RegEx.new()
-	full_tag.compile(tag_regex) 
-	
-	var has_next = false
-	var file_string = temp_mod_scripts[key]
-	var which_operation = "NULL"
-	var current_match
-	var new_offset = 0
-	
-	for i in regex_string_dictionary.keys():
-		var next_func = RegEx.new()
-		next_func.compile(regex_string_dictionary[i])
-		var next_match = next_func.search(string, offset)
-		if next_match != null && (new_offset == 0 || new_offset > next_match.get_start()) && next_match.get_start() > -1:
-			new_offset = next_match.get_start()
-			current_match = next_match
-			which_operation = i
-			has_next = true
-	
-	var next_tag = full_tag.search(string, offset)
-	if new_offset != 0 :
-		new_offset = new_offset + current_match.get_string().length()
-	var file_match
-	if has_next && (next_tag == null || new_offset <= next_tag.get_start() || next_tag.get_start() == -1):
-		var regex_match = RegEx.new()
-		if regex_string_dictionary.has(which_operation):
-			regex_match.compile(regex_string_dictionary[which_operation])
-			file_match = regex_match.search_all(file_string)
-		var found_match = false
-		for nested_match in file_match:
-			if(current_match.get_string(1) == nested_match.get_string(1)):
-				temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), current_match.get_string())
-				found_match = true
-		if !found_match :
-			temp_mod_scripts[key] = temp_mod_scripts[key] + "\r\n" + current_match.get_string()
-		pass
-	elif has_next :
-		var regex_match = RegEx.new()
-		if regex_string_dictionary.has(which_operation):
-			regex_match.compile(regex_string_dictionary[which_operation])
-			file_match = regex_match.search_all(file_string)
-		if next_tag.get_string(1) == add_to:
-			var param = next_tag.get_string(2).to_int() + 1
-			if param == 0:
-				param = -1
-			
-			for nested_match in file_match:
-				if(current_match.get_string(1) == nested_match.get_string(1)):
-					var pool_string = nested_match.get_string().split("\n")
-					if param > pool_string.size() :
-						param = -1
-					var new_string = current_match.get_string()
-					if which_operation in ["FUNC",'CLASS']:
-						var param_temp = param
-						for i in current_match.get_string(2).split("\n"):
-							if i != "":
-								pool_string.insert(param_temp, i)
-								if param_temp > 0:
-									param_temp += 1
-						temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), pool_string.join("\n"))
-					elif which_operation == "VAR":
-						var param_temp = param
-
-						var match_stripped = current_match.get_string(2)
-						#if matching brackets are found, strips the first and last brackets
-						var chrIdx1 = match_stripped.find("{")
-						if chrIdx1 >= 0:
-							var chrIdx2 = match_stripped.find_last("}") - 1
-							if chrIdx2 >= 0:
-								match_stripped.erase(chrIdx1, 1)
-								match_stripped.erase(chrIdx2, 1)
-						for i in match_stripped.split("\n"):
-							if i != "":
-								pool_string.insert(param_temp, i)
-								if param_temp > 0:
-									param_temp += 1
-						temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), pool_string.join("\n"))
-					elif which_operation == "SIGN":
-						pool_string.insert(param, current_match.get_string(1))
-						temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), pool_string.join("\n"))
-					elif which_operation == "ONREADY":
-						pool_string.insert(param, current_match.get_string(2))
-						temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), pool_string.join("\n"))
-					else:
-						#operation not supported
-						pass
-					break
-		elif next_tag.get_string(1) == remove_from:
-			var param = next_tag.get_string(2).to_int()
-			var param_2 = next_tag.get_string(3).to_int()
-			for nested_match in file_match:
-				if(current_match.get_string(1) == nested_match.get_string(1)):
-					var new_string = nested_match.get_string().split("\n")
-					for i in range(0, param_2 - param + 1):
-						if i < new_string.size():
-							new_string.remove(param)
-					temp_mod_scripts[key] = temp_mod_scripts[key].replacen(nested_match.get_string(), new_string.join("\n"))
-					break
-			pass
-		else:
-			# operation not supported
-			pass
-	offset = new_offset + 1
-	if(has_next):
-		 return offset
-	else:
-		 return -1
-
-func _on_disablemods_pressed():
-	loadorder.clear()
-	loadbackup()
-	saveconfig()
-	$restartpanel.show()
 
 func _on_closemods_pressed():
 	self.visible = false
+	saveconfig()
 
-
-
-func _on_FileDialog_dir_selected(dir):
-	globals.setfolders.mods = dir
-	print(dir)
+func _on_FileDialog_dir_selected(path):
+	path = path.replace(OS.get_user_data_dir(), "user:/")
+	if !path.ends_with("/"):
+		path += "/"
+	globals.modfolder = path
+	globals.setfolders.mods = path
 	show()
 
+func _on_saveFolderID_text_changed(textID):
+	var pos = $saveFolderID.caret_position
+	var length = textID.length()
+	for symbol in ['/', '\\', '<', '>', ':', '"', '|', '?', '*']:
+		textID = textID.replace(symbol, "")
+	saveID = textID
+	if length != textID.length():
+		$saveFolderID.text = textID
+		$saveFolderID.caret_position = pos - (length - textID.length())
+	if saveID.empty():
+		globals.saveDir = globals.saveDirDefault
+	else:
+		globals.saveDir = globals.saveDirDefault.insert(globals.saveDirDefault.length() - 1, "_" + saveID) 
+	$saveFolderID.hint_tooltip = "Current save folder:\n" + ProjectSettings.globalize_path(globals.saveDir)
 
 func _on_modfolder_pressed():
+	$FileDialog.current_dir = ProjectSettings.globalize_path(modfolder)
 	$FileDialog.popup()
-	$FileDialog.current_dir = modfolder
-
-
 
 func _on_helpclose_pressed():
 	$Panel.hide()
 
-
 func _on_modhelp_pressed():
 	$Panel.show()
 
-
 func _on_openmodfolder_pressed():
-	if modfolder.begins_with("user://"):
-		OS.shell_open(modfolder.replace("user:/", OS.get_user_data_dir()))
-	else:
-		OS.shell_open(modfolder)
-
+	globals.shellOpenFolder(modfolder)
 
 func _on_activemods_pressed():
 	var text = '\n'
 	for i in activemods:
 		text += i + '\n'
-	$activemodlist.popup()
 	$activemodlist/RichTextLabel.bbcode_text = text
-
+	$activemodlist.popup()
 
 func _on_restartbutton_pressed():
-	
 	get_tree().quit()
+
+func _on_continuebutton_pressed():
+	$restartpanel.hide()
+	show()

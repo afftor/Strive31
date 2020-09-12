@@ -17,34 +17,41 @@ func ruletoggle(rule):
 			get_node("TabContainer/Game/furrynipples").set_disabled(false)
 	if rule == 'futa':
 		if (globals.rules['futa'] == false):
-			get_node("TabContainer/Game/futaslider").hide()
+			get_node("TabContainer/Game/futasliderlabel").set_text('Random futa occurrence: 0% of females, 0% of people are futa')
+			get_node("TabContainer/Game/futaslider").set_editable(false)
 			get_node("TabContainer/Game/futaballs").set_disabled(true)
 			get_node("TabContainer/Game/futaballs").set_pressed(false)
 			globals.rules['futaballs'] = false
 		else:
-			get_node("TabContainer/Game/futaslider").show()
+			futaslider(globals.rules['futa_chance'])
+			get_node("TabContainer/Game/futaslider").set_editable(true)
 			get_node("TabContainer/Game/futaballs").set_disabled(false)
-	if rule == 'children':
-		if globals.rules.children == false:
-			get_node("TabContainer/Game/noadults").hide()
-			get_node("TabContainer/Game/noadults").set_pressed(false)
-			globals.rules.adults = true
-		else:
-			get_node("TabContainer/Game/noadults").show()
+#	if rule == 'children':
+#		if globals.rules.children == false:
+#			get_node("TabContainer/Game/noadults").hide()
+#			get_node("TabContainer/Game/noadults").set_pressed(false)
+#			globals.rules.noadults = false
+#		else:
+#			get_node("TabContainer/Game/noadults").show()
 	
 
 func maleslider(value):
 	globals.rules.male_chance = value
 	get_node("TabContainer/Game/malesslider").set_value(globals.rules['male_chance'])
-	get_node("TabContainer/Game/malesliderlabel").set_text('Random gender occurrence balance: ' + str(globals.rules['male_chance']) + '% of males')
+	get_node("TabContainer/Game/malesliderlabel").set_text('Random gender occurrence balance: ' + str(globals.rules['male_chance']) + '% of people are males')
 
 func futaslider(value):
 	globals.rules.futa_chance = value
 	get_node("TabContainer/Game/futaslider").set_value(globals.rules['futa_chance'])
-	get_node("TabContainer/Game/futasliderlabel").set_text('Random futa occurrence: ' + str(globals.rules['futa_chance']) + '% of females')
+	if (globals.rules['futa']):
+		get_node("TabContainer/Game/futasliderlabel").set_text('Random futa occurrence: ' + str(globals.rules['futa_chance']) + '% of females, '
+			+ str(round((100-globals.rules['male_chance'])*globals.rules['futa_chance']/10)/10) + '% of people are futa')
+	else:
+		get_node("TabContainer/Game/futasliderlabel").set_text('Random futa occurrence: 0% of females, 0% of people are futa')
 
 func _ready():
 	futaslider(globals.rules.futa_chance)
+	get_node("TabContainer/Game/futaslider").set_editable(globals.rules.futa)
 	maleslider(globals.rules.male_chance)
 	for i in ['furry','furrynipples','futa','futaballs','slaverguildallraces','children','receiving','permadeath','noadults']:
 		get_node("TabContainer/Game/" + i).pressed = globals.rules[i]
@@ -52,6 +59,8 @@ func _ready():
 	for i in ['fadinganimation','spritesindialogues','randomcustomportraits','instantcombatanimation','thumbnails']:
 		get_node("TabContainer/Settings/" + i).pressed = globals.rules[i]
 		get_node("TabContainer/Settings/" + i).connect("pressed", self, 'ruletoggle', [i])
+	get_node("TabContainer/Settings/errorLogging").set_pressed( ProjectSettings.get_setting("logging/file_logging/enable_file_logging"))
+	get_node("TabContainer/Game/aliseoption").select(globals.rules.enddayalise)
 	get_node("TabContainer/Settings/fullscreen").set_pressed(OS.is_window_fullscreen())
 	get_node("TabContainer/Supporter section/cheatpassword").set_text('')
 	get_node("TabContainer/Settings/fontsize").set_value(globals.rules.fontsize)
@@ -78,13 +87,18 @@ func show():
 
 func _on_malesslider_value_changed( value ):
 	globals.rules['male_chance'] = value
-	get_node("TabContainer/Game/malesliderlabel").set_text('Random gender occurrence balance: ' + str(globals.rules['male_chance']) + '% of males')
+	get_node("TabContainer/Game/malesliderlabel").set_text('Random gender occurrence balance: ' + str(globals.rules['male_chance']) + '% of people are males')
+	futaslider(globals.rules['futa_chance'])
 
 func _on_futaslider_value_changed( value ):
 	globals.rules['futa_chance'] = value
-	get_node("TabContainer/Game/futasliderlabel").set_text('Random futa occurrence: ' + str(globals.rules['futa_chance']) + '% of females')
+	get_node("TabContainer/Game/futasliderlabel").set_text('Random futa occurrence: ' + str(globals.rules['futa_chance']) + '% of females, '
+		+ str(round((100-globals.rules['male_chance'])*globals.rules['futa_chance']/10)/10) + '% of people are futa')
 
-
+func _on_errorLogging_toggled(value):
+	ProjectSettings.set_setting("logging/file_logging/max_log_files", 1)
+	ProjectSettings.set_setting("logging/file_logging/enable_file_logging", value)
+	ProjectSettings.save()
 
 func _on_fullscreen_pressed():
 	OS.set_window_fullscreen(get_node("TabContainer/Settings/fullscreen").is_pressed())
@@ -209,6 +223,8 @@ func _on_levelup_pressed():
 func _on_fontsize_value_changed( value ):
 	if get_tree().get_current_scene().find_node('MainScreen') != null:
 		get_tree().get_current_scene().get_node('MainScreen').get_font('font').set_size(value)
+		if globals.main != null:
+			globals.main.on_resize_screen()
 	elif get_tree().get_current_scene().find_node('changelog') != null:
 		get_tree().get_current_scene().get_node('TextureFrame/changelog').get_font('font').set_size(value)
 	globals.rules.fontsize = value

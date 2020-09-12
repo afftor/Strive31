@@ -109,14 +109,14 @@ func gethair(person):
 			person.hairstyle = 'straight'
 
 func getrandomfromarray(array):
-	return array[rand_range(0,array.size())]
+	return array[randi() % array.size()]
 
 
 func getrandomeyecolor():
 	return getrandomfromarray(['blue', 'green', 'brown', 'hazel', 'black', 'gray', 'purple', 'blue', 'blond', 'red', 'auburn'])
 
 func getrandomfurcolor():
-	return getrandomfromarray(['white', 'gray', 'orange_white','black_white','black_gray','black'])
+	return getrandomfromarray(['white', 'gray', 'orange_white','black_white','black_gray','black','orange','brown'])
 
 func getrandomhaircolor():
 	return getrandomfromarray(['red', 'auburn', 'brown', 'black', 'white', 'green', 'purple', 'blue', 'blond', 'red'])

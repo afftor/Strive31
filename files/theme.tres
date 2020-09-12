@@ -65,7 +65,8 @@ margin_bottom = 10.0
 
 [sub_resource type="StyleBoxTexture" id=8]
 
-[sub_resource type="StyleBoxLine" id=9]
+[sub_resource type="StyleBoxTexture" id=9]
+content_margin_left = 2.0
 
 [sub_resource type="StyleBoxTexture" id=10]
 
@@ -243,7 +244,7 @@ Button/styles/normal = SubResource( 5 )
 Button/styles/pressed = SubResource( 6 )
 CheckBox/colors/font_color = Color( 0.800781, 0.797653, 0.797653, 1 )
 CheckBox/colors/font_color_disabled = Color( 0.320313, 0.315151, 0.305298, 0.923843 )
-CheckBox/colors/font_color_hover = Color( 0.800781, 0.797653, 0.797653, 1 )
+CheckBox/colors/font_color_hover = Color( 0.882353, 1, 0.823529, 1 )
 CheckBox/colors/font_color_pressed = Color( 0.33431, 0.667969, 0.323547, 1 )
 CheckBox/constants/check_vadjust = 0
 CheckBox/constants/hseparation = 4

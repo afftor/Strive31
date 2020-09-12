@@ -559,9 +559,8 @@ clip_text = true
 [node name="Gold" type="Control" parent="ResourcePanel"]
 margin_left = 117.0
 margin_top = 7.0
-margin_right = 1087.0
-margin_bottom = 336.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_right = 217.0
+margin_bottom = 42.0
 hint_tooltip = "Gold is used as universal currency
 Gold can be obtained from quests, sellings or job assignments"
 size_flags_horizontal = 2
@@ -570,9 +569,8 @@ size_flags_vertical = 2
 [node name="cleanicon" type="Control" parent="ResourcePanel"]
 margin_left = 543.0
 margin_top = 7.0
-margin_right = 1513.0
-margin_bottom = 336.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_right = 643.0
+margin_bottom = 42.0
 hint_tooltip = "Mansion's state reflects cleanliness
 When low will make residents unhappy
 You can improve it by paying for cleaning or by assigning servants to clean it daily"
@@ -581,20 +579,18 @@ size_flags_vertical = 2
 
 [node name="Day" type="Control" parent="ResourcePanel"]
 margin_left = 9.0
-margin_top = 6.0
-margin_right = 987.0
-margin_bottom = 356.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_top = 7.0
+margin_right = 109.0
+margin_bottom = 42.0
 hint_tooltip = "This is current date since game start"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
 [node name="FoodIcon" type="Control" parent="ResourcePanel"]
 margin_left = 224.0
-margin_top = 6.0
-margin_right = 1206.0
-margin_bottom = 344.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_top = 7.0
+margin_right = 324.0
+margin_bottom = 42.0
 hint_tooltip = "Food is necessary for everyday survival
 You and your residents will consume it
 Food can be obtained from job assignments, market or farm
@@ -605,10 +601,9 @@ size_flags_vertical = 2
 
 [node name="ManaIcon" type="Control" parent="ResourcePanel"]
 margin_left = 330.0
-margin_top = 6.0
-margin_right = 1300.0
-margin_bottom = 356.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_top = 7.0
+margin_right = 430.0
+margin_bottom = 42.0
 hint_tooltip = "Mana is required for many magical operations
 Mana is obtained mainly from sexual activity"
 size_flags_horizontal = 2
@@ -616,21 +611,19 @@ size_flags_vertical = 2
 
 [node name="EnergyIcon" type="Control" parent="ResourcePanel"]
 margin_left = 435.0
-margin_top = 6.0
-margin_right = 1412.0
-margin_bottom = 359.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_top = 7.0
+margin_right = 535.0
+margin_bottom = 42.0
 hint_tooltip = "Energy is used for various activites and explorations
 Energy automatically restored by the end of the day"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
 [node name="PopulationIcon" type="Control" parent="ResourcePanel"]
-margin_left = 652.0
+margin_left = 648.0
 margin_top = 7.0
-margin_right = 1603.0
-margin_bottom = 348.0
-rect_scale = Vector2( 0.1, 0.1 )
+margin_right = 748.0
+margin_bottom = 42.0
 hint_tooltip = "This is your population number"
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -812,9 +805,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -368.0
+margin_left = -367.0
 margin_top = -83.0
-margin_right = -287.0
+margin_right = -286.0
 margin_bottom = -8.0
 hint_tooltip = "Personal Info"
 size_flags_horizontal = 2
@@ -835,9 +828,13 @@ text = "R"
 
 [node name="TextureRect" type="TextureRect" parent="Navigation/personal"]
 show_behind_parent = true
-margin_top = -1.0
-margin_right = 80.0
-margin_bottom = 75.0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -81.0
+margin_top = -76.0
+margin_right = -1.0
 texture = ExtResource( 18 )
 expand = true
 stretch_mode = 6
@@ -905,9 +902,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -527.0
+margin_left = -518.0
 margin_top = -83.0
-margin_right = -411.0
+margin_right = -402.0
 margin_bottom = -8.0
 hint_tooltip = "Leave to town"
 size_flags_horizontal = 2
@@ -997,9 +994,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -917.0
+margin_left = -918.0
 margin_top = -83.0
-margin_right = -799.0
+margin_right = -800.0
 margin_bottom = -8.0
 hint_tooltip = "Library"
 size_flags_horizontal = 2
@@ -1059,9 +1056,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -659.0
+margin_left = -658.0
 margin_top = -83.0
-margin_right = -541.0
+margin_right = -540.0
 margin_bottom = -8.0
 hint_tooltip = "Farm"
 size_flags_horizontal = 2
@@ -1122,18 +1119,17 @@ text = "Residents: 0/6"
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -384.0
+margin_left = -393.0
 margin_top = 33.0
-margin_right = 1.0
+margin_right = -10.0
 margin_bottom = -75.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-scroll_horizontal_enabled = false
 
 [node name="slave_list" type="VBoxContainer" parent="charlistcontrol/CharList/scroll_list"]
-margin_right = 330.0
-margin_bottom = 20.0
-size_flags_horizontal = 2
+margin_right = 383.0
+margin_bottom = 162.0
+size_flags_horizontal = 3
 size_flags_vertical = 2
 
 [node name="line" type="HBoxContainer" parent="charlistcontrol/CharList/scroll_list/slave_list"]
@@ -1225,26 +1221,63 @@ size_flags_horizontal = 2
 size_flags_vertical = 2
 texture_normal = ExtResource( 42 )
 
-[node name="prisonlabel" type="Label" parent="charlistcontrol/CharList/scroll_list/slave_list"]
-margin_right = 330.0
-margin_bottom = 20.0
-rect_min_size = Vector2( 330, 0 )
-size_flags_horizontal = 2
-size_flags_vertical = 0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-text = "Jail"
-align = 1
-
-[node name="prisonbutton" type="Button" parent="charlistcontrol/CharList/scroll_list/slave_list/prisonlabel"]
+[node name="mansionCategory" type="Button" parent="charlistcontrol/CharList/scroll_list/slave_list"]
 show_behind_parent = true
-margin_left = 3.0
-margin_top = -7.0
-margin_right = 392.0
-margin_bottom = 22.0
-size_flags_horizontal = 2
+margin_right = 383.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
 size_flags_vertical = 2
 theme = ExtResource( 43 )
 custom_styles/disabled = SubResource( 6 )
+toggle_mode = true
+pressed = true
+text = "Mansion"
+
+[node name="prisonCategory" type="Button" parent="charlistcontrol/CharList/scroll_list/slave_list"]
+show_behind_parent = true
+margin_top = 33.0
+margin_right = 383.0
+margin_bottom = 62.0
+size_flags_horizontal = 3
+size_flags_vertical = 2
+theme = ExtResource( 43 )
+custom_styles/disabled = SubResource( 6 )
+toggle_mode = true
+text = "Jail"
+
+[node name="farmCategory" type="Button" parent="charlistcontrol/CharList/scroll_list/slave_list"]
+show_behind_parent = true
+margin_top = 66.0
+margin_right = 383.0
+margin_bottom = 95.0
+size_flags_horizontal = 3
+size_flags_vertical = 2
+theme = ExtResource( 43 )
+custom_styles/disabled = SubResource( 6 )
+toggle_mode = true
+text = "Farm"
+
+[node name="awayCategory" type="Button" parent="charlistcontrol/CharList/scroll_list/slave_list"]
+show_behind_parent = true
+margin_top = 99.0
+margin_right = 383.0
+margin_bottom = 128.0
+size_flags_horizontal = 3
+size_flags_vertical = 2
+theme = ExtResource( 43 )
+custom_styles/disabled = SubResource( 6 )
+toggle_mode = true
+text = "Away"
+
+[node name="awayLabel" type="RichTextLabel" parent="charlistcontrol/CharList/scroll_list/slave_list"]
+margin_top = 132.0
+margin_right = 383.0
+margin_bottom = 162.0
+rect_min_size = Vector2( 290, 30 )
+bbcode_enabled = true
+bbcode_text = "Slave is away for X days."
+text = "Slave is away for X days."
+scroll_active = false
 
 [node name="orderbutton" type="Button" parent="charlistcontrol"]
 anchor_left = 1.0
@@ -1303,8 +1336,8 @@ __meta__ = {
 anchor_bottom = 1.0
 margin_left = 17.0
 margin_top = 18.0
-margin_right = 733.0
-margin_bottom = -126.0
+margin_right = 742.0
+margin_bottom = -71.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/normal_font = ExtResource( 45 )
@@ -1313,9 +1346,9 @@ bbcode_enabled = true
 [node name="portals" type="Button" parent="MainScreen/mansion" groups=[
 "mansioncontrols",
 ]]
-margin_left = 570.0
+margin_left = 569.0
 margin_top = 556.0
-margin_right = 747.0
+margin_right = 746.0
 margin_bottom = 603.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -1336,9 +1369,9 @@ text = "X"
 "mansioncontrols",
 ]]
 margin_left = 749.0
-margin_top = 403.0
+margin_top = 406.0
 margin_right = 926.0
-margin_bottom = 450.0
+margin_bottom = 453.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Quest Log"
@@ -1362,9 +1395,9 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -190.0
-margin_top = -114.0
+margin_top = -113.0
 margin_right = -13.0
-margin_bottom = -67.0
+margin_bottom = -66.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Mansion Settings"
@@ -1377,9 +1410,9 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -190.0
-margin_top = -166.0
+margin_top = -163.0
 margin_right = -13.0
-margin_bottom = -119.0
+margin_bottom = -116.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 theme = ExtResource( 3 )
@@ -2112,23 +2145,42 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -486.0
-margin_top = -60.0
+margin_top = -67.0
 margin_right = -416.0
-margin_bottom = -13.0
+margin_bottom = -20.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "Close"
+
+[node name="defaultMasterNoun" type="LineEdit" parent="MainScreen/mansion/selfinspect"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -231.0
+margin_top = -407.0
+margin_right = -20.0
+margin_bottom = -373.0
+text = "Master"
+placeholder_text = "Master"
+
+[node name="Label" type="Label" parent="MainScreen/mansion/selfinspect/defaultMasterNoun"]
+margin_left = 6.0
+margin_top = -25.0
+margin_right = 190.0
+margin_bottom = -5.0
+text = "Default Title"
 
 [node name="selfinspectlooks" type="Button" parent="MainScreen/mansion/selfinspect"]
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -303.0
-margin_right = -18.0
-margin_bottom = -264.0
+margin_left = -159.0
+margin_top = -339.0
+margin_right = -20.0
+margin_bottom = -300.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Inspect Looks"
@@ -2138,10 +2190,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -260.0
-margin_right = -18.0
-margin_bottom = -221.0
+margin_left = -159.0
+margin_top = -299.0
+margin_right = -20.0
+margin_bottom = -260.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Gear"
@@ -2151,10 +2203,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -219.0
-margin_right = -18.0
-margin_bottom = -180.0
+margin_left = -159.0
+margin_top = -259.0
+margin_right = -20.0
+margin_bottom = -220.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Piercing"
@@ -2164,10 +2216,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -179.0
-margin_right = -18.0
-margin_bottom = -140.0
+margin_left = -159.0
+margin_top = -219.0
+margin_right = -20.0
+margin_bottom = -180.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Tattoo"
@@ -2177,23 +2229,36 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -97.0
-margin_right = -18.0
-margin_bottom = -58.0
+margin_left = -159.0
+margin_top = -139.0
+margin_right = -20.0
+margin_bottom = -100.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-text = "Set Portait"
+text = "Set Portrait"
+
+[node name="selfbody" type="Button" parent="MainScreen/mansion/selfinspect"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -159.0
+margin_top = -99.0
+margin_right = -20.0
+margin_bottom = -60.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "Set Body Image"
 
 [node name="selfabilityupgrade" type="Button" parent="MainScreen/mansion/selfinspect"]
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -139.0
-margin_right = -18.0
-margin_bottom = -100.0
+margin_left = -159.0
+margin_top = -179.0
+margin_right = -20.0
+margin_bottom = -140.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Unlock Abilities"
@@ -2203,10 +2268,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -157.0
-margin_top = -55.0
-margin_right = -18.0
-margin_bottom = -16.0
+margin_left = -159.0
+margin_top = -59.0
+margin_right = -20.0
+margin_bottom = -20.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "See Relatives"
@@ -2214,10 +2279,10 @@ text = "See Relatives"
 [node name="spellbook" type="Button" parent="MainScreen/mansion/selfinspect"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 17.0
-margin_top = -53.0
-margin_right = 156.0
-margin_bottom = -14.0
+margin_left = 20.0
+margin_top = -59.0
+margin_right = 159.0
+margin_bottom = -20.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Spell Book"
@@ -2363,30 +2428,11 @@ bbcode_enabled = true
 
 [node name="Contraception" type="CheckBox" parent="MainScreen/mansion/selfinspect"]
 margin_left = 610.0
-margin_top = 577.0
+margin_top = 572.0
 margin_right = 766.0
-margin_bottom = 597.0
+margin_bottom = 592.0
 hint_tooltip = "Prevents pregnancy and impregnation"
 text = "Contraceptives"
-
-[node name="defaultMasterNoun" type="LineEdit" parent="MainScreen/mansion/selfinspect"]
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -229.0
-margin_top = -407.0
-margin_right = -18.0
-margin_bottom = -373.0
-text = "Master"
-placeholder_text = "Master"
-
-[node name="Label" type="Label" parent="MainScreen/mansion/selfinspect/defaultMasterNoun"]
-margin_left = 6.0
-margin_top = -25.0
-margin_right = 190.0
-margin_bottom = -5.0
-text = "Default Title"
 
 [node name="labpanel" type="Panel" parent="MainScreen/mansion"]
 visible = false
@@ -2436,7 +2482,7 @@ margin_bottom = -12.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
-text = "Work on slaves"
+text = "Modifications"
 
 [node name="labmodpanel" type="Panel" parent="MainScreen/mansion/labpanel"]
 visible = false
@@ -3161,8 +3207,8 @@ text = "Farm"
 anchor_right = 1.0
 margin_left = 228.0
 margin_top = 59.0
-margin_right = 160.0
-margin_bottom = 365.0
+margin_right = -40.0
+margin_bottom = 538.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
@@ -3778,48 +3824,40 @@ margin_bottom = 150.0
 [node name="trainingabils" type="Button" parent="MainScreen/slave_tab/stats" groups=[
 "prisondisable",
 ]]
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -917.0
-margin_top = -182.0
-margin_right = -770.0
-margin_bottom = -142.0
+margin_left = 25.0
+margin_top = 450.0
+margin_right = 175.0
+margin_bottom = 490.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "Learn. Points"
 
 [node name="statistics" type="Button" parent="MainScreen/slave_tab/stats"]
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -919.0
-margin_top = -141.0
-margin_right = -771.0
-margin_bottom = -101.0
+margin_left = 25.0
+margin_top = 490.0
+margin_right = 175.0
+margin_bottom = 530.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "Statistics"
 
 [node name="gear" type="Button" parent="MainScreen/slave_tab/stats"]
-margin_left = 28.0
-margin_top = 359.0
+margin_left = 25.0
+margin_top = 370.0
 margin_right = 175.0
-margin_bottom = 399.0
+margin_bottom = 410.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "Gear"
 
 [node name="items" type="Button" parent="MainScreen/slave_tab/stats"]
-margin_left = 28.0
-margin_top = 401.0
+margin_left = 25.0
+margin_top = 410.0
 margin_right = 175.0
-margin_bottom = 441.0
+margin_bottom = 450.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -3827,10 +3865,10 @@ text = "Item"
 
 [node name="inspect" type="Button" parent="MainScreen/slave_tab/stats"]
 modulate = Color( 0.778402, 0.917969, 0.727921, 1 )
-margin_left = 26.0
-margin_top = 527.0
+margin_left = 25.0
+margin_top = 530.0
 margin_right = 175.0
-margin_bottom = 567.0
+margin_bottom = 570.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -3840,10 +3878,10 @@ text = "Inspect"
 
 [node name="customize" type="Button" parent="MainScreen/slave_tab/stats"]
 modulate = Color( 0.778402, 0.917969, 0.727921, 1 )
-margin_left = 26.0
-margin_top = 569.0
+margin_left = 25.0
+margin_top = 570.0
 margin_right = 175.0
-margin_bottom = 609.0
+margin_bottom = 610.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -3853,34 +3891,44 @@ text = "Customization"
 [node name="workbutton" type="Button" parent="MainScreen/slave_tab/stats" groups=[
 "prisondisable",
 ]]
-margin_left = 27.0
-margin_top = 181.0
-margin_right = 177.0
-margin_bottom = 221.0
+margin_left = 25.0
+margin_top = 186.0
+margin_right = 175.0
+margin_bottom = 226.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "Choose work"
 clip_text = true
 
-[node name="Label3" type="Label" parent="MainScreen/slave_tab/stats" groups=[
+[node name="Label3" type="Label" parent="MainScreen/slave_tab/stats/workbutton" groups=[
 "prisondisable",
 ]]
-margin_left = 49.0
-margin_top = 164.0
-margin_right = 150.0
-margin_bottom = 184.0
+margin_left = 24.0
+margin_top = -17.0
+margin_right = 125.0
+margin_bottom = 3.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 45 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 text = "Occupation"
 
-[node name="sleeplabel" type="Label" parent="MainScreen/slave_tab/stats"]
-margin_left = 16.0
-margin_top = 218.0
-margin_right = 184.0
-margin_bottom = 238.0
+[node name="sleep" type="OptionButton" parent="MainScreen/slave_tab/stats"]
+margin_left = 25.0
+margin_top = 242.0
+margin_right = 175.0
+margin_bottom = 281.0
+text = "Communal"
+align = 1
+items = [ "Communal", null, false, -1, null, "Personal", null, false, -1, null, "Your Bed", null, false, -1, null, "Jail", null, false, -1, null ]
+selected = 0
+
+[node name="sleeplabel" type="Label" parent="MainScreen/slave_tab/stats/sleep"]
+margin_left = -9.0
+margin_top = -17.0
+margin_right = 159.0
+margin_bottom = 3.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 45 )
@@ -3888,31 +3936,21 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 text = "Sleeping conditions"
 align = 1
 
-[node name="sleep" type="OptionButton" parent="MainScreen/slave_tab/stats"]
-margin_left = 29.0
-margin_top = 236.0
-margin_right = 174.0
-margin_bottom = 275.0
-text = "Communal"
-align = 1
-items = [ "Communal", null, false, 0, null, "Personal", null, false, 1, null, "Your Bed", null, false, 2, null, "Jail", null, false, 3, null ]
-selected = 0
-
 [node name="castspell" type="Button" parent="MainScreen/slave_tab/stats"]
-margin_left = 28.0
-margin_top = 317.0
+margin_left = 25.0
+margin_top = 330.0
 margin_right = 175.0
-margin_bottom = 357.0
+margin_bottom = 370.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "Cast Spell"
 
 [node name="talk" type="Button" parent="MainScreen/slave_tab/stats"]
-margin_left = 28.0
-margin_top = 276.0
-margin_right = 174.0
-margin_bottom = 316.0
+margin_left = 25.0
+margin_top = 290.0
+margin_right = 175.0
+margin_bottom = 330.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -4495,9 +4533,9 @@ size_flags_vertical = 2
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -247.0
+margin_left = -250.0
 margin_top = 20.0
-margin_right = -118.0
+margin_right = -121.0
 margin_bottom = 40.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
@@ -4511,10 +4549,10 @@ align = 1
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -243.0
-margin_top = 202.0
-margin_right = -107.0
-margin_bottom = 222.0
+margin_left = -250.0
+margin_top = 226.0
+margin_right = -114.0
+margin_bottom = 246.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 45 )
@@ -4527,10 +4565,10 @@ align = 1
 ]]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -233.0
-margin_top = 93.0
-margin_right = -124.0
-margin_bottom = 113.0
+margin_left = -250.0
+margin_top = 99.0
+margin_right = -141.0
+margin_bottom = 119.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 45 )
@@ -4545,9 +4583,9 @@ align = 1
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 44.0
+margin_top = 40.0
 margin_right = -79.0
-margin_bottom = 72.0
+margin_bottom = 68.0
 hint_tooltip = "Daily intake of special herbal medicine will
 prevent pregnancy for a few days at
 minor cost in gold (5 per intake). 
@@ -4566,9 +4604,9 @@ text = "Herbal contraception"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 67.0
+margin_top = 64.0
 margin_right = -95.0
-margin_bottom = 95.0
+margin_bottom = 92.0
 hint_tooltip = "Servant's daily food will be mixed with untraceable
 amounts of aphrodisiac constantly boosting their
 libido for some cost in (8 per day) gold. "
@@ -4586,9 +4624,9 @@ text = "Aphrodisiac in food"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 217.0
+margin_top = 246.0
 margin_right = -119.0
-margin_bottom = 245.0
+margin_bottom = 274.0
 hint_tooltip = "Servant will not be able to talk unless addressed."
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -4604,9 +4642,9 @@ text = "Enforced Silence"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 241.0
+margin_top = 270.0
 margin_right = -152.0
-margin_bottom = 269.0
+margin_bottom = 298.0
 hint_tooltip = "Servant will be forced to act like animal: 
 walk on all fours and not interact with 
 others with human words."
@@ -4624,9 +4662,9 @@ text = "Pet Behavior"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 264.0
+margin_top = 294.0
 margin_right = -115.0
-margin_bottom = 292.0
+margin_bottom = 322.0
 hint_tooltip = "Servant won't be able to relieve from 
 sexual build up on their own."
 size_flags_horizontal = 2
@@ -4643,9 +4681,9 @@ text = "No Masturbation"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 287.0
+margin_top = 318.0
 margin_right = -146.0
-margin_bottom = 315.0
+margin_bottom = 346.0
 hint_tooltip = "While in mansion, servant will be wearing 
 special clothes, revealing their naughty pieces."
 size_flags_horizontal = 2
@@ -4662,9 +4700,9 @@ text = "Partial Nudity"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 108.0
+margin_top = 119.0
 margin_right = -161.0
-margin_bottom = 136.0
+margin_bottom = 147.0
 hint_tooltip = "Servant will receive additional 
 selection of higher grade food 
 (-5 food per day)"
@@ -4682,9 +4720,9 @@ text = "Better food"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 132.0
+margin_top = 143.0
 margin_right = -142.0
-margin_bottom = 160.0
+margin_bottom = 171.0
 hint_tooltip = "Servant will be able to take 
 personal bath on their own
 (-2 supplies per day)"
@@ -4702,9 +4740,9 @@ text = "Personal Bath"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 156.0
+margin_top = 167.0
 margin_right = -171.0
-margin_bottom = 184.0
+margin_bottom = 195.0
 hint_tooltip = "Servant will use various available cosmetics
 to keep themselves in better shape
 (-1 supply per day)"
@@ -4722,9 +4760,9 @@ text = "Cosmetics"
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -286.0
-margin_top = 179.0
+margin_top = 191.0
 margin_right = -136.0
-margin_bottom = 207.0
+margin_bottom = 219.0
 hint_tooltip = "Servant will receive some money
 which they can use for their needs
 (-10 gold per day)"
@@ -4760,10 +4798,10 @@ custom_colors/font_color = Color( 0.0739976, 0.660156, 0.00773621, 1 )
 text = "P"
 
 [node name="hairstyle" type="OptionButton" parent="MainScreen/slave_tab/stats/customization"]
-margin_left = 23.0
-margin_top = 80.0
+margin_left = 25.0
+margin_top = 90.0
 margin_right = 175.0
-margin_bottom = 120.0
+margin_bottom = 130.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -4772,11 +4810,9 @@ items = [ "straight", null, false, 0, null, "ponytail", null, false, 1, null, "t
 selected = 0
 
 [node name="hairstylelabel" type="Label" parent="MainScreen/slave_tab/stats/customization/hairstyle"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -112.0
+margin_left = 40.0
 margin_top = -17.0
-margin_right = -37.0
+margin_right = 115.0
 margin_bottom = 3.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
@@ -4787,10 +4823,10 @@ align = 1
 [node name="piercing" type="Button" parent="MainScreen/slave_tab/stats/customization" groups=[
 "prisondisable",
 ]]
-margin_left = 205.0
-margin_top = 80.0
+margin_left = 200.0
+margin_top = 90.0
 margin_right = 350.0
-margin_bottom = 120.0
+margin_bottom = 130.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -4799,10 +4835,10 @@ text = "Piercing"
 [node name="image" type="Button" parent="MainScreen/slave_tab/stats/customization"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 282.0
-margin_top = -52.0
-margin_right = 438.0
-margin_bottom = -12.0
+margin_left = 249.0
+margin_top = -60.0
+margin_right = 419.0
+margin_bottom = -20.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -4811,10 +4847,10 @@ text = "Full Body Image"
 [node name="portrait" type="Button" parent="MainScreen/slave_tab/stats/customization"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 282.0
-margin_top = -98.0
-margin_right = 438.0
-margin_bottom = -58.0
+margin_left = 249.0
+margin_top = -110.0
+margin_right = 419.0
+margin_bottom = -70.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -4823,10 +4859,10 @@ text = "Portrait"
 [node name="tattoo" type="Button" parent="MainScreen/slave_tab/stats/customization" groups=[
 "prisondisable",
 ]]
-margin_left = 205.0
-margin_top = 21.0
-margin_right = 351.0
-margin_bottom = 61.0
+margin_left = 200.0
+margin_top = 30.0
+margin_right = 350.0
+margin_bottom = 70.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -4897,7 +4933,7 @@ rect_min_size = Vector2( 135, 0 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "None"
-items = [ "None", null, false, 0, null ]
+items = [ "None", null, false, -1, null ]
 selected = 0
 
 [node name="piercestate" type="Label" parent="MainScreen/slave_tab/stats/customization/piercingpanel"]
@@ -5064,26 +5100,16 @@ margin_bottom = 198.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "None"
-items = [ "None", null, false, 0, null, "Nature", null, false, 1, null, "Tribal", null, false, 2, null, "Derogatory", null, false, 3, null, "Animalistic", null, false, 4, null, "Magic", null, false, 5, null ]
+items = [ "None", null, false, -1, null, "Nature", null, false, -1, null, "Tribal", null, false, -1, null, "Derogatory", null, false, -1, null, "Animalistic", null, false, -1, null, "Magic", null, false, -1, null ]
 selected = 0
-
-[node name="Label2" type="Label" parent="MainScreen/slave_tab/stats/customization"]
-margin_left = 74.0
-margin_top = 12.0
-margin_right = 125.0
-margin_bottom = 32.0
-size_flags_horizontal = 2
-size_flags_vertical = 0
-custom_fonts/font = ExtResource( 45 )
-text = "Brand"
 
 [node name="relativesbutton" type="Button" parent="MainScreen/slave_tab/stats/customization"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 22.0
-margin_top = -315.0
-margin_right = 154.0
-margin_bottom = -275.0
+margin_left = 25.0
+margin_top = -305.0
+margin_right = 175.0
+margin_bottom = -265.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -5092,10 +5118,10 @@ text = "See Relatives"
 [node name="nickname" type="Button" parent="MainScreen/slave_tab/stats/customization"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 21.0
-margin_top = -97.0
-margin_right = 159.0
-margin_bottom = -57.0
+margin_left = 25.0
+margin_top = -110.0
+margin_right = 225.0
+margin_bottom = -70.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -5106,10 +5132,10 @@ text = "Set Nickname"
 ]]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 19.0
-margin_top = -52.0
-margin_right = 211.0
-margin_bottom = -12.0
+margin_left = 25.0
+margin_top = -60.0
+margin_right = 225.0
+margin_bottom = -20.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -5117,13 +5143,23 @@ text = "Custom Description"
 
 [node name="brandbutton" type="Button" parent="MainScreen/slave_tab/stats/customization"]
 margin_left = 25.0
-margin_top = 28.0
-margin_right = 176.0
-margin_bottom = 68.0
+margin_top = 30.0
+margin_right = 175.0
+margin_bottom = 70.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
 text = "None"
+
+[node name="Label2" type="Label" parent="MainScreen/slave_tab/stats/customization/brandbutton"]
+margin_left = 49.0
+margin_top = -17.0
+margin_right = 100.0
+margin_bottom = 3.0
+size_flags_horizontal = 2
+size_flags_vertical = 0
+custom_fonts/font = ExtResource( 45 )
+text = "Brand"
 
 [node name="brandpopup" type="WindowDialog" parent="MainScreen/slave_tab/stats/customization"]
 anchor_left = 1.0
@@ -5298,10 +5334,6 @@ size_flags_vertical = 2
 [node name="TextureRect2" type="TextureRect" parent="MainScreen/slave_tab/stats/customization/relativespanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -1.0
-margin_top = -49.0
-margin_right = -1.0
-margin_bottom = -49.0
 texture = ExtResource( 44 )
 expand = true
 
@@ -5339,23 +5371,19 @@ size_flags_vertical = 2
 custom_styles/panel = ExtResource( 77 )
 
 [node name="statstext" type="RichTextLabel" parent="MainScreen/slave_tab/stats/statisticpanel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 10.0
+margin_left = 40.0
 margin_top = 20.0
-margin_right = -409.0
-margin_bottom = -66.0
+margin_right = 380.0
+margin_bottom = 390.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 bbcode_enabled = true
 
 [node name="statssextext" type="RichTextLabel" parent="MainScreen/slave_tab/stats/statisticpanel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 382.0
-margin_top = 21.0
-margin_right = -19.0
-margin_bottom = -63.0
+margin_left = 420.0
+margin_top = 20.0
+margin_right = 731.0
+margin_bottom = 390.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 bbcode_enabled = true
@@ -5970,9 +5998,9 @@ text = "Questname"
 
 [node name="questforfeit" type="Button" parent="questnode/TabContainer/Repeatable Quests"]
 margin_left = 689.0
-margin_top = 375.0
+margin_top = 360.0
 margin_right = 823.0
-margin_bottom = 412.0
+margin_bottom = 400.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -5982,7 +6010,7 @@ text = "Forfeit"
 margin_left = 437.0
 margin_top = 407.0
 margin_right = 565.0
-margin_bottom = 445.0
+margin_bottom = 447.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/font = ExtResource( 45 )
@@ -6426,7 +6454,7 @@ margin_bottom = 37.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Leave"
-items = [ "Leave", null, false, 0, null, "Rape", null, false, 1, null, "Kill", null, false, 2, null ]
+items = [ "Leave", null, false, -1, null, "Rape", null, false, -1, null, "Kill", null, false, -1, null ]
 selected = 0
 
 [node name="Label" type="Label" parent="explorationnode/winningpanel/ScrollContainer/VBoxContainer/Button"]
@@ -6437,6 +6465,7 @@ margin_bottom = 28.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 45 )
+custom_constants/line_spacing = -6
 align = 1
 autowrap = true
 
@@ -7372,7 +7401,7 @@ margin_left = 41.0
 margin_top = 55.0
 margin_right = 59.0
 margin_bottom = 507.0
-rect_rotation = -89.9709
+rect_rotation = -90.0
 texture = SubResource( 55 )
 expand = true
 
@@ -7381,7 +7410,7 @@ margin_left = 493.0
 margin_top = 364.0
 margin_right = 511.0
 margin_bottom = 816.0
-rect_rotation = -269.989
+rect_rotation = 90.0
 texture = SubResource( 55 )
 expand = true
 
@@ -8213,13 +8242,13 @@ text = "Headgirl Setting"
 align = 1
 
 [node name="foodbuy" type="SpinBox" parent="mansionsettings/Panel"]
-margin_left = 694.0
-margin_top = 33.0
-margin_right = 810.0
-margin_bottom = 63.0
+margin_left = 680.0
+margin_top = 60.0
+margin_right = 796.0
+margin_bottom = 94.0
+hint_tooltip = "Amount of food purchased by the cook when mansion has less than 200 food"
 size_flags_horizontal = 2
 size_flags_vertical = 2
-min_value = 20.0
 max_value = 3000.0
 step = 20.0
 value = 200.0
@@ -8230,18 +8259,27 @@ margin_left = 134.0
 margin_top = 6.0
 margin_right = 234.0
 margin_bottom = 22.0
+hint_tooltip = "Amount of food purchased by the cook when mansion has less than 200 food"
+mouse_filter = 1
 size_flags_horizontal = 2
 size_flags_vertical = 0
-text = "Food purchase"
+text = "Low food resupply"
+
+[node name="Label2" type="Label" parent="mansionsettings/Panel/foodbuy"]
+margin_left = -30.0
+margin_top = -30.0
+margin_right = 53.0
+margin_bottom = -10.0
+text = "Cooking Job Settings"
 
 [node name="supplykeep" type="SpinBox" parent="mansionsettings/Panel"]
-margin_left = 694.0
-margin_top = 74.0
-margin_right = 810.0
-margin_bottom = 104.0
+margin_left = 680.0
+margin_top = 140.0
+margin_right = 796.0
+margin_bottom = 174.0
+hint_tooltip = "Market workers will attempt to sell any supplies over this amount"
 size_flags_horizontal = 2
 size_flags_vertical = 2
-min_value = 1.0
 max_value = 200.0
 value = 10.0
 rounded = true
@@ -8251,6 +8289,8 @@ margin_left = 134.0
 margin_top = 6.0
 margin_right = 243.0
 margin_bottom = 22.0
+hint_tooltip = "Market workers will attempt to sell any supplies over this amount"
+mouse_filter = 1
 size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "Keep supplies"
@@ -8259,9 +8299,17 @@ text = "Keep supplies"
 margin_top = 40.0
 margin_right = 267.0
 margin_bottom = 65.0
+hint_tooltip = "If enabled, market workers will attempt to buy supplies up to the amount above"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Purchase when low"
+
+[node name="Label2" type="Label" parent="mansionsettings/Panel/supplykeep"]
+margin_left = -30.0
+margin_top = -30.0
+margin_right = 69.0
+margin_bottom = -10.0
+text = "Market Job Settings"
 
 [node name="tutorialnode" type="Control" parent="." groups=[
 "blockmaininput",
@@ -8671,6 +8719,7 @@ margin_left = 483.0
 margin_top = 181.0
 margin_right = 852.0
 margin_bottom = 412.0
+mouse_filter = 1
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
@@ -8686,6 +8735,7 @@ margin_top = 12.0
 margin_right = 357.0
 margin_bottom = 216.0
 rect_min_size = Vector2( 200, 0 )
+mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/normal_font = ExtResource( 45 )
@@ -8698,6 +8748,7 @@ margin_left = 484.0
 margin_top = 181.0
 margin_right = 1048.0
 margin_bottom = 393.0
+mouse_filter = 2
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
@@ -8706,6 +8757,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -1.0
 margin_right = -1.0
+mouse_filter = 2
 texture = ExtResource( 44 )
 expand = true
 
@@ -8714,6 +8766,7 @@ margin_left = 214.0
 margin_top = 43.0
 margin_right = 378.0
 margin_bottom = 155.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/normal_font = ExtResource( 45 )
@@ -8726,6 +8779,7 @@ margin_left = 392.0
 margin_top = 43.0
 margin_right = 556.0
 margin_bottom = 197.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/normal_font = ExtResource( 45 )
@@ -8739,6 +8793,7 @@ margin_top = 16.0
 margin_right = 193.0
 margin_bottom = 196.0
 rect_min_size = Vector2( 180, 180 )
+mouse_filter = 2
 texture = ExtResource( 120 )
 expand = true
 stretch_mode = 7
@@ -8757,6 +8812,7 @@ margin_left = 520.0
 margin_top = 4.0
 margin_right = 560.0
 margin_bottom = 44.0
+mouse_filter = 2
 texture = ExtResource( 121 )
 expand = true
 stretch_mode = 7
@@ -8766,6 +8822,7 @@ margin_left = 208.0
 margin_top = 160.0
 margin_right = 248.0
 margin_bottom = 200.0
+mouse_filter = 2
 texture = ExtResource( 68 )
 expand = true
 stretch_mode = 6
@@ -8775,6 +8832,7 @@ margin_left = 248.0
 margin_top = 160.0
 margin_right = 288.0
 margin_bottom = 200.0
+mouse_filter = 2
 texture = ExtResource( 122 )
 expand = true
 stretch_mode = 6
@@ -8784,12 +8842,14 @@ margin_left = 484.0
 margin_top = 181.0
 margin_right = 1094.0
 margin_bottom = 410.0
+mouse_filter = 2
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
 [node name="TextureRect" type="TextureRect" parent="itemtooltip"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 texture = ExtResource( 123 )
 expand = true
 
@@ -8799,6 +8859,7 @@ margin_top = 6.0
 margin_right = 604.0
 margin_bottom = 222.0
 rect_min_size = Vector2( 200, 0 )
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_fonts/normal_font = ExtResource( 45 )
@@ -8812,6 +8873,7 @@ margin_top = 15.0
 margin_right = 202.0
 margin_bottom = 197.0
 rect_min_size = Vector2( 200, 200 )
+mouse_filter = 2
 texture = ExtResource( 120 )
 expand = true
 stretch_mode = 7
@@ -8867,7 +8929,10 @@ current = true
 [connection signal="pressed" from="Navigation/personal" to="." method="_on_personal_pressed"]
 [connection signal="pressed" from="Navigation/combatgroup" to="." method="_on_combatgroup_pressed"]
 [connection signal="pressed" from="Navigation/inventory" to="." method="_on_inventory_pressed"]
-[connection signal="pressed" from="charlistcontrol/CharList/scroll_list/slave_list/prisonlabel/prisonbutton" to="." method="_on_prisonbutton_pressed"]
+[connection signal="pressed" from="charlistcontrol/CharList/scroll_list/slave_list/mansionCategory" to="." method="_on_category_pressed"]
+[connection signal="pressed" from="charlistcontrol/CharList/scroll_list/slave_list/prisonCategory" to="." method="_on_category_pressed"]
+[connection signal="pressed" from="charlistcontrol/CharList/scroll_list/slave_list/farmCategory" to="." method="_on_category_pressed"]
+[connection signal="pressed" from="charlistcontrol/CharList/scroll_list/slave_list/awayCategory" to="." method="_on_category_pressed"]
 [connection signal="pressed" from="charlistcontrol/orderbutton" to="." method="_on_orderbutton_pressed"]
 [connection signal="pressed" from="charlistcontrol/slavelist" to="." method="_on_slavelist_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/portals" to="." method="_on_portals_pressed"]
@@ -8884,20 +8949,22 @@ current = true
 [connection signal="value_changed" from="MainScreen/mansion/alchemypanel/brewcounter" to="." method="_on_brewcounter_value_changed"]
 [connection signal="meta_clicked" from="MainScreen/mansion/selfinspect/statspanel/info" to="MainScreen/slave_tab" method="_on_info_meta_clicked"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfinspectclose" to="." method="_on_selfinspectclose_pressed"]
+[connection signal="text_changed" from="MainScreen/mansion/selfinspect/defaultMasterNoun" to="." method="_on_defaultMasterNoun_text_changed"]
+[connection signal="text_entered" from="MainScreen/mansion/selfinspect/defaultMasterNoun" to="." method="_on_defaultMasterNoun_text_entered"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfinspectlooks" to="." method="_on_selfinspectlooks_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfgear" to="." method="_on_selfgear_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfpierce" to="." method="_on_selfpierce_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selftattoo" to="." method="_on_selftattoo_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfportait" to="." method="_on_selfportait_pressed"]
+[connection signal="pressed" from="MainScreen/mansion/selfinspect/selfbody" to="." method="_on_selfbody_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfabilityupgrade" to="." method="_on_selfabilityupgrade_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfrelatives" to="." method="_on_selfrelatives_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/spellbook" to="." method="_on_spellbook_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/relativespanel/relativesclose" to="." method="_on_relativesclose_pressed"]
+[connection signal="meta_clicked" from="MainScreen/mansion/selfinspect/selflookspanel/selfdescript" to="MainScreen/slave_tab" method="_on_slavedescript_meta_clicked"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selflookspanel/selfskillclose" to="." method="_on_selfskillclose_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfabilitypanel/abilityclose" to="." method="_on_abilityclose_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/selfinspect/selfabilitypanel/abilitypurchase" to="." method="_on_abilitypurchase_pressed"]
-[connection signal="text_changed" from="MainScreen/mansion/selfinspect/defaultMasterNoun" to="." method="_on_defaultMasterNoun_text_changed"]
-[connection signal="text_entered" from="MainScreen/mansion/selfinspect/defaultMasterNoun" to="." method="_on_defaultMasterNoun_text_entered"]
 [connection signal="pressed" from="MainScreen/mansion/labpanel/chooseassist" to="MainScreen/mansion/labpanel" method="_on_chooseassist_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/labpanel/labstart" to="MainScreen/mansion/labpanel" method="_on_labstart_pressed"]
 [connection signal="pressed" from="MainScreen/mansion/labpanel/labmodpanel/labcancel" to="MainScreen/mansion/labpanel" method="_on_labcancel_pressed"]

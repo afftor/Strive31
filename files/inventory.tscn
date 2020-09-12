@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=2]
+[gd_scene load_steps=60 format=2]
 
 [ext_resource path="res://files/theme.tres" type="Theme" id=1]
 [ext_resource path="res://files/buttons/inventory/11-litter.png" type="Texture" id=2]
@@ -52,9 +52,10 @@
 [ext_resource path="res://files/buttons/inventory/4.png" type="Texture" id=50]
 [ext_resource path="res://files/buttons/inventory/5.png" type="Texture" id=51]
 [ext_resource path="res://files/buttons/inventory/33.png" type="Texture" id=52]
-[ext_resource path="res://files/buttons/arrows/down.png" type="Texture" id=53]
-[ext_resource path="res://files/buttons/arrows/down-press.png" type="Texture" id=54]
-[ext_resource path="res://files/buttons/arrows/down-hl.png" type="Texture" id=55]
+[ext_resource path="res://files/bigpanel.tres" type="StyleBox" id=53]
+[ext_resource path="res://files/buttons/arrows/down.png" type="Texture" id=54]
+[ext_resource path="res://files/buttons/arrows/down-press.png" type="Texture" id=55]
+[ext_resource path="res://files/buttons/arrows/down-hl.png" type="Texture" id=56]
 
 [sub_resource type="StyleBoxTexture" id=1]
 texture = ExtResource( 27 )
@@ -603,7 +604,6 @@ margin_left = -2.0
 margin_top = -1.0
 margin_right = 3.0
 margin_bottom = 4.0
-hint_tooltip = "test"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 texture = ExtResource( 43 )
@@ -904,11 +904,10 @@ margin_bottom = 398.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="hairchange"]
+[node name="Panel" type="Panel" parent="hairchange"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-texture = ExtResource( 4 )
-expand = true
+custom_styles/panel = ExtResource( 53 )
 
 [node name="TextEdit" type="LineEdit" parent="hairchange"]
 margin_left = 52.0
@@ -946,11 +945,10 @@ margin_bottom = 398.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="itemrename"]
+[node name="Panel" type="Panel" parent="itemrename"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-texture = ExtResource( 4 )
-expand = true
+custom_styles/panel = ExtResource( 53 )
 
 [node name="TextEdit" type="LineEdit" parent="itemrename"]
 margin_left = 52.0
@@ -988,48 +986,43 @@ margin_bottom = 588.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="amnesia"]
+[node name="Panel" type="Panel" parent="amnesia"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 15.0
-margin_top = -57.0
-margin_right = 15.0
-margin_bottom = -57.0
-texture = ExtResource( 4 )
-expand = true
+custom_styles/panel = ExtResource( 53 )
 
 [node name="name" type="LineEdit" parent="amnesia"]
 margin_left = 53.0
-margin_top = 208.0
+margin_top = 225.0
 margin_right = 392.0
-margin_bottom = 242.0
+margin_bottom = 259.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 placeholder_text = "Name"
 
 [node name="surname" type="LineEdit" parent="amnesia"]
 margin_left = 53.0
-margin_top = 249.0
+margin_top = 265.0
 margin_right = 392.0
-margin_bottom = 283.0
+margin_bottom = 299.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 placeholder_text = "Surname"
 
 [node name="amnesiaconf" type="Button" parent="amnesia"]
 margin_left = 146.0
-margin_top = 293.0
+margin_top = 302.0
 margin_right = 282.0
-margin_bottom = 332.0
+margin_bottom = 341.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Confirm"
 
 [node name="RichTextLabel" type="RichTextLabel" parent="amnesia"]
 margin_left = 21.0
-margin_top = 18.0
+margin_top = 15.0
 margin_right = 425.0
-margin_bottom = 201.0
+margin_bottom = 220.0
 bbcode_enabled = true
 
 [node name="search" type="LineEdit" parent="."]
@@ -1045,9 +1038,9 @@ margin_top = 26.0
 margin_right = 155.0
 margin_bottom = 80.0
 hint_tooltip = "Move everything to storage"
-texture_normal = ExtResource( 53 )
-texture_pressed = ExtResource( 54 )
-texture_hover = ExtResource( 55 )
+texture_normal = ExtResource( 54 )
+texture_pressed = ExtResource( 55 )
+texture_hover = ExtResource( 56 )
 expand = true
 
 [connection signal="pressed" from="mode" to="." method="_on_mode_pressed"]

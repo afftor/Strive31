@@ -253,7 +253,7 @@ size_flags_vertical = 2
 window_title = "Open a Directory"
 dialog_text = "Select default path folder"
 mode = 2
-access = 1
+access = 2
 current_dir = "user://"
 current_path = "user://"
 

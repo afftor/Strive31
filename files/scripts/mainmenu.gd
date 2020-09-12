@@ -151,18 +151,14 @@ func _ready_system_check():
 		globals.rules.custommouse = false
 		$htmlwarn.popup()
 		
-	if globals.rules.fullscreen == true:
-		OS.set_window_fullscreen(true)
 		
 func _on_htmlwarnclose_pressed():
 	$htmlwarn.hide()
 	
 #QMod - Added Adult warning helper
 func _ready_adult_warning():	
-	
-	var settings = File.new()
 	#Disables Adult warning if settings file exists, for own convenience
-	var showWarning = !settings.file_exists("user://settings.ini")
+	var showWarning = !File.new().file_exists(globals.settingsFile)
 	#showWarning = true ### Uncomment this to always show warning as in original
 	if true:
 		$warning.visible = true
@@ -170,10 +166,17 @@ func _ready_adult_warning():
 	else:
 		$warning.visible = false
 		$TextureFrame.visible = true
+	yield(get_tree().create_timer(0.1), "timeout")
+	if OS.is_window_fullscreen() && OS.get_window_position() != Vector2(0,0):
+		OS.set_window_fullscreen(false)
+		OS.set_window_fullscreen(true)
 
 func _on_warningconfirm_pressed():
 	get_node("TextureFrame").visible = true
 	$warning.visible = false	
+	if OS.is_window_fullscreen() && OS.get_window_position() != Vector2(0,0):
+		OS.set_window_fullscreen(false)
+		OS.set_window_fullscreen(true)
 
 func _on_warningcancel_pressed():
 	_on_exit_pressed()
@@ -261,10 +264,10 @@ func _ready_newgame_creator():
 	
 	#Initialize newgame variables
 	player = globals.newslave(playerDefaults.race, playerDefaults.age, playerDefaults.sex, playerDefaults.origins) #Prefer to use a constructor/builder
+	globals.player = player #Necessary for descriptions to properly identify player character during newgame creation
 	player.cleartraits()
 	player.hairstyle = 'straight'
 	player.beautybase = variables.playerstartbeauty
-	globals.player = player #Necessary for descriptions to properly identify player character during newgame creation
 	
 	startSlave = globals.newslave(slaveDefaults.race, slaveDefaults.age, slaveDefaults.sex, slaveDefaults.origins) #Prefer a constructor/builder
 	startSlave.cleartraits()
@@ -317,7 +320,7 @@ func _newgame_creator_reset():
 	startSlave.memory = slaveBackgrounds[0]
 
 
-var filesname = 'user://saves/autosave'
+var filesname = null
 #QMod - Load game
 func _on_load_pressed():
 	_on_SavePanel_visibility_changed()
@@ -325,8 +328,8 @@ func _on_load_pressed():
 #QMod - Simplified function, didn't see what the extra vars/steps were for? Debug?
 func _on_SavePanel_visibility_changed():
 	var dir = Directory.new() #Create savegame directory if it doesn't exist
-	if dir.dir_exists("user://saves") == false:
-		dir.make_dir("user://saves")
+	if !dir.dir_exists(globals.saveDir):
+		dir.make_dir_recursive(globals.saveDir)
 		
 	for i in get_node("TextureFrame/SavePanel/ScrollContainer/savelist").get_children(): #Clear previous savegame list
 		if i != get_node("TextureFrame/SavePanel/ScrollContainer/savelist/Button"):
@@ -334,31 +337,33 @@ func _on_SavePanel_visibility_changed():
 			i.visible = false
 	
 	$TextureFrame/SavePanel.visible = true#Display save panel
-	
-	get_node("TextureFrame/SavePanel/saveline").set_text(filesname.replacen("user://saves/",'')) #Displays name of current selected savefile in textbox	
+	if filesname == null:
+		filesname = globals.saveDir + 'autosave1'
+	get_node("TextureFrame/SavePanel/saveline").set_text(filesname.replace(globals.appDataDir,'')) #Displays name of selected savefile in textbox
 	
 	#var node
 	var savefiles = globals.dir_contents()
-	for i in globals.savelist:
-		if savefiles.find(i) < 0:
+	for i in globals.savelist.duplicate():
+		if !savefiles.has(i):
 			globals.savelist.erase(i)
-	
+
 	for i in savefiles:
 		var node = get_node("TextureFrame/SavePanel/ScrollContainer/savelist/Button").duplicate() #Create save file button
 		get_node("TextureFrame/SavePanel/ScrollContainer/savelist").add_child(node) #Add button to savefile load display list
 		node.show()
-		if globals.savelist.has(i) == true:
-			node.get_node("date").set_text(globals.savelist[i].date)
-			node.get_node("name").set_text(i.replacen("user://saves/",''))
-		else:
-			node.get_node("name").set_text(i.replacen("user://saves/",''))
+		if !globals.savelist.has(i):
+			if globals.saveListNewEntry(i):
+				node.get_node("date").set_text(globals.savelist[i].get('date'))
+		else:	
+			node.get_node("date").set_text(globals.savelist[i].get('date'))
+		node.get_node("name").set_text(i.replace(globals.saveDir,''))
 		node.set_meta('text', i)
 		node.connect('pressed', self, '_display_savegame_info', [node]) #Connect button to loadchosen method
 
 #QMod - Renamed as func displays save info and doesn't load savegame.
 func _display_savegame_info(node):
 	filesname = node.get_meta('text') #Get name of selected savegame
-	get_node("TextureFrame/SavePanel/saveline").set_text(filesname.replacen("user://saves/",'')) #Display selected savegame name in textbox
+	get_node("TextureFrame/SavePanel/saveline").set_text(filesname.replace(globals.appDataDir,'')) #Displays name of selected savefile in textbox
 		
 	for i in $TextureFrame/SavePanel/ScrollContainer/savelist.get_children(): #Find and 'press' button of selected savegame
 		i.pressed = (i == node)
@@ -618,11 +623,12 @@ func _on_quickstart_pressed():
 
 	#Select random start location
 	var locationArray = locationDict.keys()
-	startingLocation = locationArray[rand_range(0, locationArray.size())]
+	#startingLocation = locationArray[rand_range(0, locationArray.size())]
+	startingLocation = 'wimborn'
 	
 	#Generate random Player
 	if isSandbox: #Randomize from sandbox full race list
-		player.race = globals.allracesarray[rand_range(0, globals.allracesarray.size())]
+		player.race = globals.randomfromarray(globals.allracesarray)
 	else: #Randomize from story starting race list
 		player.race = globals.getracebygroup('starting')
 		#player.race = globals.starting_pc_races[rand_range(0, globals.starting_pc_races.size())]
@@ -630,22 +636,22 @@ func _on_quickstart_pressed():
 	if !globals.rules.futa: #If futanari not allowed, remove futa
 		sexArray.erase('futanari')
 	
-	player.sex = sexArray[rand_range(0,sexArray.size())]
-	player.age = ageArray[rand_range(0,ageArray.size())]
+	player.sex = globals.randomfromarray(sexArray)
+	player.age = globals.randomfromarray(ageArray)
 	regenerateplayer()
 	quickstartStats()
-	player.spec = playerSpecializationArray[rand_range(0, playerSpecializationArray.size())]
+	player.spec = globals.randomfromarray(playerSpecializationArray)
 	
 	#Generate random starting slave
 	if globals.rules.children: #If children allowed, add 'child' age
 		ageArray.push_front('child')
 	
 	if isSandbox: #Randomize from sandbox full race list
-		slaveDefaults.race = globals.allracesarray[rand_range(0, globals.allracesarray.size())]
+		slaveDefaults.race = globals.randomfromarray(globals.allracesarray)
 	else: #Randomize from story starting race list
 		slaveDefaults.race = globals.getracebygroup('starting')
 	
-	slaveDefaults.age = ageArray[rand_range(0,ageArray.size())]
+	slaveDefaults.age = globals.randomfromarray(ageArray)
 	slaveDefaults.sex = 'random'
 	startSlave = globals.newslave(slaveDefaults.race, slaveDefaults.age, slaveDefaults.sex, 'poor')	
 	player.imageportait = playerPortraits[randi()%playerPortraits.size()]
@@ -922,10 +928,11 @@ func _process_stage6_sex_options():
 	if makeoverPerson.sex != 'female':
 		get_node("TextureFrame/newgame/stage6/penis").set_disabled(false)
 		get_node("TextureFrame/newgame/stage6/balls").set_disabled(false)
-		for i in ['none','small', 'average', 'big']:
+		for i in ['small', 'average', 'big']:
 			get_node("TextureFrame/newgame/stage6/penis").add_item(i)
 			if makeoverPerson.penis == i:
 				get_node("TextureFrame/newgame/stage6/penis").select(get_node("TextureFrame/newgame/stage6/penis").get_item_count()-1)
+		for i in ['none', 'small', 'average', 'big']:
 			get_node("TextureFrame/newgame/stage6/balls").add_item(i)
 			if makeoverPerson.balls == i:
 				get_node("TextureFrame/newgame/stage6/balls").select(get_node("TextureFrame/newgame/stage6/balls").get_item_count()-1)
@@ -983,6 +990,8 @@ func _process_stage6_body_options():
 		get_node("TextureFrame/newgame/stage6/wings").set_disabled(true)
 	for i in wingTypes:
 		get_node("TextureFrame/newgame/stage6/wings").add_item(i.replace("_", " "))
+		if makeoverPerson.wings == i:
+			get_node("TextureFrame/newgame/stage6/wings").select(get_node("TextureFrame/newgame/stage6/wings").get_item_count()-1)
 		
 	#Process fur colors
 	var furColors
@@ -1010,12 +1019,12 @@ func _process_stage6_locked_options():
 	get_node("TextureFrame/newgame/stage6/penistype").set_disabled(true)	
 	
 func _option_select(item, button):
-	if !button.get_name() in ['penis','tits']:
-		makeoverPerson[button.get_name()] = button.get_item_text(item).replace(" ", "_")
-	elif button.get_name() == 'tits':
+	if button.get_name() == 'tits':
 		makeoverPerson.titssize = button.get_item_text(item)
-	elif button.get_name() == 'penis':
-		makeoverPerson.penis = button.get_item_text(item)
+	elif button.get_name() in ['penis','skin']:
+		makeoverPerson[button.get_name()] = button.get_item_text(item)
+	else:
+		makeoverPerson[button.get_name()] = button.get_item_text(item).replace(" ", "_")
 	_update_stage6()
 	
 func _update_stage6():
@@ -1343,7 +1352,6 @@ func _on_traitclose_pressed():
 func _on_slavefinetune_pressed():
 	#Display slave appearance customization panel
 	get_node("TextureFrame/newgame/stage6").visible = true
-	get_node("TextureFrame/newgame/stage6").set_as_toplevel(true)
 	
 	#Run character customization back-end
 	_stage6(startSlave)
@@ -1353,7 +1361,8 @@ func _on_slavefinetune_pressed():
 func _on_slaveconfirm_pressed():	
 	#Finish processing slave
 	startSlave.cleartraits() #Clear traits, reset basics	
-	
+	startSlave.health = 1000
+
 	#Generate mental stats
 	for i in ['conf','cour','wit','charm']:
 		startSlave[i] = rand_range(30,35)	
@@ -1386,6 +1395,7 @@ func _on_slaveconfirm_pressed():
 	globals.slaves = startSlave	#A bit deceptive as it assigns 'person' to 'array', works because of 'setget'
 	
 	
+	player.health = 1000
 	#Apply player racial bonuses
 	if player.race == 'Elf':
 		player.stats.maf_base += 1
@@ -1394,16 +1404,16 @@ func _on_slaveconfirm_pressed():
 	elif player.race == 'Orc':
 		globals.state.reputation.gorn += 30
 	elif player.race == 'Demon':
-		for i in globals.state.reputation.values():
-			i -= 10
+		for i in globals.state.reputation:
+			globals.state.reputation[i] -= 10
 		player.skillpoints += 1
 	elif player.race == 'Taurus':
 		player.stats.end_base += 1
 	elif player.race.find("Beastkin") >= 0:
 		globals.state.reputation.frostford += 30
-	elif player.race.find("Halfkin"):
-		for i in globals.state.reputation.values():
-			i += 15
+	elif player.race.find("Halfkin") >= 0:
+		for i in globals.state.reputation:
+			globals.state.reputation[i] += 15
 	else:
 		globals.state.reputation.wimborn += 30
 	

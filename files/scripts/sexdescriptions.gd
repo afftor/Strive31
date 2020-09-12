@@ -1,8 +1,9 @@
 extends Node
 
-var givers
-var takers
 
+var groupArray = [null, [], [], []] #null aligns index with groupNum
+var player
+var playerGroup = 0
 
 #For expressions in brackets: 1 refers to givers, 2 refers to takers and checks if groups consist of 1 or more persons to pick up correct references. 
 #[name1] and [name2] build name lists of those parties, while [name] refers to specific person from any side (generally used in reactions)
@@ -10,1397 +11,1796 @@ var takers
 #[his], [he] etc will be replaced with female pronouns if referred character is not male
 #[his1] can be also replaced with their and will refer to group
 
+# this file has been primarily optimized for faster performance. some basic optimizations:
+#	var is faster than const. dictionary lookup is faster for strings in var. string comparison and string manipulation is faster for raw strings. 
 
-func decoder(text, tempgivers = null, temptakers = null):
-	if tempgivers != null: givers = tempgivers
-	if temptakers != null: takers = temptakers
-	if takers.size() == 0:
-		takers = givers
+
+func _init():
+	simplifyDesc(descAssSizeAgeKeys, descAssSizeAgeConvert)
+	simplifyDesc(descHipsSizeAgeKeys, descHipsSizeAgeConvert)
+	simplifyDesc(descTitsSizeAgeKeys, descTitsSizeAgeConvert)
+
+
+#-------------------------------------------------------------------------------------------------------------------------
+# tags
+var personVerbs = [
+	null, #null aligns index with groupNum
+	[
+		#state verbs
+		'[is1]',
+		'[has1]',
+		'[was1]',
+		#verb endings
+		'[ies/y1]',
+		'[s/1]',
+		'[es/1]',
+	],
+	[
+		#state verbs
+		'[is2]',
+		'[has2]',
+		'[was2]',
+		#verb endings
+		'[ies/y2]',
+		'[s/2]',
+		'[es/2]',
+	],
+]
+
+# if group.size() >= 2 || group[0][C_PERSON] == player
+var personVerbsPlural = [
+	#state verbs
+	"are", # [is1]
+	"have", # [has1]
+	"were", # [was1]
+	#verb endings
+	"y", # [ies/y1]
+	"", # [s/1]
+	"", # [es/1]
+]
+# if group.size() == 1
+var personVerbsSingular = [
+	#state verbs
+	"is", # [is1]
+	"has", # [has1]
+	"was", # [was1]
+	#verb endings
+	"ies", # [ies/y1]
+	"s", # [s/1]
+	"es", # [es/1]
+]
+#-------------------------------------------------------------------------------------------------------------------------
+# tags
+var objectVerbsNouns = [
+	null, #null aligns index with groupNum
+	[
+		#verb endings involving objects and body actions. always third person, so only takes number into account
+		'[ies/y#1]',
+		'[s/#1]',
+		'[es/#1]',
+		#nouns
+		'[y/ies1]',
+		'[/s1]',
+		'[/es1]',
+		'[a /1]',
+		'[an /1]',
+		#pronouns
+		'[it1]',
+	],
+	[
+		#verb endings involving objects and body actions. always third person, so only takes number into account
+		'[ies/y#2]',
+		'[s/#2]',
+		'[es/#2]',
+		#nouns
+		'[y/ies2]',
+		'[/s2]',
+		'[/es2]',
+		'[a /2]',
+		'[an /2]',
+		#pronouns
+		'[it2]',
+	],
+]
+
+# if group.size() >= 2
+var objectVerbsNounsPlural = [
+	#verb endings involving objects and body actions. always third person, so only takes number into account
+	"y", # [ies/y#1]
+	"", # [s/#1]
+	"", # [es/#1]
+	#nouns
+	"ies", # [y/ies1]
+	"s", # [/s1]
+	"es", # [/es1]
+	"", # [a /1]
+	"", # [an /1]
+	#pronouns
+	"them", # [it1]
+]
+# if group.size() == 1
+var objectVerbsNounsSingular = [
+	#verb endings involving objects and body actions. always third person, so only takes number into account
+	"ies", # [ies/y#1]
+	"s", # [s/#1]
+	"es", # [es/#1]
+	#nouns
+	"y", # [y/ies1]
+	"", # [/s1]
+	"", # [/es1]
+	"a ", # [a /1]
+	"an ", # [an /1]
+	#pronouns
+	"it", # [it1]
+]
+#-------------------------------------------------------------------------------------------------------------------------
+# tags
+var pronouns = [
+	null, #null aligns index with groupNum
+	[
+		'[he1]',
+		'[him1]',
+		'[himself1]',
+		'[his1]',
+		'[his_1]',
+	],
+	[
+		'[he2]',
+		'[him2]',
+		'[himself2]',
+		'[his2]',
+		'[his_2]',
+	],
+	[
+		'[he3]',
+		'[him3]',
+		'[himself3]',
+		'[his3]',
+		'[his_3]',
+	],
+]
+#pre-located indexes for simple lookup
+var pronounIdxHimself = pronouns[1].find('[himself1]')
+var pronounIdxHis = pronouns[1].find('[his1]')
+
+# if playerGroup == groupNum && group.size() == 1
+var pronounsPlayerSingular = [
+	"you", # [he1]
+	"you", # [him1]
+	"yourself", # [himself1]
+	"your", # [his1]
+	"yours", # [his_1]
+]
+# if playerGroup == groupNum && group.size() == 2
+var pronounsPlayerDuo = [
+	"{^you both:you}", # [he1]
+	"{^you both:both of you}", # [him1]
+	"yourselves", # [himself1]
+	"{^both of your:your}", # [his1]
+	"yours", # [his_1]
+]
+# if playerGroup == groupNum && group.size() > 2
+var pronounsPlayerPlural = [
+	"{^you all:you}", # [he1]
+	"{^you all:all of you}", # [him1]
+	"yourselves", # [himself1]
+	"{^all of your:your}", # [his1]
+	"yours", # [his_1]
+]
+# if group.size() == 1 && group[0][C_SEX] == 'male'
+var pronounsMaleSingular = [
+	"he", # [he1]
+	"him", # [him1]
+	"himself", # [himself1]
+	"his", # [his1]
+	"his", # [his_1]
+]
+# if group.size() == 1 && group[0][C_SEX] != 'male'
+var pronounsFemaleSingular = [
+	"she", # [he1]
+	"her", # [him1]
+	"herself", # [himself1]
+	"her", # [his1]
+	"hers", # [his_1]
+]
+# if group.size() == 2
+var pronounsDuo = [
+	"{^they both:they}", # [he1]
+	"them", # [him1]
+	"themselves", # [himself1]
+	"their", # [his1]
+	"theirs", # [his_1]
+]
+# if group.size() > 2
+var pronounsPlural = [
+	"they", # [he1]
+	"them", # [him1]
+	"themselves", # [himself1]
+	"their", # [his1]
+	"theirs", # [his_1]
+]
+#-------------------------------------------------------------------------------------------------------------------------
+# constant strings except that const is slightly slower than var
+var C_PERSON = 'person'
+var C_NAME = 'name'
+var C_RACE = 'race'
+var C_AGE = 'age'
+var C_SEX = 'sex'
+var C_MALE = 'male'
+var C_TITSSIZE = 'titssize'
+var C_ASSSIZE = 'asssize'
+var C_PREG = 'preg'
+var C_DURATION = 'duration'
+var C_HAS_WOMB = 'has_womb'
+var C_MASCULINE = 'masculine'
+var C_BODYSHAPE = 'bodyshape'
+var C_CHILD = 'child'
+var C_SKINCOV = 'skincov'
+var C_FULL_BODY_FUR = 'full_body_fur'
+var C_HALFHORSE = 'halfhorse'
+var C_SINGLE = 'single'
+var C_PLURAL = 'plural'
+var C_SINGLEPOS = 'singlepos'
+var C_PLURALPOS = 'pluralpos'
+
+
+var refSizeArray = globals.sizearray # ['masculine','flat','small','average','big','huge']
+var refAgesArray = globals.agesarray # ['child','teen','adult']
+var refHeightArray = globals.heightarray # ['petite','short','average','tall','towering']
+var refGenitaliaArray  = globals.genitaliaarray # ['small','average','big']
+var refPenisTypeArray = globals.penistypearray # ['human','canine','feline','equine']
+
+
+func applyVerbsNouns(text):
+	var refWhat
+	var refForWhat
+	for i in [1,2]:
+		refWhat = personVerbs[i]
+		refForWhat = personVerbsPlural if (groupArray[i].size() >= 2 || groupArray[i][0][C_PERSON] == player) else personVerbsSingular
+		for j in refWhat.size():
+			text = text.replace( refWhat[j], refForWhat[j])
+
+		refWhat = objectVerbsNouns[i]
+		refForWhat = objectVerbsNounsPlural if (groupArray[i].size() >= 2) else objectVerbsNounsSingular
+		for j in refWhat.size():
+			text = text.replace( refWhat[j], refForWhat[j])
+	return text
+
+func selectPronouns(group, groupNum):
+	if playerGroup & groupNum: # bitwise & is effectively equivalent to:  playerGroup == groupNum || (groupNum == 3 && playerGroup > 0)
+		if group.size() == 1:
+			return pronounsPlayerSingular
+		elif group.size() == 2:
+			return pronounsPlayerDuo
+		else:
+			return pronounsPlayerPlural
+	elif group.size() == 1:
+		if group[0][C_SEX] == 'male':
+			return pronounsMaleSingular
+		else:
+			return pronounsFemaleSingular
+	elif group.size() == 2:
+		return pronounsDuo
+	else:
+		return pronounsPlural
+
+func applyPronouns(text):
+	var refWhat
+	var refForWhat
+	for i in [1,2,3]:
+		refWhat = pronouns[i]
+		refForWhat = selectPronouns(groupArray[i], i)
+		for j in refWhat.size():
+			text = text.replace( refWhat[j], refForWhat[j])
+	return text
+
+
+func decoder(text, tempGivers, tempTakers = []):
+	player = globals.player
+	playerGroup = 0
+	for member in tempGivers:
+		if member[C_PERSON] == player:
+			playerGroup = 1
+			break
+	if playerGroup == 0:
+		for member in tempTakers:
+			if member[C_PERSON] == player:
+				playerGroup = 2
+				break
+
+	if tempTakers.empty():
+		if tempGivers.empty():
+			return text
+		groupArray[1] = tempGivers
+		groupArray[2] = tempGivers
+		groupArray[3] = tempGivers
+	elif tempGivers.empty():
+		groupArray[1] = tempTakers
+		groupArray[2] = tempTakers
+		groupArray[3] = tempTakers
+	else:
+		groupArray[1] = tempGivers
+		groupArray[2] = tempTakers
+		groupArray[3] = tempGivers + tempTakers
 	
 	#split before parse
 	text = splitrand(text)
 	
-	#dictionary of replacements
-	var replacements = {
-		#state verbs
-		'[their]' : 'your' if givers[0].person == globals.player || takers[0].person == globals.player else 'their',
-		'[is1]' : 'are' if givers.size() >= 2 or givers[0].person == globals.player else 'is',
-		'[is2]' : 'are' if takers.size() >= 2 or takers[0].person == globals.player else 'is',
-		'[has1]' : 'have' if givers.size() >= 2 or givers[0].person == globals.player else 'has',
-		'[has2]' : 'have' if takers.size() >= 2 or takers[0].person == globals.player else 'has',
-		'[was1]' : 'were' if givers.size() >= 2 or givers[0].person == globals.player else 'was',
-		'[was2]' : 'were' if takers.size() >= 2 or takers[0].person == globals.player else 'was',
-		#verb endings
-		'[ies/y1]' : 'y' if givers.size() >= 2 or givers[0].person == globals.player else 'ies',
-		'[ies/y2]' : 'y' if takers.size() >= 2 or takers[0].person == globals.player else 'ies',
-		'[s/1]' : '' if givers.size() >= 2 or givers[0].person == globals.player else 's',
-		'[s/2]' : '' if takers.size() >= 2 or takers[0].person == globals.player else 's',
-		'[es/1]' : '' if givers.size() >= 2 or givers[0].person == globals.player else 'es',
-		'[es/2]' : '' if takers.size() >= 2 or takers[0].person == globals.player else 'es',
-		#verb endings involving objects and body actions
-		#same as above, but only takes number into account
-		'[ies/y#1]' : 'y' if givers.size() >= 2 else 'ies',
-		'[ies/y#2]' : 'y' if takers.size() >= 2 else 'ies',
-		'[s/#1]' : '' if givers.size() >= 2 else 's',
-		'[s/#2]' : '' if takers.size() >= 2 else 's',
-		'[es/#1]' : '' if givers.size() >= 2 else 'es',
-		'[es/#2]' : '' if takers.size() >= 2 else 'es',
-		#nouns
-		'[y/ies1]' : 'ies' if givers.size() >= 2 else 'y',
-		'[y/ies2]' : 'ies' if takers.size() >= 2 else 'y',
-		'[/s1]' : 's' if givers.size() >= 2 else '',
-		'[/s2]' : 's' if takers.size() >= 2 else '',
-		'[/es1]' : 'es' if givers.size() >= 2 else '',
-		'[/es2]' : 'es' if takers.size() >= 2 else '',
-		'[a /1]' : '' if givers.size() >= 2 else 'a ',
-		'[a /2]' : '' if takers.size() >= 2 else 'a ',
-		'[an /1]' : '' if givers.size() >= 2 else 'an ',
-		'[an /2]' : '' if takers.size() >= 2 else 'an ',
-		#pronouns
-		'[it1]' : 'them' if givers.size() >= 2 else 'it',
-		'[it2]' : 'them' if takers.size() >= 2 else 'it',
-		'[he1]' : he(givers),
-		'[he2]' : he(takers),
-		'[he3]' : he(givers + takers),
-		'[him1]' : him(givers),
-		'[him2]' : him(takers),
-		'[him3]' : him(givers + takers),
-		'[himself1]' : himself(givers),
-		'[himself2]' : himself(takers),
-		'[himself3]' : himself(givers + takers),
-		'[his1]' : his(givers),
-		'[his2]' : his(takers),
-		'[his3]' : his(givers + takers),
-		'[his_1]' : his_(givers),
-		'[his_2]' : his_(takers),
-		'[his_3]' : his_(givers + takers),
-		#proper nouns
-		'[name1]' : name(givers),
-		'[name2]' : name(takers),
-		'[name3]' : name(givers + takers),
-		'[names1]' : names(givers),
-		'[names2]' : names(takers),
-		'[names3]' : names(givers + takers),
-		'[partner1]' : partner(givers),
-		'[partner2]' : partner(takers),
-		'[partner3]' : partner(givers + takers),
-		'[partners1]' : partners(givers),
-		'[partners2]' : partners(takers),
-		'[partners3]' : partners(givers + takers),
-		#body parts
-		'[pussy1]' : pussy(givers),
-		'[pussy2]' : pussy(takers),
-		'[pussy3]' : pussy(givers + takers),
-		'[penis1]' : penis(givers),
-		'[penis2]' : penis(takers),
-		'[penis3]' : penis(givers + takers),
-		'[ass1]' : ass(givers),
-		'[ass2]' : ass(takers),
-		'[ass3]' : ass(givers + takers),
-		'[hips1]' : hips(givers),
-		'[hips2]' : hips(takers),
-		'[hips3]' : hips(givers + takers),
-		'[tits1]' : tits(givers),
-		'[tits2]' : tits(takers),
-		'[tits3]' : tits(givers + takers),
-		'[body1]' : body(givers),
-		'[body2]' : body(takers),
-		'[body3]' : body(givers + takers),
-		#sex actions
-		'[fuck1]' : fuck(givers),
-		'[fuck2]' : fuck(takers),
-		'[fuck3]' : fuck(givers + takers),
-		'[fucks1]' : fucks(givers),
-		'[fucks2]' : fucks(takers),
-		'[fucks3]' : fucks(givers + takers),
-		'[fucking1]' : fucking(givers),
-		'[fucking2]' : fucking(takers),
-		'[fucking3]' : fucking(givers + takers),
-		'[vfuck1]' : fuck(givers),
-		'[vfuck2]' : fuck(takers),
-		'[vfuck3]' : fuck(givers + takers),
-		'[vfucks1]' : fucks(givers),
-		'[vfucks2]' : fucks(takers),
-		'[vfucks3]' : fucks(givers + takers),
-		'[vfucking1]' : fucking(givers),
-		'[vfucking2]' : fucking(takers),
-		'[vfucking3]' : fucking(givers + takers),
-		'[afuck1]' : fuck(givers),
-		'[afuck2]' : fuck(takers),
-		'[afuck3]' : fuck(givers + takers),
-		'[afucks1]' : fucks(givers),
-		'[afucks2]' : fucks(takers),
-		'[afucks3]' : fucks(givers + takers),
-		'[afucking1]' : fucking(givers),
-		'[afucking2]' : fucking(takers),
-		'[afucking3]' : fucking(givers + takers),
-		#unfinished
-		'[labia1]' : 'labia' if givers.size() >= 2 else labia(givers[0]),
-		'[labia2]' : 'labia' if takers.size() >= 2 else labia(takers[0]),
-		'[anus1]' : 'anuses' if givers.size() >= 2 else anus(givers[0]),
-		'[anus2]' : 'anuses' if takers.size() >= 2 else anus(takers[0]),
-	}
-	
 	#some tricks to make proper nouns easier
-	if text.find("[name1]") + text.find("[names1]") < -1:
-		replacements['[he1]'] = name(givers)
-	if text.find("[name2]") + text.find("[names2]") < -1:
-		replacements['[he2]'] = name(takers)
-	
-	#replace
-	for i in replacements:
-		text = text.replace(i, replacements[i])
+	if text.find('[name1]') < 0 && text.find('[names1]') < 0:
+		text = text.replace('[he1]', '[name1]')
+	if text.find('[name2]') < 0 && text.find('[names2]') < 0:
+		text = text.replace('[he2]', '[name2]')
+
+	text = text.replace('[their]', "your" if playerGroup > 0 else "their")
+
+	text = applyVerbsNouns(text)
+	text = applyPronouns(text)
+	text = searchAndReplace(text)
 	
 	text = splitrand(text)
-	#handle capitalization
-	text = capitallogic(text)
 	
-	return text
+	#handle capitalization and return
+	return capitallogic(text)
 
 #choose randomly from str in {^str:str:str}
 #does not support nesting
 func splitrand(text):
-	while text.find("{^") >= 0:
-		var temptext = text.substr(text.find("{^"), text.find("}")+1 - text.find("{^"))
-		text = text.replace(temptext, temptext.split(":")[randi()%temptext.split(":").size()].replace("{^", "").replace("}",""))
+	var pos = text.find("{^")
+	while pos >= 0:
+		var targetText = text.substr(pos, text.find("}", pos)+1 - pos)
+		var splitText = targetText.substr(2, targetText.length()-3).split(":")
+		text = text.replace(targetText, splitText[ randi() % splitText.size() ])
+		pos = text.find("{^", pos)
 	return text
 
+var clookfor = ["\n", ". ", "! "]
 #capitalize the first letter in text and those after strings in the array clookfor
 #ignores flags inside "[" and "]"
 func capitallogic(text):
-	var clookfor = ["\n",". ","! "]
-	var clookat = [0]
 	var cplace
 	for i in clookfor:
 		cplace = 0
-		while text.find(i, cplace) >= 0:
-			clookat.append(text.find(i, cplace) + i.length())
-			cplace = text.find(i, cplace + i.length() + 1)
-	for i in clookat:
-		if text.substr(i, 1) == "[":
-				i = text.find("]", i) + 1
-		if i < text.length():
-			text = text.left(i) + text.substr(i, 1).to_upper() + text.right(i + 1)
+		while cplace < text.length():
+			if text[cplace] == "[":
+				cplace = text.find("]", cplace) + 1
+				if cplace == 0:
+					break
+				continue
+			if text[cplace] == " ":
+				cplace += 1
+				continue
+			text[cplace] = text[cplace].to_upper()
+			cplace = text.find(i, cplace)
+			if cplace < 0:
+				break
+			cplace += i.length()
 	return text
 
 
-func dictionary(member, text):
-	if member.person == globals.player:
-		text = text.replace('[name]', '[color=yellow]' + 'you' + '[/color]' if givers.find(member) >= 0 else '[color=aqua]' + 'you' + '[/color]')
-	else:
-		text = text.replace('[name]', '[color=yellow]' + member.name + '[/color]' if givers.find(member) >= 0 else '[color=aqua]' + member.name + '[/color]')
-	if member.person == globals.player:
-		text = text.replace('[his]', 'you')
-	else:
-		text = text.replace('[his]', 'his' if member.person.sex == 'male' else 'her')
-	text = text.replace('[body]', body(member))
-	return text
+var replacements = {
+	#proper nouns
+	'[name1]' : [funcref(self, 'name'), 1, true],
+	'[name2]' : [funcref(self, 'name'), 2, false],
+	'[name3]' : [funcref(self, 'name'), 3, false],
+	'[names1]' : [funcref(self, 'names'), 1, true],
+	'[names2]' : [funcref(self, 'names'), 2, false],
+	'[names3]' : [funcref(self, 'names'), 3, false],
+	'[partner1]' : [funcref(self, 'partner'), 1, 1],
+	'[partner2]' : [funcref(self, 'partner'), 2, 2],
+	'[partner3]' : [funcref(self, 'partner'), 3, 3],
+	'[partners1]' : [funcref(self, 'partners'), 1, 1],
+	'[partners2]' : [funcref(self, 'partners'), 2, 2],
+	'[partners3]' : [funcref(self, 'partners'), 3, 3],
+	#body parts
+	'[pussy1]' : [funcref(self, 'pussy'), 1],
+	'[pussy2]' : [funcref(self, 'pussy'), 2],
+	'[pussy3]' : [funcref(self, 'pussy'), 3],
+	'[penis1]' : [funcref(self, 'penis'), 1],
+	'[penis2]' : [funcref(self, 'penis'), 2],
+	'[penis3]' : [funcref(self, 'penis'), 3],
+	'[ass1]' : [funcref(self, 'ass'), 1],
+	'[ass2]' : [funcref(self, 'ass'), 2],
+	'[ass3]' : [funcref(self, 'ass'), 3],
+	'[hips1]' : [funcref(self, 'hips'), 1],
+	'[hips2]' : [funcref(self, 'hips'), 2],
+	'[hips3]' : [funcref(self, 'hips'), 3],
+	'[tits1]' : [funcref(self, 'tits'), 1],
+	'[tits2]' : [funcref(self, 'tits'), 2],
+	'[tits3]' : [funcref(self, 'tits'), 3],
+	'[body1]' : [funcref(self, 'body'), 1],
+	'[body2]' : [funcref(self, 'body'), 2],
+	'[body3]' : [funcref(self, 'body'), 3],
+	#sex actions
+	'[fuck1]' : [funcref(self, 'fuck'), 1, 1, ''],
+	'[fuck2]' : [funcref(self, 'fuck'), 2, 2, ''],
+	'[fuck3]' : [funcref(self, 'fuck'), 3, 3, ''],
+	'[fucks1]' : [funcref(self, 'fuck'), 1, 1, 's'],
+	'[fucks2]' : [funcref(self, 'fuck'), 2, 2, 's'],
+	'[fucks3]' : [funcref(self, 'fuck'), 3, 3, 's'],
+	'[fucking1]' : [funcref(self, 'fuck'), 1, 1, 'ing'],
+	'[fucking2]' : [funcref(self, 'fuck'), 2, 2, 'ing'],
+	'[fucking3]' : [funcref(self, 'fuck'), 3, 3, 'ing'],
+	'[vfuck1]' : [funcref(self, 'vfuck'), 1, 1, ''],
+	'[vfuck2]' : [funcref(self, 'vfuck'), 2, 2, ''],
+	'[vfuck3]' : [funcref(self, 'vfuck'), 3, 3, ''],
+	'[vfucks1]' : [funcref(self, 'vfuck'), 1, 1, 's'],
+	'[vfucks2]' : [funcref(self, 'vfuck'), 2, 2, 's'],
+	'[vfucks3]' : [funcref(self, 'vfuck'), 3, 3, 's'],
+	'[vfucking1]' : [funcref(self, 'vfuck'), 1, 1, 'ing'],
+	'[vfucking2]' : [funcref(self, 'vfuck'), 2, 2, 'ing'],
+	'[vfucking3]' : [funcref(self, 'vfuck'), 3, 3, 'ing'],
+	'[afuck1]' : [funcref(self, 'afuck'), 1, 1, ''],
+	'[afuck2]' : [funcref(self, 'afuck'), 2, 2, ''],
+	'[afuck3]' : [funcref(self, 'afuck'), 3, 3, ''],
+	'[afucks1]' : [funcref(self, 'afuck'), 1, 1, 's'],
+	'[afucks2]' : [funcref(self, 'afuck'), 2, 2, 's'],
+	'[afucks3]' : [funcref(self, 'afuck'), 3, 3, 's'],
+	'[afucking1]' : [funcref(self, 'afuck'), 1, 1, 'ing'],
+	'[afucking2]' : [funcref(self, 'afuck'), 2, 2, 'ing'],
+	'[afucking3]' : [funcref(self, 'afuck'), 3, 3, 'ing'],
+	#unfinished
+	'[labia1]' : [funcref(self, 'labia'), 1],
+	'[labia2]' : [funcref(self, 'labia'), 2],
+	'[labia3]' : [funcref(self, 'labia'), 3],
+	'[anus1]' : [funcref(self, 'anus'), 1],
+	'[anus2]' : [funcref(self, 'anus'), 2],
+	'[anus3]' : [funcref(self, 'anus'), 3],
+}
 
-func he(group):
-	for i in group:
-		if i.person == globals.player:
-			if group.size() == 1:
-				return 'you'
-			elif group.size() == 2:
-				return '{^you both:you}'
-			else:
-				return '{^you all:you}'
-	if group.size() == 1:
-		if group[0].sex == 'male':
-			return 'he'
-		else:
-			return 'she'
-	elif group.size() == 2:
-		return '{^they both:they}'
-	else:
-		return 'they'
-
-func himself(group):
-	for i in group:
-		if i.person == globals.player:
-			if group.size() == 1:
-				return 'yourself'
-			else:
-				return 'yourselves'
-	if group.size() == 1:
-		if group[0].sex == 'male':
-			return 'himself'
-		else:
-			return 'herself'
-	else:
-		return 'themselves'
-
-func his(group):
-	for i in group:
-		if i.person == globals.player:
-			if group.size() == 1:
-				return 'your'
-			elif group.size() == 2:
-				return '{^both of your:your}'
-			else:
-				return '{^all of your:your}'
-	if group.size() == 1:
-		if group[0].sex == 'male':
-			return 'his'
-		else:
-			return 'her'
-	else:
-		return 'their'
-
-func his_(group):
-	for i in group:
-		if i.person == globals.player:
-			return 'yours'
-	if group.size() == 1:
-		if group[0].sex == 'male':
-			return 'his'
-		else:
-			return 'hers'
-	else:
-		return 'theirs'
-
-func him(group):
-	for i in group:
-		if i.person == globals.player:
-			if group.size() == 1:
-				return 'you'
-			elif group.size() == 2:
-				return '{^you both:both of you}'
-			else:
-				return '{^you all:all of you}'
-	if group.size() == 1:
-		if group[0].sex == 'male':
-			return 'him'
-		else:
-			return 'her'
-	elif group.size() == 2:
-		return '{^them both:them}'
-	else:
-		return 'them'
-
-func name(group):
-	var text = ''
-	for i in group:
-		#text += "%" + str(i.number) #portraittag
-		
-		if group == givers:
-			text += '[color=yellow]'
-			if i.person == globals.player:
-				text += 'You'
-			else:
-				text += i.name
-			text += '[/color]'
-			if i != givers.back() && givers.find(i) != givers.size()-2:
-				text += ', '
-			elif givers.find(i) == givers.size()-2:
-				text += ' and '
-		else:
-			text += '[color=aqua]'
-			if i.person == globals.player:
-				text += 'You'
-			else:
-				if globals.getrelativename(givers[0].person, i.person) != null && randf() >= 0.5:
-					if givers[0].person == globals.player:
-						text += givers[0].person.dictionary('your ') 
-					else:
-						text += givers[0].person.dictionary('$his ') 
-					text += globals.getrelativename(givers[0].person ,i.person)
-				else:
-					text += i.name
-			text += '[/color]'
-			if i != takers.back() && takers.find(i) != takers.size()-2:
-				text += ', '
-			elif takers.find(i) == takers.size()-2:
-				text += ' and '
-	return text
-
-func names(group):
-	var text = ''
-	for i in group:
-		if i.person == globals.player:
-			group.erase(i)
-			group.push_front(i)
+func searchAndReplace(text):
+	var priorPos = 0
+	var pos1 = text.find("[")
+	var pos2
+	var strPool = PoolStringArray()
+	while pos1 >= 0:
+		pos2 = text.find("]", pos1)
+		if pos2 < 0:
 			break
-	for i in group:
-		#text += "%" + str(i.number)
-		if group == givers:
-			text += '[color=yellow]'
-			if i.person == globals.player:
-				text += "Your"
-#				if group.size() == 1:
-#					text += 'your'
-#				else:
-#					text += 'you'
-			else:
-				text += i.name
-			if i.person != globals.player:
-				text += "'s"
-			text += '[/color]'
-			if i != givers.back() && givers.find(i) != givers.size()-2:
-				text += ', '
-			elif givers.find(i) == givers.size()-2:
-				text += ' and '
-		else:
-			text += '[color=aqua]'
-			if i.person == globals.player:
-				text += "Your"
-			else:
-				text += i.name
-			if i.person != globals.player:
-				text += "'s"
-			text += '[/color]'
-			if i != takers.back() && takers.find(i) != takers.size()-2:
-				text += ', '
-			elif takers.find(i) == takers.size()-2:
-				text += ' and '
-	return text
+		var refRep = replacements.get(text.substr(pos1, pos2 - pos1 + 1))
+		if refRep != null:
+			strPool.append( text.substr(priorPos, pos1 - priorPos) )
+			if refRep.size() == 3:
+				strPool.append( refRep[0].call_func( groupArray[refRep[1]], refRep[2]) )
+			elif refRep.size() == 2:
+				strPool.append( refRep[0].call_func( groupArray[refRep[1]]) )
+			elif refRep.size() == 4:
+				strPool.append( refRep[0].call_func( groupArray[refRep[1]], refRep[2], refRep[3]) )
+			priorPos = pos2 + 1
+		pos1 = text.find("[", pos2)
+	strPool.append( text.substr(priorPos, text.length() - priorPos) )
+	return strPool.join("")
 
-#no recursive functions allowed in godot so this looks semi-horrible, but whatever
+
+# isGivers is true only when group is only the givers
+func name(group, isGivers):
+	var strArr = PoolStringArray()
+	if isGivers:
+		for member in group:
+			if member[C_PERSON] == player:
+				strArr.append("[color=yellow]you[/color]")
+			else:
+				strArr.append("[color=yellow]%s[/color]" % member[C_NAME])
+	else:
+		for member in group:
+			if member[C_PERSON] == player:
+				strArr.append("[color=aqua]you[/color]")
+			elif randf() <= 0.5:
+				var relName = globals.getrelativename(groupArray[1][0][C_PERSON], member[C_PERSON])
+				if relName != null:
+					if playerGroup == 1:
+						strArr.append("[color=aqua]your %s[/color]" % relName)
+					else:
+						strArr.append(groupArray[1][0][C_PERSON].dictionary("[color=aqua]$his %s[/color]" % relName))
+				else:
+					strArr.append("[color=aqua]%s[/color]" % member[C_NAME])
+			else:
+				strArr.append("[color=aqua]%s[/color]" % member[C_NAME])
+	if strArr.size() <= 2:
+		return strArr.join(" and ")
+	strArr[strArr.size()-1] = "and " + strArr[strArr.size()-1]
+	return strArr.join(", ")
+
+# isGivers is true only when group is only the givers
+func names(group, isGivers):
+	var strArr = PoolStringArray()
+	if isGivers:
+		for member in group:
+			if member[C_PERSON] == player:
+				strArr.append("[color=yellow]your[/color]")
+			else:
+				strArr.append("[color=yellow]%s's[/color]" % member[C_NAME])
+	else:
+		for member in group:
+			if member[C_PERSON] == player:
+				strArr.append("[color=aqua]your[/color]")
+			else:
+				strArr.append("[color=aqua]%s's[/color]" % member[C_NAME])
+	if strArr.size() <= 2:
+		return strArr.join(" and ")
+	strArr[strArr.size()-1] = "and " + strArr[strArr.size()-1]
+	return strArr.join(", ")
+
 #fuck() and variants used after "to" or a modal verb such as "will/should"
 #fucks() used in other present tense cases, will return fuck() depending on group characteristics
 #vfuck() and afuck() variants assume verticality
-func fuck(group):
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['fuck','plow','screw','penetrate','churn','pummel'])]
-	temp = getrandomfromarray(['plunge','hammer','pound','pump','slam','thrust','grind','drive'])
-	temp += getrandomfromarray([' ' + his(group) + ' ' + penis(group),''])
-	temp += getrandomfromarray([' deep','']) + ' into'
-	outputs += [temp]
-	temp = getrandomfromarray(['plunge','pump','slide','thrust'])
-	temp += getrandomfromarray([' ' + his(group) + ' ' + penis(group),'']) + ' in and out of'
-	outputs += [temp]
-	temp = getrandomfromarray(['plunge','thrust'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + penis(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['in and out of','inside'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
+var randFuckStrs = [
+	{
+		'' : [
+			["fuck","plow","screw","penetrate","churn","pummel"],
+			["plunge ","hammer ","pound ","pump ","slam ","thrust ","grind ","drive "],
+			["plunge ","pump ","slide ","thrust "],
+			["plunge ","thrust "],
+		],
+		's' : [
+			["fucks","plows","screws","penetrates","churns","pummels"],
+			["plunges ","hammers ","pounds ","pumps ","slams ","thrusts ","grinds ","drives "],
+			["plunges ","pumps ","slides ","thrusts "],
+			["plunges ","thrusts "],
+		],
+		'ing' : [
+			["fucking","plowing","screwing","penetrating","churning","pummeling"],
+			["plunging ","hammering ","pounding ","pumping ","slaming ","thrusting ","grinding ","driving "],
+			["plunging ","pumping ","sliding ","thrusting "],
+			["plunging ","thrusting "],
+		],
+	},
+	[" deep into"," into"],
+	[" in and out of"],
+	[" in and out of"," inside"],
+]
 
-func fucks(group):
-	if group.size() >= 2:
-		return fuck(group)
-	for i in group:
-		if i.person == globals.player:
-			return fuck(group)
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['fucks','plows','screws','penetrates','churns','pummels'])]
-	temp = getrandomfromarray(['plunges','hammers','pounds','pumps','slams','thrusts','grinds','drives'])
-	temp += getrandomfromarray([' ' + his(group) + ' ' + penis(group),''])
-	temp += getrandomfromarray([' deep','']) + ' into'
-	outputs += [temp]
-	temp = getrandomfromarray(['plunges','pumps','slides','thrusts'])
-	temp += getrandomfromarray([' ' + his(group) + ' ' + penis(group),'']) + ' in and out of'
-	outputs += [temp]
-	temp = getrandomfromarray(['plunges','thrusts'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + penis(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['in and out of','into','inside'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
+func fuck(group, groupNum, suffix):
+	if suffix == 's':
+		if group.size() >= 2 || group[0][C_PERSON] == player:
+			suffix = ''
+	var rng = randi() % 4
+	var ref = randFuckStrs[0][suffix][rng]
+	if rng == 0:
+		return getRandStr(ref)
+	elif rng in [1,2]:
+		if bool(randi() % 2):
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHis] + " " + penis(group) + getRandStr(randFuckStrs[rng])
+		else:
+			return getRandStr(ref) + getRandStr(randFuckStrs[rng]).right(1) #fixes double space
+	else:
+		if bool(randi() % 2):
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHis] + " " + penis(group) + getRandStr(randFuckStrs[rng])
+		else:
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHimself] + getRandStr(randFuckStrs[rng])
+	
+var randVAFuckStrs = [
+	{
+		'' : [
+			["massage","squeeze","envelop","milk"],
+			["grind ","bounce ","gyrate "],
+			["grind ","bounce ","gyrate ","thrust ","pump ","work "],
+			["grind ","thrust ","slam ","pound "],
+			["impale ","pleasure ","churn ","satisfy "],
+		],
+		's' : [
+			["massages","squeezes","envelops","milks"],
+			["grinds ","bounces ","gyrates "],
+			["grinds ","bounces ","gyrates ","thrusts ","pumps ","works "],
+			["grinds ","thrusts ","slams ","pounds "],
+			["impales ","pleasures ","churns ","satisfies "],
+		],
+		'ing' : [
+			["massaging","squeezing","enveloping","milking"],
+			["grinding ","bouncing ","gyrating "],
+			["grinding ","bouncing ","gyrating ","thrusting ","pumping ","working "],
+			["grinding ","thrusting ","slamming ","pounding "],
+			["impaling ","pleasuring ","churning ","satisfying "],
+		],
+	},
+	["on top of","on","atop"], #fixes double space
+	[" on top of"," on"," atop"],
+	[" against"," down on"],
+	[" on top of"," on"],
+]	
 
-func fucking(group):
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['fucking','plowing','screwing','penetrating','churning','pummeling'])]
-	temp = getrandomfromarray(['plunging','hammering','pounding','pumping','slaming','thrusting','grinding','driving'])
-	temp += getrandomfromarray([' ' + his(group) + ' ' + penis(group),''])
-	temp += getrandomfromarray([' deep','']) + ' into'
-	outputs += [temp]
-	temp = getrandomfromarray(['plunging','pumping','sliding','thrusting'])
-	temp += getrandomfromarray([' ' + his(group) + ' ' + penis(group),'']) + ' in and out of'
-	outputs += [temp]
-	temp = getrandomfromarray(['plunging','thrusting'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + penis(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['in and out of','into','inside'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
+func vfuck(group, groupNum, suffix):
+	if suffix == 's':
+		if group.size() >= 2 || group[0][C_PERSON] == player:
+			suffix = ''
+	var rng = randi() % 4
+	var ref = randVAFuckStrs[0][suffix][rng]
+	if rng == 0:
+		return getRandStr(ref)
+	elif rng == 1:
+		return getRandStr(ref) + getRandStr(randVAFuckStrs[rng])
+	elif rng == 2:
+		return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHis] + " " + hips(group) + getRandStr(randVAFuckStrs[rng])
+	else:
+		if bool(randi() % 2):
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHis] + " " + pussy(group) + getRandStr(randVAFuckStrs[rng])
+		else:
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHimself] + getRandStr(randVAFuckStrs[rng])
 
-func vfuck(group):
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['massage','squeeze','envelop','milk'])]
-	temp = getrandomfromarray(['grind','bounce','gyrate'])
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grind','bounce','gyrate','thrust','pump','work'])
-	temp += ' ' + his(group) + ' ' + hips(group)
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grind','thrust','slam','pound'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + pussy(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['against','down on'])
-	outputs += [temp]
-	temp = getrandomfromarray(['impale','pleasure','churn','satisfy'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + pussy(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['on top of','on'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
-
-func vfucks(group):
-	if group.size() >= 2:
-		return vfuck(group)
-	for i in group:
-		if i.person == globals.player:
-			return vfuck(group)
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['massages','squeezes','envelops','milks'])]
-	temp = getrandomfromarray(['grinds','bounces','gyrates'])
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinds','bounces','gyrates','thrusts','pumps','works'])
-	temp += ' ' + his(group) + ' ' + hips(group)
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinds','thrusts','slams','pounds'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + pussy(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['against','down on'])
-	outputs += [temp]
-	temp = getrandomfromarray(['impales','pleasures','churns','satisfies'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + pussy(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['on top of','on'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
-
-func vfucking(group):
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['massaging','squeezing','enveloping','milking'])]
-	temp = getrandomfromarray(['grinding','bouncing','gyrating'])
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinding','bouncing','gyrating','thrusting','pumping','working'])
-	temp += ' ' + his(group) + ' ' + hips(group)
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinding','thrusting','slamming','pounding'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + pussy(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['against','down on'])
-	outputs += [temp]
-	temp = getrandomfromarray(['impaling','pleasuring','churning','satisfying'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + pussy(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['on top of','on'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
-
-func afuck(group):
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['massage','squeeze','envelop','milk'])]
-	temp = getrandomfromarray(['grind','bounce','gyrate'])
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grind','bounce','gyrate','thrust','pump','work'])
-	temp += ' ' + his(group) + ' ' + hips(group)
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grind','thrust','slam','pound'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + anus(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['against','down on'])
-	outputs += [temp]
-	temp = getrandomfromarray(['impale','pleasure','churn','satisfy'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + anus(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['on top of','on'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
-
-func afucks(group):
-	if group.size() >= 2:
-		return afuck(group)
-	for i in group:
-		if i.person == globals.player:
-			return afuck(group)
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['massages','squeezes','envelops','milks'])]
-	temp = getrandomfromarray(['grinds','bounces','gyrates'])
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinds','bounces','gyrates','thrusts','pumps','works'])
-	temp += ' ' + his(group) + ' ' + hips(group)
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinds','thrusts','slams','pounds'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + anus(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['against','down on'])
-	outputs += [temp]
-	temp = getrandomfromarray(['impales','pleasures','churns','satisfies'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + anus(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['on top of','on'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
-
-func afucking(group):
-	var outputs = []
-	var temp = ''
-	outputs += [getrandomfromarray(['massaging','squeezing','enveloping','milking'])]
-	temp = getrandomfromarray(['grinding','bouncing','gyrating'])
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinding','bouncing','gyrating','thrusting','pumping','working'])
-	temp += ' ' + his(group) + ' ' + hips(group)
-	temp += ' ' + getrandomfromarray(['on top of','on','atop'])
-	outputs += [temp]
-	temp = getrandomfromarray(['grinding','thrusting','slamming','pounding'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + anus(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['against','down on'])
-	outputs += [temp]
-	temp = getrandomfromarray(['impaling','pleasuring','churning','satisfying'])
-	temp += ' ' + getrandomfromarray([his(group) + ' ' + anus(group),himself(group)])
-	temp += ' ' + getrandomfromarray(['on top of','on'])
-	outputs += [temp]
-	return outputs[randi()%outputs.size()]
+func afuck(group, groupNum, suffix):
+	if suffix == 's':
+		if group.size() >= 2 || group[0][C_PERSON] == player:
+			suffix = ''
+	var rng = randi() % 4
+	var ref = randVAFuckStrs[0][suffix][rng]
+	if rng == 0:
+		return getRandStr(ref)
+	elif rng == 1:
+		return getRandStr(ref) + getRandStr(randVAFuckStrs[rng])
+	elif rng == 2:
+		return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHis] + " " + hips(group) + getRandStr(randVAFuckStrs[rng])
+	else:
+		if bool(randi() % 2):
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHis] + " " + anus(group) + getRandStr(randVAFuckStrs[rng])
+		else:
+			return getRandStr(ref) + selectPronouns(group, groupNum)[pronounIdxHimself] + getRandStr(randVAFuckStrs[rng])
 
 #this could be added to the race dictionaries instead
-const racenames = {
+var racenames = {
 	Human = {
-		single = "human",
-		plural = "humans",
-		singlepos = "human's",
-		pluralpos = "humans'"
+		single = " human",
+		plural = " humans",
+		singlepos = " human's",
+		pluralpos = " humans'"
 	},
 	Elf = {
-		single = "elf",
-		plural = "elves",
-		singlepos = "elf's",
-		pluralpos = "elves'"
+		single = " elf",
+		plural = " elves",
+		singlepos = " elf's",
+		pluralpos = " elves'"
 	},
 	'Dark Elf' : {
-		single = "elf",
-		plural = "elves",
-		singlepos = "elf's",
-		pluralpos = "elves'"
+		single = " elf",
+		plural = " elves",
+		singlepos = " elf's",
+		pluralpos = " elves'"
 	},
 	Drow = {
-		single = "elf",
-		plural = "elves",
-		singlepos = "elf's",
-		pluralpos = "elves'"
+		single = " elf",
+		plural = " elves",
+		singlepos = " elf's",
+		pluralpos = " elves'"
 	},
 	Orc = {
-		single = "orc",
-		plural = "orcs",
-		singlepos = "orc's",
-		pluralpos = "orcs'"
+		single = " orc",
+		plural = " orcs",
+		singlepos = " orc's",
+		pluralpos = " orcs'"
 	},
 	Gnome = {
-		single = "gnome",
-		plural = "gnomes",
-		singlepos = "gnome's",
-		pluralpos = "gnomes'"
+		single = " gnome",
+		plural = " gnomes",
+		singlepos = " gnome's",
+		pluralpos = " gnomes'"
 	},
 	Goblin = {
-		single = "goblin",
-		plural = "goblins",
-		singlepos = "goblin's",
-		pluralpos = "goblins'"
+		single = " goblin",
+		plural = " goblins",
+		singlepos = " goblin's",
+		pluralpos = " goblins'"
 	},
 	Fairy = {
-		single = "fairy",
-		plural = "fairies",
-		singlepos = "fairy's",
-		pluralpos = "fairies'"
+		single = " fairy",
+		plural = " fairies",
+		singlepos = " fairy's",
+		pluralpos = " fairies'"
 	},
 	Seraph = {
-		single = "seraph",
-		plural = "seraphs",
-		singlepos = "seraph's",
-		pluralpos = "seraphs'"
+		single = " seraph",
+		plural = " seraphs",
+		singlepos = " seraph's",
+		pluralpos = " seraphs'"
 	},
 	Demon = {
-		single = "demon",
-		plural = "demon's",
-		singlepos = "demon's",
-		pluralpos = "demons'"
+		single = " demon",
+		plural = " demon's",
+		singlepos = " demon's",
+		pluralpos = " demons'"
 	},
 	Dryad = {
-		single = "dryad",
-		plural = "dryads",
-		singlepos = "dryad's",
-		pluralpos = "dryads'"
+		single = " dryad",
+		plural = " dryads",
+		singlepos = " dryad's",
+		pluralpos = " dryads'"
 	},
 	Dragonkin = {
-		single = "dragon",
-		plural = "dragons",
-		singlepos = "dragon's",
-		pluralpos = "dragons'"
+		single = " dragon",
+		plural = " dragons",
+		singlepos = " dragon's",
+		pluralpos = " dragons'"
 	},
 	Taurus = {
-		single = "taurus",
-		plural = "tauruses",
-		singlepos = "taurus'",
-		pluralpos = "tauruses'"
+		single = " taurus",
+		plural = " tauruses",
+		singlepos = " taurus'",
+		pluralpos = " tauruses'"
 	},
 	Slime = {
-		single = "slime",
-		plural = "slimes",
-		singlepos = "slime's",
-		pluralpos = "slimes'"
+		single = " slime",
+		plural = " slimes",
+		singlepos = " slime's",
+		pluralpos = " slimes'"
 	},
 	Lamia = {
-		single = "lamia",
-		plural = "lamias",
-		singlepos = "lamia's",
-		pluralpos = "lamias'"
+		single = " lamia",
+		plural = " lamias",
+		singlepos = " lamia's",
+		pluralpos = " lamias'"
 	},
 	Harpy = {
-		single = "harpy",
-		plural = "harpies",
-		singlepos = "harpy's",
-		pluralpos = "harpies'"
+		single = " harpy",
+		plural = " harpies",
+		singlepos = " harpy's",
+		pluralpos = " harpies'"
 	},
 	Arachna = {
-		single = "arachna",
-		plural = "arachnas",
-		singlepos = "arachna's",
-		pluralpos = "arachnas'"
+		single = " arachna",
+		plural = " arachnas",
+		singlepos = " arachna's",
+		pluralpos = " arachnas'"
 	},
 	Centaur = {
-		single = "centaur",
-		plural = "centaurs",
-		singlepos = "centaur's",
-		pluralpos = "centaurs'"
+		single = " centaur",
+		plural = " centaurs",
+		singlepos = " centaur's",
+		pluralpos = " centaurs'"
 	},
 	Nereid = {
-		single = "nereid",
-		plural = "nereids",
-		singlepos = "nereid's",
-		pluralpos = "nereids'"
+		single = " nereid",
+		plural = " nereids",
+		singlepos = " nereid's",
+		pluralpos = " nereids'"
 	},
 	Scylla = {
-		single = "scylla",
-		plural = "scyllas",
-		singlepos = "scylla's",
-		pluralpos = "scyllas'"
+		single = " scylla",
+		plural = " scyllas",
+		singlepos = " scylla's",
+		pluralpos = " scyllas'"
 	},
 	"Beastkin Cat" : {
-		single = "cat",
-		plural = "cats",
-		singlepos = "cat's",
-		pluralpos = "cats'"
+		single = " cat",
+		plural = " cats",
+		singlepos = " cat's",
+		pluralpos = " cats'"
 	},
 	"Beastkin Fox" : {
-		single = "fox",
-		plural = "foxes",
-		singlepos = "fox's",
-		pluralpos = "foxes'"
+		single = " fox",
+		plural = " foxes",
+		singlepos = " fox's",
+		pluralpos = " foxes'"
 	},
 	"Beastkin Wolf" : {
-		single = "wolf",
-		plural = "wolves",
-		singlepos = "wolf's",
-		pluralpos = "wolves'"
+		single = " wolf",
+		plural = " wolves",
+		singlepos = " wolf's",
+		pluralpos = " wolves'"
 	},
 	"Beastkin Bunny" : {
-		single = "bunny",
-		plural = "bunnies",
-		singlepos = "bunny's",
-		pluralpos = "bunnies'"
+		single = " bunny",
+		plural = " bunnies",
+		singlepos = " bunny's",
+		pluralpos = " bunnies'"
 	},
 	"Beastkin Tanuki" : {
-		single = "tanuki",
-		plural = "tanukis",
-		singlepos = "tanuki's",
-		pluralpos = "tanukis'"
+		single = " tanuki",
+		plural = " tanukis",
+		singlepos = " tanuki's",
+		pluralpos = " tanukis'"
 	},
 	"Halfkin Cat" : {
-		single = "cat",
-		plural = "cats",
-		singlepos = "cat's",
-		pluralpos = "cats'"
+		single = " cat",
+		plural = " cats",
+		singlepos = " cat's",
+		pluralpos = " cats'"
 	},
 	"Halfkin Fox" : {
-		single = "fox",
-		plural = "foxes",
-		singlepos = "fox's",
-		pluralpos = "foxes'"
+		single = " fox",
+		plural = " foxes",
+		singlepos = " fox's",
+		pluralpos = " foxes'"
 	},
 	"Halfkin Wolf" : {
-		single = "wolf",
-		plural = "wolves",
-		singlepos = "wolf's",
-		pluralpos = "wolves'"
+		single = " wolf",
+		plural = " wolves",
+		singlepos = " wolf's",
+		pluralpos = " wolves'"
 	},
 	"Halfkin Bunny" : {
-		single = "bunny",
-		plural = "bunnies",
-		singlepos = "bunny's",
-		pluralpos = "bunnies'"
+		single = " bunny",
+		plural = " bunnies",
+		singlepos = " bunny's",
+		pluralpos = " bunnies'"
 	},
 	"Halfkin Tanuki" : {
-		single = "tanuki",
-		plural = "tanukis",
-		singlepos = "tanuki's",
-		pluralpos = "tanukis'"
-	}
+		single = " tanuki",
+		plural = " tanukis",
+		singlepos = " tanuki's",
+		pluralpos = " tanukis'"
+	},
 }
 
 
-func partner(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	var boygirl = ''
-	for i in group:
-		if i.person == globals.player && group.size() == 1:
-			return "you"
-		var mp = i.person
-		array1 = []
-		array2 = []
-		var thick = thickness(mp)
-		#feminity descriptors
-		if mp.titssize == 'masculine':
-			array1 += ["muscular","toned"]
-		elif thick < 3:
-			array1 += ["dainty","delicate","slim"]
-		elif thick < 5:
-			array1 += ["healthy","shapely"]
-		elif thick < 7:
-			array1 += ["healthy","shapely","sensuous","curvaceous","buxom"]
-		else:
-			array1 += ["sensuous","curvaceous","buxom","voluptuous","bombastic","meaty"]
-		#body
-		if mp.preg.duration > 1:
-			array1 += ["pregnant","gravid"]
-		#age
-		if mp.age == 'child':
-			array1 += ["young","adolescent"]
-			array2 += ["child"] if group.size() == 1 else ["children"]
-		elif mp.age == 'teen':
-			array1 += ['young']
-			array2 += ["teen"] if group.size() == 1 else ["teens"]
-		else:
-			array1 += ['mature', 'adult']
-		#beauty
-		if mp.beauty_get() >= 50:
-			array1 += ['attractive']
-			if mp.sex == 'male':
-				array1 += ['handsome']
-			elif mp.age == 'child':
-				array1 += ['cute','pretty']
-			elif mp.age == 'teen':
-				array1 += ['cute','pretty','beautiful']
+var descFemininity = [
+	["muscular", "toned"], # masculine
+	["dainty","delicate","slim","petite"], # thickness: [0,1,2] to [0,1,2]
+	["healthy","shapely"], # thickness: [3,4] to [3,4,5,6]
+	["healthy","shapely","sensuous","curvaceous","buxom"], # thickness: [5,6] to [5,6]
+	["sensuous","curvaceous","buxom"], # thickness: [5,6] to 7+
+	["sensuous","curvaceous","buxom","voluptuous","bombastic","meaty"], # thickness: 7+ to 7+
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeFemininity(group):
+	if group[0][C_PERSON][C_TITSSIZE] == 'masculine':
+		for i in range(1, group.size()):
+			if group[i][C_PERSON][C_TITSSIZE] != 'masculine':
+				return null
+		return getRandStr(descFemininity[0])
+
+	var low = 999
+	var high = -999
+	var temp
+	for member in group:
+		temp = max(refSizeArray.find(member[C_PERSON][C_TITSSIZE])-1, 0) + max(refSizeArray.find(member[C_PERSON][C_ASSSIZE])-1, 0) # calc thickness
+		low = min(low, temp)
+		high = max(high, temp)
+	if low <= 2:
+		if high <= 2: # [0,1,2] to [0,1,2]
+			return getRandStr(descFemininity[1])
+	elif low <= 4:
+		if high <= 6: # [3,4] to [3,4,5,6]
+			return getRandStr(descFemininity[2])
+	elif low <= 6:
+		if high <= 6: # [5,6] to [5,6]
+			return getRandStr(descFemininity[3])
+		else: # [5,6] to 7+
+			return getRandStr(descFemininity[4])
+	else: # 7+ to 7+
+		return getRandStr(descFemininity[5])
+	return null
+
+
+var descPreg = ["pregnant","gravid"]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePreg(group):
+	for member in group:
+		if member[C_PERSON][C_PREG][C_DURATION] == 0:
+			return null
+	return getRandStr(descPreg)
+
+
+var descAge = [
+	["young","adolescent"], # ages: [0] to [0]
+	["mature", "adult"], # ages: [2] to [2]
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeAge(group):
+	var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+	if limitsAge[0] == 2: # [2] to [2]
+		return getRandStr(descAge[1])
+	elif limitsAge[1] == 1: # [0,1] to [1]
+		return "young"
+	elif limitsAge[1] == 0: # [0] to [0]
+		return getRandStr(descAge[0])
+	return null
+
+
+var descBeauty = [
+	["attractive","handsome"], # all male
+	["attractive","cute","pretty"], # ages: [0] to [0,1]
+	["attractive","cute","pretty","beautiful"], # ages: [1] to [1]
+	["attractive","pretty","beautiful"], # ages: [1,2] to [2]
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeBeauty(group):
+	if !areAllAttrib_GE_val(group, 'beauty', 50):
+		return null
+	if areAllAttrib_E_val(group, C_SEX, C_MALE):
+		return getRandStr(descBeauty[0])
+
+	var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+	if limitsAge[1] == 2:
+		if limitsAge[0] >= 1: # [1,2] to [2]
+			return getRandStr(descBeauty[3])
+	elif limitsAge[0] == 0:
+		if limitsAge[1] <= 1: # [0] to [0,1]
+			return getRandStr(descBeauty[1])
+	elif limitsAge[0] == limitsAge[1]: # [1] to [1]
+		return getRandStr(descBeauty[2])
+	return "attractive"
+
+
+var descSize = [
+	["tiny","small","little","pint-sized","diminutive"], # heights: [0,1] to [0,1]
+	["giant","huge","large","big","tall"], # heights: [3,4] to [3,4]
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeSize(group):
+	var limitsHeight = getAttribLimits(group, 'height', refHeightArray)
+	if limitsHeight[0] < 2:
+		if limitsHeight[1] < 2: # [0,1] to [0,1]
+			return getRandStr(descSize[0])
+	elif limitsHeight[0] > 2 && limitsHeight[1] > 2: # [3,4] to [3,4]
+		return getRandStr(descSize[1])
+	return null
+
+
+var descCharm = [
+	["adorable","cute"], # ages: [0] to [0,1]
+	["adorable","cute","charming","enchanting","captivating"], # ages: [1] to [1]
+	["charming","enchanting","captivating"], # ages: [1,2] to [2]
+]
+var descCour = ["shy","meek"]
+var descConf = ["proud","haughty"]
+var descLust = ["horny", "excited"]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePersonality(group):
+	var options = range(5)
+	options.shuffle()
+	for i in options:
+		if i == 0:
+			if areAllAttrib_G_val(group, 'charm', 60):
+				var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+				if limitsAge[1] == 2: # [1,2] to [2]
+					if limitsAge[0] >= 1:
+						return getRandStr(descCharm[2])
+				elif limitsAge[0] == 0: # [0] to [0,1]
+					if limitsAge[1] <= 1:
+						return getRandStr(descCharm[0])
+				elif limitsAge[0] == limitsAge[1]: # [1] to [1]
+					return getRandStr(descCharm[1])
+		elif i == 1:
+			if areAllAttrib_L_val(group, 'cour', 40):
+				return getRandStr(descCour)
+		elif i == 2:
+			if areAllAttrib_G_val(group, 'wit', 80):
+				return "clever"
+		elif i == 3:
+			if areAllAttrib_G_val(group, 'conf', 65):
+				return getRandStr(descConf)
+		elif i == 4:
+			var val = true
+			for member in group:
+				if member.lust <= 300:
+					val = false
+					break
+			if val:
+				return getRandStr(descLust)
+	return null
+
+
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeSexRace(group):
+	var str1 = null
+	var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+	if areAllAttrib_E_val(group, C_SEX, C_MALE):
+		if limitsAge[0] == 2: # all adult
+			str1 = " man" if group.size() == 1 else " men"
+		elif bool(randi() % 2):
+			str1 = " boy" if group.size() == 1 else " boys"
+		elif limitsAge[1] == 0: # all child
+			str1 = " child" if group.size() == 1 else " children"
+		elif limitsAge[0] == limitsAge[1]: # all teen
+			str1 = " teen" if group.size() == 1 else " teens"
+		else: # more than 1 age
+			str1 = " boys"
+	elif areAllAttrib_NE_val(group, C_SEX, C_MALE):
+		if limitsAge[0] == 2: # all adult
+			str1 = " woman" if group.size() == 1 else " women"
+		elif bool(randi() % 2):
+			str1 = " girl" if group.size() == 1 else " girls"
+		elif limitsAge[1] == 0: # all child
+			str1 = " child" if group.size() == 1 else " children"
+		elif limitsAge[0] == limitsAge[1]: # all teen
+			str1 = " teen" if group.size() == 1 else " teens"
+		else: # more than 1 age
+			str1 = " girls"
+	else:
+		if limitsAge[1] == 0: # all child
+			str1 = " child" if group.size() == 1 else " children"
+		elif limitsAge[1] == 1 && limitsAge[0] == 1: # all teen
+			str1 = " teen" if group.size() == 1 else " teens"
+			
+	if str1 != null:
+		if randf() < 0.3:
+			return str1
+		var temp1 = racenames[ group[0][C_PERSON][C_RACE] ]
+		var temp2 = temp1[C_SINGLE]
+		for i in range(1,group.size()):
+			if temp2 != racenames[ group[i][C_PERSON][C_RACE] ][C_SINGLE]:
+				temp1 = null
+				break	
+		if temp1: # all same race
+			if group.size() > 1 && randf() < 0.5:
+				return temp1[C_PLURAL]
 			else:
-				array1 += ['pretty','beautiful']
-		#size
-		if mp.height in ['petite','shortstack']:
-			array1 += ["tiny","small","little","pint-sized","diminutive"]
-		elif mp.height in ['tall', 'towering']:
-			array1 += ["giant","large","big","tall"]
-		#personality
-		if mp.charm > 60:
-			if mp.age in ['child','teen']:
-				array1 += ['adorable','cute']
-			if mp.age in ['adult','teen']:
-				array1 += ['charming','enchanting','captivating']
-		if mp.cour < 40:
-			array1 += ['shy','meek']
-		if mp.wit > 80:
-			array1 += ['clever']
-		if mp.conf > 65:
-			array1 += ['proud','haughty']
-		if i.lust > 300:
-			array1 += ['horny', 'excited']
-		#boy/girl
-		if mp.sex == 'male':
-			if mp.age == 'adult':
-				boygirl = 'man' if group.size() == 1 else 'men'
-				if group.size() >= 2:
-					boygirl = 'boy' if group.size() == 1 else 'boys'
-			else:
-				boygirl = 'boy' if group.size() == 1 else 'boys'
+				return temp2 + str1
 		else:
-			if mp.age == 'adult':
-				boygirl = 'woman' if group.size() == 1 else 'women'
-				if group.size() >= 2:
-					boygirl = 'girl' if group.size() == 1 else 'girls'
+			return str1
+	return null
+
+
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeSexRacePos(group):
+	var str1 = null
+	var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+	if areAllAttrib_E_val(group, C_SEX, C_MALE):
+		if limitsAge[0] == 2: # all adult
+			str1 = " man's" if group.size() == 1 else " men's"
+		elif bool(randi() % 2):
+			str1 = " boy's" if group.size() == 1 else " boys'"
+		elif limitsAge[1] == 0: # all child
+			str1 = " child's" if group.size() == 1 else " children's"
+		elif limitsAge[0] == limitsAge[1]: # all teen
+			str1 = " teen's" if group.size() == 1 else " teens'"
+		else: # more than 1 age
+			str1 = " boys'"
+	elif areAllAttrib_NE_val(group, C_SEX, C_MALE):
+		if limitsAge[0] == 2: # all adult
+			str1 = " woman's" if group.size() == 1 else " women's"
+		elif bool(randi() % 2):
+			str1 = " girl's" if group.size() == 1 else " girls'"
+		elif limitsAge[1] == 0: # all child
+			str1 = " child's" if group.size() == 1 else " children's"
+		elif limitsAge[0] == limitsAge[1]: # all teen
+			str1 = " teen's" if group.size() == 1 else " teens'"
+		else: # more than 1 age
+			str1 = " girls'"
+	else:
+		if limitsAge[1] == 0: # all child
+			str1 = " child's" if group.size() == 1 else " children's"
+		elif limitsAge[1] == 1 && limitsAge[0] == 1: # all teen
+			str1 = " teen's" if group.size() == 1 else " teens'"
+			
+	if str1 != null:
+		if randf() < 0.3:
+			return str1
+		var temp1 = racenames[ group[0][C_PERSON][C_RACE] ]
+		var temp2 = temp1[C_SINGLE]
+		for i in range(1,group.size()):
+			if temp2 != racenames[ group[i][C_PERSON][C_RACE] ][C_SINGLE]:
+				temp1 = null
+				break	
+		if temp1: # all same race
+			if randf() < 0.5:
+				if group.size() > 1:
+					return temp1[C_PLURALPOS]
+				else:
+					return temp1[C_SINGLEPOS]
 			else:
-				boygirl = 'girl' if group.size() == 1 else 'girls'
-		array2 += [boygirl]
-		#race
-		for i in racenames:
-			if i == mp.race:
-				array2 += [racenames[i].single + ' ' + boygirl]
-				if group.size() >= 2:
-					array2 += [racenames[i].plural]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
+				return temp2 + str1
 		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#assures correct return values
-	if marray1 == []:
-		if marray2 == []:
+			return str1
+	return null
+
+
+func partner(group, groupNum):
+	if group.size() == 1 && groupNum == playerGroup:
+		return "you"
+
+	var str1 = null
+	var options = range(6)
+	options.shuffle()
+	for i in options:
+		if i < 3:
+			if i == 0:
+				str1 = describeFemininity(group)
+			elif i == 1:
+				str1 = describePreg(group)
+			else:
+				str1 = describeAge(group)
+		else:
+			if i == 3:
+				str1 = describeBeauty(group)
+			elif i == 4:
+				str1 = describeSize(group)
+			else:
+				str1 = describePersonality(group)
+		if str1 != null:
+			break
+	var str2 = describeSexRace(group)
+
+	if str1 == null:
+		if str2 == null:
 			return "the diverse group"
 		else:
-			return "the " + getrandomfromarray(marray2)
-	elif marray2 == []:
-		return "the " + getrandomfromarray(marray1) + " group"
+			return "the" + str2
+	elif str2 == null:
+		return "the " + str1 + " group"
 	else:
-		return "the " + getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+		return "the " + str1 + str2
 
 
-func partners(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	var boygirl = ''
-	for i in group:
-		if i.person == globals.player && group.size() == 1:
-			return "your"
-		var mp = i.person
-		array1 = []
-		array2 = []
-		var thick = thickness(mp)
-		#feminity descriptors
-		if mp.titssize == 'masculine':
-			array1 += ["muscular","toned"]
-		elif thick < 3:
-			array1 += ["dainty","delicate","slim","petite"]
-		elif thick < 5:
-			array1 += ["healthy","shapely"]
-		elif thick < 7:
-			array1 += ["healthy","shapely","sensuous","curvaceous","buxom"]
-		else:
-			array1 += ["sensuous","curvaceous","buxom","voluptuous","bombastic","meaty"]
-		#body
-		if mp.preg.duration > 1:
-			array1 += ["pregnant","gravid"]
-		#age
-		if mp.age == 'child':
-			array1 += ["young","adolescent"]
-			array2 += ["child's"] if group.size() == 1 else ["childrens'"]
-		elif mp.age == 'teen':
-			array1 += ['young']
-			array2 += ["teen's"] if group.size() == 1 else ["teens'"]
-		else:
-			array1 += ['mature', 'adult']
-		#beauty
-		if mp.beauty_get() >= 50:
-			array1 += ['attractive']
-			if mp.sex == 'male':
-				array1 += ['handsome']
-			elif mp.age == 'child':
-				array1 += ['cute','pretty']
-			elif mp.age == 'teen':
-				array1 += ['cute','pretty','beautiful']
+func partners(group, groupNum):
+	if group.size() == 1 && groupNum == playerGroup:
+		return "your"
+
+	var str1 = null
+	var options = range(6)
+	options.shuffle()
+	for i in options:
+		if i < 3:
+			if i == 0:
+				str1 = describeFemininity(group)
+			elif i == 1:
+				str1 = describePreg(group)
 			else:
-				array1 += ['pretty','beautiful']
-		#size
-		if mp.height in ['petite','shortstack']:
-			array1 += ["tiny","small","little","pint-sized","diminutive"]
-		elif mp.height in ['tall', 'towering']:
-			array1 += ["giant","huge","large","big","tall"]
-		#personality
-		if mp.charm > 60:
-			if mp.age in ['child','teen']:
-				array1 += ['adorable','cute']
-			if mp.age in ['adult','teen']:
-				array1 += ['charming','enchanting','captivating']
-		if mp.cour < 40:
-			array1 += ['shy','meek']
-		if mp.wit > 80:
-			array1 += ['clever']
-		if mp.conf > 65:
-			array1 += ['proud','haughty']
-		if i.lust > 300:
-			array1 += ['horny', 'excited']
-		#boy/girl
-		if mp.sex == 'male':
-			if mp.age == 'adult':
-				boygirl = "man's" if group.size() == 1 else "men's"
-				if group.size() >= 2:
-					boygirl = "boy's" if group.size() == 1 else "boys'"
-			else:
-				boygirl = "boy's" if group.size() == 1 else "boys'"
+				str1 = describeAge(group)
 		else:
-			if mp.age == 'adult':
-				boygirl = "woman's" if group.size() == 1 else "women's"
-				if group.size() >= 2:
-					boygirl = "girl's" if group.size() == 1 else "girls'"
+			if i == 3:
+				str1 = describeBeauty(group)
+			elif i == 4:
+				str1 = describeSize(group)
 			else:
-				boygirl = "girl's" if group.size() == 1 else "girls'"
-		array2 += [boygirl]
-		#race
-		for i in racenames:
-			if i == mp.race:
-				array2 += [racenames[i].single + ' ' + boygirl]
-				if group.size() >= 2:
-					array2 += [racenames[i].pluralpos]
-				else:
-					array2 += [racenames[i].singlepos]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
-		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#assures correct return values
-	if marray1 == []:
-		if marray2 == []:
+				str1 = describePersonality(group)
+		if str1 != null:
+			break
+	var str2 = describeSexRace(group)
+	
+	if str1 == null:
+		if str2 == null:
 			return "the diverse group's"
 		else:
-			return "the " + getrandomfromarray(marray2)
-	elif marray2 == []:
-		return "the " + getrandomfromarray(marray1) + " group's"
+			return "the" + str2
+	elif str2 == null:
+		return "the " + str1 + " group's"
 	else:
-		return "the " + getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+		return "the " + str1 + str2
+
+
+var descAge2 = ["youthful","immature"] # only children
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeAge2(group):
+	var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+	if limitsAge[0] == 2: # [2] to [2]
+		if areAllAttrib_E_val(group, C_SEX, C_MALE):
+			return "manly"
+		elif bool(randi() % 2) && areAllAttrib_NE_val(group, C_SEX, C_MALE):
+			return "womanly"
+		else:
+			return "mature"
+	elif limitsAge[1] == 1: # [0,1] to [1]
+		return "youthful"
+	elif limitsAge[1] == 0: # [0] to [0]
+		return getRandStr(descAge2)
+	return null
+
+
+var descBeauty2 = [
+	["alluring","enticing"], # child or male
+	["alluring","enticing","ravishing","seductive"], # not child and not male
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeBeauty2(group):
+	if !areAllAttrib_GE_val(group, 'beauty', 50):
+		return null
+	if areAllAttrib_NE_val(group, C_SEX, C_MALE) && areAllAttrib_NE_val(group, C_AGE, C_CHILD):
+		return getRandStr(descBeauty2[1])
+	return getRandStr(descBeauty2[0])
+
+var descBodyType = [
+	["transparent","squishy","gelatinous"], # bodyshape: jelly
+	["long","serpentine"], # bodyshape: halfsnake
+	["furry","fluffy","fur-covered"], # skincov: full_body_fur
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeBodyType(group):
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'jelly'):
+		return getRandStr(descBodyType[0])
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'halfsnake'):
+		return getRandStr(descBodyType[1])
+	if areAllAttrib_E_val(group, C_SKINCOV, C_FULL_BODY_FUR):
+		return getRandStr(descBodyType[2])
+	return null
+
 
 func body(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	for i in group:
-		array1 = []
-		array2 = ["body"] if group.size() == 1 else ["bodies"]
-		var mp = i.person
-		var thick = thickness(mp)
-		#feminity
-		if mp.titssize == 'masculine':
-			array1 += ["muscular","toned"]
-		elif thick < 3:
-			array1 += ["dainty","delicate","slim","petite"]
-		elif thick < 5:
-			array1 += ["healthy","shapely"]
-		elif thick < 7:
-			array1 += ["healthy","shapely","sensuous","curvaceous","buxom"]
-		else:
-			array1 += ["sensuous","curvaceous","buxom","voluptuous","bombastic"]
-		#beauty
-		if mp.beauty_get() >= 50:
-			array1 += ['alluring','enticing']
-			if mp.age in ['adult','teen'] && mp.sex != 'male':
-				array1 += ['ravishing','seductive']
-		#age
-		if mp.age == 'child':
-			array1 += ["youthful","immature"]
-		elif mp.age == 'teen':
-			array1 += ["youthful"]
-		elif mp.age == 'adult':
-			if mp.sex == 'male':
-				array1 += ["manly"]
+	var str1 = null
+	var options = range(5)
+	options.shuffle()
+	for i in options:
+		if i < 2:
+			if i == 0:
+				str1 = describeFemininity(group)
 			else:
-				array1 += ["womanly","mature"]
-		#size
-		if mp.height in ['petite','shortstack']:
-			array1 += ["tiny","small","little"]
-		elif mp.height in ['tall','towering']:
-			array1 += ["giant","huge","large"]
-		#bodytype
-		if mp.bodyshape == 'jelly':
-			array1 += ["transparent","squishy","gelatinous"]
-		if mp.bodyshape == 'halfsnake':
-			array1 += ["long","serpentine"]
-		elif mp.skincov == 'full_body_fur':
-			array1 += ["furry","fluffy","fur-covered"]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
+				str1 = describeBeauty2(group)
 		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#30% of time do not use descriptors
-	if  randf() < 0.5 || marray1 == []:
-		return getrandomfromarray(marray2)
-	else:
-		return getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+			if i == 2:
+				str1 = describeAge2(group)
+			elif i == 3:
+				str1 = describeSize(group)
+			else:
+				str1 = describeBodyType(group)
+				
+		if str1 != null:
+			break
+	var str2 = "body" if group.size() == 1 else "bodies"
 
+	#30% of time do not use descriptors
+	if str1 == null || randf() < 0.3:
+		return str2
+	else:
+		return str1 + " " + str2
+
+
+var descPenisSize = [
+	["tiny","small","petite"], # size: [0] to [0]
+	["tiny","small","petite","immature"], # size: [0] to [0], child
+	["average-sized","decently-sized"], # size: [1] to [1]
+	["average-sized","decently-sized","well-developed","adult-like"], # size: [1] to [1], child
+	["big","sizeable","thick","girthy","impressively large"], # size: [2] to [2]
+	["big","sizeable","thick","girthy","impressively large","overgrown","surprisingly large"], # size: [2] to [2], child
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePenis(group):
+	var limitsPenis = getAttribLimits(group, 'penis', refGenitaliaArray)
+	if limitsPenis[0] == limitsPenis[1]:
+		return getRandStr( descPenisSize[ clamp(limitsPenis[0],0,2) * 2 + int(areAllAttrib_E_val(group, C_AGE, C_CHILD)) ])
+	return null
+
+
+var descPenisType = [
+	[ null ], # penisType: human
+	["knotted","tapered"], # penisType: canine
+	["barbed"], # penisType: feline
+	["flared","long"], # penisType: equine
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePenisType(group):
+	var limitsPenis = getAttribLimits(group, 'penistype', refPenisTypeArray)
+	if limitsPenis[0] != 0 && limitsPenis[0] == limitsPenis[1]:
+		return getRandStr(descPenisType[ limitsPenis[0] ])
+	return null
+
+
+var descPenis = [
+	["strap-on","shaft"], # no penis singular nouns
+	["strap-ons","shafts"], # no penis plural nouns
+	["cock","dick","penis","shaft"], # penis singular nouns
+	["cocks","dicks","penises","shafts"], # penis plural nouns
+	["cock","dick","penis","shaft","manhood"], # only male penis singular nouns
+	["cocks","dicks","penises","shafts","manhoods"], # only male penis plural nouns
+	["cock","dick","penis","shaft","manhood","horse cock","horse dick"], # only male horse penis singular nouns
+	["cocks","dicks","penises","shafts","manhoods","horse cocks","horse dicks"], # only male horse penis plural nouns
+]
 func penis(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	for i in group:
-		array1 = []
-		array2 = ['cock','dick','penis','shaft'] if group.size() == 1 else ['cocks','dicks','penises','shafts']
-		var mp = i.person
-		#size/age descriptors
-		if mp.penis == 'small':
-			array1 += ["tiny","small","petite"]
-			if mp.age == 'child':
-				array1 += ["immature"]
-		elif mp.penis == 'average':
-			array1 += ["average-sized","decently-sized"]
-			if mp.age == 'child':
-				array1 += ["well-developed","adult-like"]
-		elif mp.penis == 'big':
-			array1 += ["big","sizeable","thick","girthy","impressively large"]
-			if mp.age == 'child':
-				array1 += ["overgrown","surprisingly large"]
-		#penistype descriptors
-		if mp.penistype == 'feline':
-			array1 += ['barbed']
-		elif mp.penistype == 'canine':
-			array1 += ['knotted','tapered']
-		elif mp.penistype == 'equine':
-			array1 += ['flared','long']
-			array2 += ['horse cock','horse dick']
-		#other descriptors
-		if mp.penis == 'none':
-			array2 = ['strap-on','shaft'] if group.size() == 1 else ['strap-ons','shafts']
-		elif mp.sex == 'male':
-			array2 += ['manhood'] if group.size() == 1 else ['manhoods']
-		elif mp.sex == 'futanari':
-			array1 += ['futa']
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
+	var str1 = null
+	var options = range(3)
+	options.shuffle()
+	for i in options:
+		if i == 0:
+			str1 = describePenis(group)
+		elif i == 1:
+			str1 = describePenisType(group)
+		elif areAllAttrib_E_val(group, C_SEX, 'futanari'):
+			str1 = "futa"
+				
+		if str1 != null:
+			break
+	var str2
+	if areAllAttrib_NE_val(group, 'penis', 'none'):
+		if areAllAttrib_E_val(group, C_SEX, C_MALE):
+			if areAllAttrib_E_val(group, 'penistype', 'equine'):
+				str2 = getRandStr(descPenis[6] if group.size() == 1 else descPenis[7])
+			else:
+				str2 = getRandStr(descPenis[4] if group.size() == 1 else descPenis[5])
 		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#30% of time do not use descriptors
-	if  randf() < 0.3 || marray1 == []:
-		return getrandomfromarray(marray2)
+			str2 = getRandStr(descPenis[2] if group.size() == 1 else descPenis[3])
+	elif areAllAttrib_E_val(group, 'penis', 'none'):
+		str2 = getRandStr(descPenis[0] if group.size() == 1 else descPenis[1])
 	else:
-		return getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+		str2 = "shaft" if group.size() == 1 else "shafts"
+
+	#30% of time do not use descriptors
+	if str1 == null || randf() < 0.3:
+		return str2
+	else:
+		return str1 + " " + str2
 
 
+var descPussyAge = [
+	["childish","immature","girlish","youthful","undeveloped"], # ages: [0] to [0]
+	["girlish","youthful"], # ages: [0] to [1]
+	["girlish","youthful","developing"], # ages: [1] to [1]
+	["womanly","mature","developed"], # ages: [2] to [2]
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePussyAge(group):
+	var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+	if limitsAge[0] == 2: # [2] to [2]
+		return getRandStr(descPussyAge[3])
+	elif limitsAge[1] == 0: # [0] to [0]
+		return getRandStr(descPussyAge[0])
+	elif limitsAge[1] == 1:
+		if limitsAge[0] == 0: # [0] to [1]
+			return getRandStr(descPussyAge[1])
+		else: # [1] to [1]
+			return getRandStr(descPussyAge[2])
+	return null
+
+
+var descPussyLube = ["wet","slick","dripping"]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePussyLube(group):
+	for member in group:
+		if member.lube <= 5:
+			return null
+	return getRandStr(descPussyLube)
+
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePussyFertile(group):
+	for member in group:
+		if !member[C_PERSON][C_PREG][C_HAS_WOMB] || member[C_PERSON][C_PREG][C_DURATION] > 0:
+			return null
+	return "fertile"
+
+
+var descPubicHair = [
+	["smooth","hairless","pubeless","bald"], # no pubic hair and child
+	["hairless","pubeless"], # no pubic hair and mixed age
+	["smoothly shaved","hairless","pubeless","shaved"], # no pubic hair and not child
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describePubicHair(group):
+	if areAllAttrib_NE_val(group, 'pubichair', 'clean'):
+		var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+		if limitsAge[0] == 1: # [1,2] to [1,2]
+			return getRandStr(descPubicHair[2])
+		elif limitsAge[1] == 0: # [0] to [0]
+			return getRandStr(descPubicHair[0])
+		else: # [0] to [1,2]
+			return getRandStr(descPubicHair[1])
+	return null
+
+var descPussy = [
+	["virgin","virginal","unused"], # virgin vagina
+	["muscular","horse","horse"], # all halfhorse
+]
+var pussyNouns = [
+	["vagina","pussy","cunt"], # singular noun with halfhorses
+	["vaginas","pussies","cunts"], # plural noun with halfhorses
+	["vagina","pussy","cunt","slit"], # singular noun without halfhorses
+	["vaginas","pussies","cunts","slits"], # plural noun without halfhorses
+]
 func pussy(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	for i in group:
-		array1 = []
-		array2 = ["vagina","pussy","cunt"] if group.size() == 1 else ["vaginas","pussies","cunts"]
-		var mp = i.person
-		#body
-		if i.lube > 5:
-			array1 += ["wet","slick","dripping"]
-		if mp.preg.has_womb == true && mp.preg.duration == 0:
-			array1 += ["fertile"]
-		if mp.vagvirgin == true:
-			array1 += ["virgin","virginal","unused"]
-		if mp.pubichair == 'clean':
-			if mp.age == 'child':
-				array1 += ["smooth","hairless","pubeless","bald"]
-			else:
-				array1 += ["smoothly shaved","hairless","pubeless","shaved"]
-		#age
-		if mp.age == 'child':
-			array1 += ["childish","immature","girlish","youthful","undeveloped"]
-		elif mp.age == 'teen':
-			array1 += ["girlish","youthful","developing"]
+	var str1 = null
+	var options = range(6)
+	options.shuffle()
+	for i in options:
+		if i == 0:
+			str1 = describePussyAge(group)
+		elif i == 1:
+			str1 = describePussyLube(group)
+		elif i == 2:
+			str1 = describePussyFertile(group)
+		elif i == 3:
+			if areAllAttrib_E_val(group, 'vagvirgin', true):
+				str1 = getRandStr(descPussy[0])
+		elif i == 4:
+			str1 = describePubicHair(group)
 		else:
-			array1 += ["womanly","mature","developed"]
-		#race
-		if mp.bodyshape == 'halfhorse':
-			array1 += ["muscular","horse","horse"]
-		else:
-			array2 += ["slit"] if group.size() == 1 else ["slits"]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
-		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#30% of time do not use descriptors
-	if  randf() < 0.3 || marray1 == []:
-		return getrandomfromarray(marray2)
+			if areAllAttrib_E_val(group, C_BODYSHAPE, C_HALFHORSE):
+				str1 = getRandStr(descPussy[1])
+
+		if str1 != null:
+			break
+	var str2
+	if areAllAttrib_NE_val(group, C_BODYSHAPE, C_HALFHORSE):
+		str2 = getRandStr(pussyNouns[2] if group.size() == 1 else pussyNouns[3])
 	else:
-		return getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+		str2 = getRandStr(pussyNouns[0] if group.size() == 1 else pussyNouns[1])
 
-func labia(member):
-	var array = ["labia","pussy lips","genitals","folds"]
-	return getrandomfromarray(array)
+	#30% of time do not use descriptors
+	if str1 == null || randf() < 0.3:
+		return str2
+	else:
+		return str1 + " " + str2
 
+
+var descLabia = ["labia","pussy lips","genitals","folds"]
+func labia(group):
+	if group.size() > 1:
+		return "labia"
+	return getRandStr(descLabia)
+
+
+var descAssSizeAgeKeys = [
+	[], # masculine child
+	[], # masculine teen
+	[], # masculine adult
+	["flat","compact","tiny","developing","undeveloped","immature"], # flat child
+	["flat","compact","tiny","developing","childlike"], # flat teen
+	["flat","compact"], # flat adult
+	["small","compact","undeveloped","immature"], # small child
+	["small","compact","developing"], # small teen
+	["small","compact"], # small adult
+	["round","well-rounded","shapely","well-developed","impressively large"], # average child
+	["round","well-rounded","shapely","well-developed"], # average teen
+	["round","well-rounded","shapely"], # average adult
+	["big","sizeable","plump","hefty","overgrown","surprisingly large"], # big child
+	["big","sizeable","plump","hefty","well-developed","impressively large"], # big teen
+	["big","sizeable","plump","hefty"], # big adult
+	["huge","massive","fat","meaty","gigantic","enormous","overgrown","shockingly large"], # huge child
+	["huge","massive","fat","meaty","gigantic","enormous","well-developed","surprisingly large"], # huge teen
+	["huge","massive","fat","meaty","gigantic","enormous"], # huge adult
+]
+var descAssSizeAgeConvert = []
+# tries to pick a descriptor that applies to the entire group, else returns null
+# due to the complex overlaps of descriptor sets, this function uses the intersection of sets to create the set that applies to the entire group.
+# to speed up the process, descAssSizeAgeConvert will store the unique descriptors and descAssSizeAgeKeys will be converted to the indexes of the descriptors found in descAssSizeAgeConvert.
+func describeAssSizeAge(group):
+	var refKeys
+	var curSet = null
+	for member in group:
+		refKeys = descAssSizeAgeKeys[ clamp(refSizeArray.find(member[C_PERSON][C_ASSSIZE]),0,5) * 3 + refAgesArray.find(member[C_PERSON][C_AGE]) ]
+		if curSet == null:
+			curSet = refKeys # store ref as arrays are not mutated
+		if curSet.empty():
+			return null
+		else:
+			curSet = getIntersection(curSet, refKeys)
+	if curSet.empty():
+		return null
+	else:
+		return descAssSizeAgeConvert[ curSet[randi()%curSet.size()] ]
+
+
+var descAssBodyType = [
+	["gelatinous","slimy","gooey"], # bodyshape: jelly
+	["equine","hairy"], # bodyshape: halfhorse
+	["chitinous","spider"], # bodyshape: halfspider
+	["furry","hairy"], # skincov: full_body_fur
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeAssBodyType(group):
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'jelly'):
+		return getRandStr(descAssBodyType[0])
+	if areAllAttrib_E_val(group, C_BODYSHAPE, C_HALFHORSE):
+		return getRandStr(descAssBodyType[1])
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'halfspider'):
+		return getRandStr(descAssBodyType[2])
+	if areAllAttrib_E_val(group, C_SKINCOV, C_FULL_BODY_FUR):
+		return getRandStr(descAssBodyType[3])
+	return null
+
+
+var descBeauty3 = [
+	["cute","cute","flawless","perfect"], # ages: [0] to [0]
+	["cute","flawless","perfect"], # ages: [0] to [1]
+	["flawless","perfect"], # ages: [0] to [2]
+	["cute","beautiful","flawless","perfect"], # ages: [1] to [1]
+	["beautiful","flawless","perfect"], # ages: [1] to [2]
+	["seductive","beautiful","flawless","perfect"], # ages: [2] to [2]
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeBeauty3(group):
+	if areAllAttrib_GE_val(group, 'beauty', 50):
+		var limitsAge = getAttribLimits(group, C_AGE, refAgesArray)
+		if limitsAge[0] == 2: # [2] to [2]
+			return getRandStr(descBeauty3[5])
+		elif limitsAge[0] == 1:
+			if limitsAge[1] == 2: # [1] to [2]
+				return getRandStr(descBeauty3[4])
+			else: # [1] to [1]
+				return getRandStr(descBeauty3[3])
+		else:
+			if limitsAge[1] == 2: # [0] to [2]
+				return getRandStr(descBeauty3[2])
+			elif limitsAge[1] == 1: # [0] to [1]
+				return getRandStr(descBeauty3[1])
+			else: # [0] to [0]
+				return getRandStr(descBeauty3[0])
+	return null
+
+
+var descAssNouns = [
+	["ass","butt","backside","rear"],
+	["asses","butts","backsides","rears"],
+	["ass","butt","backside","rear","hindquarters"],
+	["asses","butts","backsides","rears","hindquarters"],
+	["abdomen","butt"],
+	["abdomens","butts"],
+]
 func ass(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	for i in group:
-		array1 = []
-		array2 = ["ass","butt","backside","rear"] if group.size() == 1 else ["asses","butts","backsides","rears"]
-		var mp = i.person
-		#size/age descriptors
-		if mp.asssize == 'flat':
-			array1 += ["flat","compact"]
-			if mp.age == 'teen':
-				array1 += ["tiny","developing","childlike"]
-			elif mp.age == 'child':
-				array1 += ["tiny","developing","undeveloped","immature"]
-		elif mp.asssize == 'small':
-			array1 += ["small","compact"]
-			if mp.age == 'teen':
-				array1 += ["developing"]
-			elif mp.age == 'child':
-				array1 += ["undeveloped","immature"]
-		elif mp.asssize == 'average':
-			array1 += ["round","well-rounded","shapely"]
-			if mp.age == 'teen':
-				array1 += ["well-developed"]
-			elif mp.age == 'child':
-				array1 += ["well-developed","impressively large"]
-		elif mp.asssize == 'big':
-			array1 += ["big","sizeable","plump","hefty"]
-			if mp.age == 'teen':
-				array1 += ["well-developed","impressively large"]
-			elif mp.age == 'child':
-				array1 += ["overgrown","surprisingly large"]
-		elif mp.asssize == 'huge':
-			array1 += ["huge","massive","fat","meaty","gigantic","enormous"]
-			if mp.age == 'teen':
-				array1 += ["well-developed","surprisingly large"]
-			elif mp.age == 'child':
-				array1 += ["overgrown","shockingly large"]
-		#bodytype descriptors
-		if mp.bodyshape == 'jelly':
-			array1 += ["gelatinous","slimy","gooey"]
-		elif mp.bodyshape == 'halfhorse':
-			array1 += ["equine","hairy"]
-			array2 += ["hindquarters"]
-		elif mp.bodyshape == 'halfspider':
-			array1 += ["chitinous","spider"]
-			array2 = ["abdomen","butt"] if group.size() == 1 else ["abdomens","butts"]
-		elif mp.skincov == 'full_body_fur':
-			array1 += ["furry","hairy"]
-		#beauty descriptors
-		if mp.beauty_get() >= 50:
-			if mp.age == 'child':
-				array1 += ["cute","cute","flawless","perfect"]
-			elif mp.age == 'teen':
-				array1 += ["cute","beautiful","flawless","perfect"]
-			else:
-				array1 += ["seductive","beautiful","flawless","perfect"]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
+	var str1 = null
+	var options = range(3)
+	options.shuffle()
+	for i in options:
+		if i == 0:
+			str1 = describeAssSizeAge(group)
+		elif i == 1:
+			str1 = describeAssBodyType(group)
 		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#30% of time do not use descriptors
-	if  randf() < 0.3 || marray1 == []:
-		return getrandomfromarray(marray2)
+			str1 = describeBeauty3(group)
+
+		if str1 != null:
+			break
+	var str2
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'halfspider'):
+		str2 = getRandStr(descAssNouns[4] if group.size() == 1 else descAssNouns[5])
+	elif areAllAttrib_E_val(group, C_BODYSHAPE, C_HALFHORSE):
+		str2 = getRandStr(descAssNouns[2] if group.size() == 1 else descAssNouns[3])
 	else:
-		return getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+		str2 = getRandStr(descAssNouns[0] if group.size() == 1 else descAssNouns[1])
+
+	#30% of time do not use descriptors
+	if str1 == null || randf() < 0.3:
+		return str2
+	else:
+		return str1 + " " + str2
+
+var maleAssSizes = ['masculine','flat','small']
+var descHipsSizeAgeKeys = [
+	["trim","slim"], # masculine child
+	["trim","slim"], # masculine teen
+	["trim","slim"], # masculine adult
+	["slim","slender","petite","tiny"], # flat child
+	["slim","slender","petite","tiny"], # flat teen
+	["slim","slender","petite","tiny"], # flat adult
+	["slim","slender","svelte","small"], # small child
+	["slim","slender","svelte","small"], # small teen
+	["slim","slender","svelte","small"], # small adult
+	["curved","shapely","well-developed","impressively thick"], # average child
+	["curved","shapely","well-developed"], # average teen
+	["curved","shapely"], # average adult
+	["sizeable","ample","wide","thick","curvaceous","overgrown","surprisingly thick"], # big child
+	["sizeable","ample","wide","thick","curvaceous","well-developed","impressively thick"], # big teen
+	["sizeable","ample","wide","thick","curvaceous"], # big adult
+	["huge","massive","enormous","wide","thick","curvaceous","overgrown","shockingly thick"], # huge child
+	["huge","massive","enormous","wide","thick","curvaceous","well-developed","surprisingly thick"], # huge teen
+	["huge","massive","enormous","wide","thick","curvaceous"], # huge adult
+]
+var descHipsSizeAgeConvert = []
+# tries to pick a descriptor that applies to the entire group, else returns null
+# due to the complex overlaps of descriptor sets, this function uses the intersection of sets to create the set that applies to the entire group.
+# to speed up the process, descAssSizeAgeConvert will store the unique descriptors and descAssSizeAgeKeys will be converted to the indexes of the descriptors found in descAssSizeAgeConvert.
+func describeHipsSizeAge(group):
+	var refKeys
+	var curSet = null
+	for member in group:
+		if member[C_PERSON][C_SEX] == 'male' && member[C_PERSON][C_ASSSIZE] in maleAssSizes:
+			refKeys = descHipsSizeAgeKeys[2]
+		else:
+			refKeys = descHipsSizeAgeKeys[ clamp(refSizeArray.find(member[C_PERSON][C_ASSSIZE]),1,5) * 3 + refAgesArray.find(member[C_PERSON][C_AGE]) ]
+		if curSet == null:
+			curSet = refKeys # store ref as arrays are not mutated
+		if curSet.empty():
+			return null
+		else:
+			curSet = getIntersection(curSet, refKeys)
+	if curSet.empty():
+		return null
+	else:
+		return descHipsSizeAgeConvert[ curSet[randi()%curSet.size()] ]
+
+
+var descHipsBodyType = [
+	["equine","hairy"], # bodyshape: halfhorse
+	["furry","hairy"], # skincov: full_body_fur
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeHipsBodyType(group):
+	if areAllAttrib_E_val(group, C_BODYSHAPE, C_HALFHORSE):
+		return getRandStr(descAssBodyType[0])
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'halfsnake'):
+		return "scaly"
+	if areAllAttrib_E_val(group, C_SKINCOV, C_FULL_BODY_FUR):
+		return getRandStr(descAssBodyType[1])
+	return null
+
 
 #only to be used in specific contexts to avoid description bloat
 #not a replacement for "hips"
 func hips(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	for i in group:
-		array1 = []
-		array2 = ["hips"]
-		var mp = i.person
-		#size/age descriptors
-		if mp.sex == 'male' && mp.asssize in ['flat','small']:
-			array1 += ["trim","slim"]
-		elif mp.asssize == 'flat':
-			array1 += ["slim","slender","petite","tiny"]
-		elif mp.asssize == 'small':
-			array1 += ["slim","slender","svelte","small"]
-		elif mp.asssize == 'average':
-			array1 += ["curved","shapely"]
-			if mp.age == 'teen':
-				array1 += ["well-developed"]
-			elif mp.age == 'child':
-				array1 += ["well-developed","impressively thick"]
-		elif mp.asssize == 'big':
-			array1 += ["sizeable","ample","wide","thick","curvaceous"]
-			if mp.age == 'teen':
-				array1 += ["well-developed","impressively thick"]
-			elif mp.age == 'child':
-				array1 += ["overgrown","surprisingly thick"]
-		elif mp.asssize == 'huge':
-			array1 += ["huge","massive","enormous","wide","thick","curvaceous"]
-			if mp.age == 'teen':
-				array1 += ["well-developed","surprisingly thick"]
-			elif mp.age == 'child':
-				array1 += ["overgrown","shockingly thick"]
-		#bodytype descriptors
-		if mp.bodyshape == 'halfhorse':
-			array1 += ["equine","hairy"]
-		elif mp.bodyshape == 'halfsnake':
-			array1 += ["scaly"]
-		elif mp.skincov == 'full_body_fur':
-			array1 += ["furry","hairy"]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
+	var str1 = null
+	var options = range(2)
+	options.shuffle()
+	for i in options:
+		if i == 0:
+			str1 = describeHipsSizeAge(group)
 		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
-	#30% of time do not use descriptors
-	if  randf() < 0.5 || marray1 == []:
-		return getrandomfromarray(marray2)
-	else:
-		return getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+			str1 = describeHipsBodyType(group)
 
+		if str1 != null:
+			break
+
+	#30% of time do not use descriptors
+	if str1 == null || randf() < 0.3:
+		return "hips"
+	else:
+		return str1 + " hips"
+
+
+var descTitsSizeAgeKeys = [
+	["muscular","strong","toned"], # masculine child
+	["muscular","strong","toned"], # masculine teen
+	["muscular","strong","toned"], # masculine adult
+	["flat","small","tiny","developing","undeveloped","immature"], # flat child
+	["flat","small","tiny","developing","childlike"], # flat teen
+	["flat","small"], # flat adult
+	["small","compact","undeveloped","immature"], # small child
+	["small","compact","developing"], # small teen
+	["small","compact"], # small adult
+	["round","well-rounded","shapely","well-developed","impressively large"], # average child
+	["round","well-rounded","shapely","well-developed"], # average teen
+	["round","well-rounded","shapely"], # average adult
+	["big","sizeable","plump","hefty","overgrown","surprisingly large"], # big child
+	["big","sizeable","plump","hefty","well-developed","impressively large"], # big teen
+	["big","sizeable","plump","hefty"], # big adult
+	["huge","massive","fat","meaty","gigantic","enormous","overgrown","shockingly large"], # huge child
+	["huge","massive","fat","meaty","gigantic","enormous","well-developed","surprisingly large"], # huge teen
+	["huge","massive","fat","meaty","gigantic","enormous"], # huge adult
+]
+var descTitsSizeAgeConvert = []
+# tries to pick a descriptor that applies to the entire group, else returns null
+# due to the complex overlaps of descriptor sets, this function uses the intersection of sets to create the set that applies to the entire group.
+# to speed up the process, descTitsSizeAgeConvert will store the unique descriptors and descTitsSizeAgeKeys will be converted to the indexes of the descriptors found in descTitsSizeAgeConvert.
+func describeTitsSizeAge(group):
+	var refKeys
+	var curSet = null
+	for member in group:
+		refKeys = descTitsSizeAgeKeys[ clamp(refSizeArray.find(member[C_PERSON][C_TITSSIZE]),0,5) * 3 + refAgesArray.find(member[C_PERSON][C_AGE]) ]
+		if curSet == null:
+			curSet = refKeys # store ref as arrays are not mutated
+		if curSet.empty():
+			return null
+		else:
+			curSet = getIntersection(curSet, refKeys)
+	if curSet.empty():
+		return null
+	else:
+		return descTitsSizeAgeConvert[ curSet[randi()%curSet.size()] ]
+
+
+var descTitsBodyType = [
+	["gelatinous","slimy","gooey"], # bodyshape: jelly
+	["furry","fluffy"], # skincov: full_body_fur
+]
+# tries to pick a descriptor that applies to the entire group, else returns null
+func describeTitsBodyType(group):
+	if areAllAttrib_E_val(group, C_BODYSHAPE, 'jelly'):
+		return getRandStr(descTitsBodyType[0])
+	if areAllAttrib_E_val(group, C_SKINCOV, C_FULL_BODY_FUR):
+		return getRandStr(descTitsBodyType[3])
+	return null
+
+
+var descTitsNouns = [
+	["chest","pecs"],
+	["chests","pecs"],
+	["tits","boobs","breasts","chest"],
+	["tits","boobs","breasts","chests"],
+]
 func tits(group):
-	var array1 = []
-	var array2 = []
-	var marray1 = null
-	var marray2 = null
-	var tarray = []
-	for i in group:
-		array1 = []
-		array2 = ["tits","boobs","breasts","chest"] if group.size() == 1 else ["tits","boobs","breasts","chests"]
-		var mp = i.person
-		#size/age descriptors
-		if mp.titssize == 'masculine':
-			array1 += ["muscular","strong","toned"]
-			array2 = ["chest","pecs"] if group.size() == 1 else ["chests","pecs"]
-		elif mp.titssize == 'flat':
-			array1 += ["flat","small"]
-			if mp.age == 'teen':
-				array1 += ["tiny","developing","childlike"]
-			elif mp.age == 'child':
-				array1 += ["tiny","developing","undeveloped","immature"]
-		elif mp.titssize == 'small':
-			array1 += ["small","compact"]
-			if mp.age == 'teen':
-				array1 += ["developing"]
-			elif mp.age == 'child':
-				array1 += ["undeveloped","immature"]
-		elif mp.titssize == 'average':
-			array1 += ["round","well-rounded","shapely"]
-			if mp.age == 'teen':
-				array1 += ["well-developed"]
-			elif mp.age == 'child':
-				array1 += ["well-developed","impressively large"]
-		elif mp.titssize == 'big':
-			array1 += ["big","sizeable","plump","hefty"]
-			if mp.age == 'teen':
-				array1 += ["well-developed","impressively large"]
-			elif mp.age == 'child':
-				array1 += ["overgrown","surprisingly large"]
-		elif mp.titssize == 'huge':
-			array1 += ["huge","massive","fat","meaty","gigantic","enormous"]
-			if mp.age == 'teen':
-				array1 += ["well-developed","surprisingly large"]
-			elif mp.age == 'child':
-				array1 += ["overgrown","shockingly large"]
-		#bodytype descriptors
-		if mp.bodyshape == 'jelly':
-			array1 += ["gelatinous","slimy","gooey"]
-		elif mp.skincov == 'full_body_fur':
-			array1 += ["furry","fluffy"]
-		#beauty descriptors
-		if mp.beauty_get() >= 50:
-			if mp.age == 'child':
-				array1 += ["cute","cute","flawless","perfect"]
-			elif mp.age == 'teen':
-				array1 += ["cute","beautiful","flawless","perfect"]
-			else:
-				array1 += ["seductive","beautiful","flawless","perfect"]
-		#for multiple people, only incude shared
-		if marray1 == null:
-			marray1 = array1
-			marray2 = array2
+	var str1 = null
+	var options = range(3)
+	options.shuffle()
+	for i in options:
+		if i == 0:
+			str1 = describeTitsSizeAge(group)
+		elif i == 1:
+			str1 = describeTitsBodyType(group)
 		else:
-			tarray = [] + marray1
-			for i in tarray:
-				if not array1.has(i):
-					marray1.erase(i)
-			tarray = [] + marray2
-			for i in tarray:
-				if not array2.has(i):
-					marray2.erase(i)
+			str1 = describeBeauty3(group)
+
+		if str1 != null:
+			break
+	var str2
+	if areAllAttrib_E_val(group, C_TITSSIZE, C_MASCULINE):
+		str2 = getRandStr(descTitsNouns[0] if group.size() == 1 else descTitsNouns[1])
+	elif areAllAttrib_NE_val(group, C_TITSSIZE, C_MASCULINE):
+		str2 = getRandStr(descTitsNouns[2] if group.size() == 1 else descTitsNouns[3])
+	else:
+		str2 = "chest" if group.size() == 1 else "chests"
+
 	#30% of time do not use descriptors
-	if  randf() < 0.3 || marray1 == []:
-		return getrandomfromarray(marray2)
+	if str1 == null || randf() < 0.3:
+		return str2
 	else:
-		return getrandomfromarray(marray1) + " " + getrandomfromarray(marray2)
+		return str1 + " " + str2
 
-func anus(member):
-	var array = []
-	var array2 = ["anus","asshole","butthole","rectum"]
-	if member.person.assvirgin == true:
-		array += ["virgin","virginal","unused"]
-	if member.person.age != 'adult':
-		array += ["pink","youthful"]
-	else:
-		array += ["rosy","mature"]
-	return getrandomfromarray(array) + " " + getrandomfromarray(array2)
 
-#register tickness
-func thickness(mp):
-	var thick = 0
-	if mp.titssize == 'small':
-		thick += 1
-	elif mp.titssize == 'average':
-		thick += 2
-	elif mp.titssize == 'big':
-		thick += 3
-	elif mp.titssize == 'huge':
-		thick += 4
-	if mp.asssize == 'small':
-		thick += 1
-	elif mp.asssize == 'average':
-		thick += 2
-	elif mp.asssize == 'big':
-		thick += 3
-	elif mp.asssize == 'huge':
-		thick += 4
-	return thick
+var descAnus = [
+	["virgin","virginal","unused"], # ass virgin
+	["pink","youthful"], # not adult
+	["rosy","mature"], # adult
+	["anus","asshole","butthole","rectum"], # noun singular
+	["anuses","assholes","buttholes","rectums"], # noun plural
+]
+func anus(group):
+	var str1 = null
+	if areAllAttrib_E_val(group, 'assvirgin', true):
+		str1 = getRandStr(descAnus[0])
+	if areAllAttrib_E_val(group, C_AGE, 'adult'):
+		str1 = getRandStr(descAnus[2])
+	elif areAllAttrib_NE_val(group, C_AGE, 'adult'):
+		str1 = getRandStr(descAnus[1])
+	if str1 == null:
+		return getRandStr(descAnus[4] if group.size() > 1 else descAnus[3])
+	return str1 + " " + getRandStr(descAnus[4] if group.size() > 1 else descAnus[3])
 
-func getrandomfromarray(array):
-	if array != []:
-		return array[randi()%array.size()]
-	else:
-		print("empty array passed to getrandomfromarray(array)")
+
+
+func getRandStr(array):
+	if array.empty():
 		return ""
+	return array[randi()%array.size()]
+
+# finds index of attribute value in refArray for each member of group
+# returns array: [minIdx, maxIdx] 
+func getAttribLimits(group, attrib, refArray):
+	var low = 999
+	var high = -999
+	var temp
+	for member in group:
+		temp = refArray.find(member[C_PERSON][attrib])
+		low = min(low, temp)
+		high = max(high, temp)
+	return [low, high]
+
+# check if all members of group have attribute equal to given value
+func areAllAttrib_E_val(group, attrib, value):
+	for member in group:
+		if member[C_PERSON][attrib] != value:
+			return false
+	return true
+
+# check if all members of group have attribute not equal to given value
+func areAllAttrib_NE_val(group, attrib, value):
+	for member in group:
+		if member[C_PERSON][attrib] == value:
+			return false
+	return true
+
+# check if all members of group have attribute less than given value
+func areAllAttrib_L_val(group, attrib, value):
+	for member in group:
+		if member[C_PERSON][attrib] >= value:
+			return false
+	return true
+
+# check if all members of group have attribute less than or equal to given value
+func areAllAttrib_LE_val(group, attrib, value):
+	for member in group:
+		if member[C_PERSON][attrib] > value:
+			return false
+	return true
+
+# check if all members of group have attribute greater than given value
+func areAllAttrib_G_val(group, attrib, value):
+	for member in group:
+		if member[C_PERSON][attrib] <= value:
+			return false
+	return true
+
+# check if all members of group have attribute greater than or equal to given value
+func areAllAttrib_GE_val(group, attrib, value):
+	for member in group:
+		if member[C_PERSON][attrib] < value:
+			return false
+	return true
+
+func getIntersection(array1, array2):
+	var intersection = []
+	for i in array1:
+		if array2.has(i):
+			intersection.append(i)
+	return intersection
+
+# refDescConvert will store the unique descriptors and refDescKeys will be converted to the indexes of the descriptors found in refDescConvert.
+# this function modifies the arrays passed to it by ref
+func simplifyDesc(refDescKeys, refDescConvert):
+	for i in range(refDescKeys.size()):
+		var temp = refDescKeys[i]
+		if typeof(temp) == TYPE_ARRAY:
+			for j in range(temp.size()):
+				var idx = refDescConvert.find(temp[j])
+				if idx == -1:
+					idx = refDescConvert.size()
+					refDescConvert.append(temp[j])
+				temp[j] = idx
+		elif typeof(temp) == TYPE_STRING:
+			var idx = refDescConvert.find(temp)
+			if idx == -1:
+				idx = refDescConvert.size()
+				refDescConvert.append(temp)
+			refDescKeys[i] = idx

@@ -1,6 +1,7 @@
 extends Node
 
 var state
+var isBuying = true
 var location = 'mansion'
 var filter = ''
 
@@ -32,10 +33,7 @@ func selectcategory(button):
 
 func categoryitems():
 	for i in get_node("ScrollContainer/GridContainer/").get_children() + $ScrollContainer2/GridContainer.get_children():
-		if (categories.everything == true && i.get_name() != 'Button' ) || (i.has_meta('category') && i.get_meta("category") != 'dummy' && categories[i.get_meta('category')] == true):
-			i.visible = true
-		else:
-			i.visible = false
+		i.visible = (categories.everything && i.get_name() != 'Button') || (i.has_meta('category') && categories.get(i.get_meta('category'), false))
 
 
 func open(place = 'mansion', part = 'inventory', keepslave = false):
@@ -45,6 +43,7 @@ func open(place = 'mansion', part = 'inventory', keepslave = false):
 	updateitems()
 	calculateweight()
 	get_node("mode").set_normal_texture(modetextures[state])
+	selectcategory(get_node("everything"))
 	self.visible = true
 
 func updateitems():
@@ -122,7 +121,9 @@ func itemsinventory():
 		if entryexists == false:
 			array.append([])
 			array[array.size()-1].append(i)
-		
+	
+	array.sort_custom(load("res://files/inventory.gd").new(), 'sortgear')
+
 	for i in array:
 		button = get_node("ScrollContainer/GridContainer/Button").duplicate()
 		button.visible = true
@@ -144,7 +145,7 @@ func itemsinventory():
 		elif i[0].enchant == 'unique':
 			button.get_node("Label").set('custom_colors/font_color', Color(0.6,0.4,0))
 		if i[0].icon != null:
-			button.get_node("icon").set_texture(load(i[0].icon))
+			button.get_node("icon").set_texture(globals.loadimage(i[0].icon))
 		itemgrid.add_child(button)
 
 func itemsbackpack():
@@ -189,6 +190,8 @@ func itemsbackpack():
 			array.append([])
 			array[array.size()-1].append(i)
 	
+	array.sort_custom(load("res://files/inventory.gd").new(), 'sortgear')
+
 	for i in array:
 		var price = getcost(i[0], 'sell')
 		button = get_node("ScrollContainer/GridContainer/Button").duplicate()
@@ -208,7 +211,7 @@ func itemsbackpack():
 		if i[0].enchant != '':
 			button.get_node("Label").set('custom_colors/font_color', Color(0,0.5,0))
 		if i[0].icon != null:
-			button.get_node("icon").set_texture(load(i[0].icon))
+			button.get_node("icon").set_texture(globals.loadimage(i[0].icon))
 		get_node("ScrollContainer/GridContainer").add_child(button)
 
 func itemsshop():
@@ -238,10 +241,8 @@ func itemsshop():
 		newbutton.connect("mouse_entered", globals, 'itemtooltip', [item])
 		newbutton.connect("mouse_exited", globals, 'itemtooltiphide')
 		newbutton.set_meta("category", item.type)
-		if typeof(item.icon) == TYPE_STRING:
-			newbutton.get_node("icon").set_texture(load(item.icon))
-		else:
-			newbutton.get_node("icon").set_texture(item.icon)
+		if item.icon != null:
+			newbutton.get_node("icon").set_texture(globals.loadimage(item.icon))
 		newbutton.set_meta('item', item)
 		newbutton.get_node("info").connect("pressed",self,'info',[newbutton])
 		#newbutton.connect('pressed',self,'selectshopitem', [newbutton])
@@ -258,17 +259,18 @@ func getcost(item, mode):
 				merchant = true
 		if typeof(item) == TYPE_STRING:
 			item = globals.itemdict[item]
-		if globals.itemdict[item.code].type != 'gear':
-			cost = item.cost*variables.sellingitempricemod
-			if merchant == true:
-				cost *= 1.25
-			if item.type == 'potion' && globals.state.spec == "Alchemist":
-				cost *= 2
-		else:
-			var itemtype = globals.itemdict[item.code]
-			cost = itemtype.cost*variables.sellingitempricemod
-			if item.has('enchant') && item.enchant != '':
-				cost = cost*variables.enchantitemprice
+		if globals.itemdict.has(item.code): 
+			if globals.itemdict[item.code].type != 'gear':
+				cost = item.cost*variables.sellingitempricemod
+				if merchant == true:
+					cost *= 1.25
+				if item.type == 'potion' && globals.state.spec == "Alchemist":
+					cost *= 2
+			else:
+				var itemtype = globals.itemdict[item.code]
+				cost = itemtype.cost*variables.sellingitempricemod
+				if item.has('enchant') && item.enchant != '':
+					cost = cost*variables.enchantitemprice
 	return round(cost)
 
 
@@ -297,43 +299,26 @@ func _on_inventoryclose_pressed():
 
 
 func sellitem(button):
+	isBuying = false
 	var item = button.get_meta('item')
-	var gold = button.get_meta('price')
-	globals.resources.gold += gold
-	if state == 'inventory' or (item.has('owner') && item.owner != null):
-		if item.has('id'):
-			var itemarray = button.get_meta('itemarray')
-			var tempitem = itemarray[itemarray.size()-1]
-			globals.state.unstackables.erase(tempitem.id)
-			itemarray.erase(tempitem)
-			button.get_node('number').set_text(str(itemarray.size()))
-			if itemarray.size() <= 0:
-				button.visible = false
-				button.queue_free()
-			calculateweight()
-		else:
-			item.amount -= 1
-			button.get_node('number').set_text(str(item.amount))
-			if item.amount <= 0:
-				button.visible = false
-				button.queue_free()
-	elif state == 'backpack':
-		globals.state.backpack.stackables[item.code] -= 1
-		if globals.state.backpack.stackables.has(item.code):
-			button.get_node('number').set_text(str(globals.state.backpack.stackables[item.code]))
-		else:
-			button.visible = false
-			button.queue_free()
-		calculateweight()
-	$gold.text = str(globals.resources.gold)
-
-func buyitem(button):
-	var text = ''
-	var item = button.get_meta('item')
-	text += "You will purchase [color=green]" + item.name + "[/color] for " + str(getcost(item, 'buy')) + " gold per piece. "
+	var cost = getcost(item, 'sell')
+	var text = "You will sell [color=green]" + item.name + "[/color] for " + str(cost) + " gold each. "
+	text += "\nOffer for [color=yellow]1[/color] is [color=yellow]" + str(cost) + "[/color] gold"
 	selecteditem = button
-	$amountselect.popup()
+	$amountselect/SpinBox.value = 1
 	$amountselect/RichTextLabel.bbcode_text = text
+	$amountselect.popup()
+	
+func buyitem(button):
+	isBuying = true
+	var item = button.get_meta('item')
+	var cost = getcost(item, 'buy')
+	var text = "You will purchase [color=green]" + item.name + "[/color] for " + str(cost) + " gold each. "
+	text += "\nCost for [color=yellow]1[/color] is [color=yellow]" + str(cost) + "[/color] gold"
+	selecteditem = button
+	$amountselect/SpinBox.value = 1
+	$amountselect/RichTextLabel.bbcode_text = text
+	$amountselect.popup()
 
 var selecteditem
 
@@ -341,47 +326,79 @@ func _on_confirm_pressed():
 	var amount = $amountselect/SpinBox.value
 	var price = selecteditem.get_meta('price')
 	var item = selecteditem.get_meta('item')
-	if amount*price > globals.resources.gold:
-		globals.main.infotext("Not enough gold",'red')
-		return
-	if state == 'backpack' && item.has('weight') && globals.state.calculateweight().currentweight + amount*item.weight > globals.state.calculateweight().maxweight:
-		globals.main.infotext("Not enough carry capacity",'red')
-		return
-	elif state == 'backpack' && (item.code == 'food' || (item.code.find('teleport') >= 0 && item.code != 'teleportseal')):
-		globals.main.infotext("This item can't be purchased for backpack",'red')
-		return
-	if item.type != 'gear':
-		if state != 'backpack':
-			item.amount += amount
-		else:
-			if globals.state.backpack.stackables.has(item.code):
-				globals.state.backpack.stackables[item.code] += amount
-			else:
-				globals.state.backpack.stackables[item.code] = amount
-	else:
-		var counter = amount
-		while counter >= 1:
-			var tmpitem = globals.items.createunstackable(item.code)
+	if isBuying:
+		if amount*price > globals.resources.gold:
+			globals.main.infotext("Not enough gold",'red')
+			return
+		if state == 'backpack' && item.has('weight') && globals.state.calculateweight().currentweight + amount*item.weight > globals.state.calculateweight().maxweight:
+			globals.main.infotext("Not enough carry capacity",'red')
+			return
+		elif state == 'backpack' && (item.code == 'food' || (item.code.find('teleport') >= 0 && item.code != 'teleportseal')):
+			globals.main.infotext("This item can't be purchased for backpack",'red')
+			return
+		if item.type != 'gear':
 			if state != 'backpack':
-				globals.state.unstackables[str(tmpitem.id)] = tmpitem
+				item.amount += amount
 			else:
-				globals.state.unstackables[str(tmpitem.id)] = tmpitem
-				tmpitem.owner = 'backpack'
-			counter -= 1
-			globals.main.infotext("Obtained: " + item.name, 'green')
-	if item.code in ['food'] || item.type == 'quest':
-		globals.items.call(item.effect, item)
-	elif item.code.find('teleport') >= 0 && item.code != 'teleportseal':
-		globals.items.call(item.effect, item)
-		selecteditem = null
+				if globals.state.backpack.stackables.has(item.code):
+					globals.state.backpack.stackables[item.code] += amount
+				else:
+					globals.state.backpack.stackables[item.code] = amount
+		else:
+			var counter = amount
+			while counter >= 1:
+				var tmpitem = globals.items.createunstackable(item.code)
+				if state != 'backpack':
+					globals.state.unstackables[str(tmpitem.id)] = tmpitem
+				else:
+					globals.state.unstackables[str(tmpitem.id)] = tmpitem
+					tmpitem.owner = 'backpack'
+				counter -= 1
+				globals.main.infotext("Obtained: " + item.name, 'green')
+		if item.code in ['food'] || item.type == 'quest':
+			globals.items.call(item.effect, item)
+		elif item.code.find('teleport') >= 0 && item.code != 'teleportseal':
+			globals.items.call(item.effect, item)
+			selecteditem = null
+		else:
+			globals.resources.gold -= price*amount
+		clearitems()
+		if state == 'inventory':
+			itemsinventory()
+		elif state == 'backpack':
+			calculateweight()
+			itemsbackpack()
 	else:
-		globals.resources.gold -= price*amount
-	clearitems()
-	if state == 'inventory':
-		itemsinventory()
-	elif state == 'backpack':
-		calculateweight()
-		itemsbackpack()
+		if amount > int(selecteditem.get_node('number').text):
+			globals.main.infotext("Not enough items",'red')
+			return
+		globals.resources.gold += price*amount
+		if state == 'inventory' or (item.has('owner') && item.owner != null):
+			if item.has('id'):
+				var itemarray = selecteditem.get_meta('itemarray')
+				for i in range(amount):
+					var tempitem = itemarray[itemarray.size()-1]
+					globals.state.unstackables.erase(tempitem.id)
+					itemarray.erase(tempitem)
+				selecteditem.get_node('number').set_text(str(itemarray.size()))
+				if itemarray.size() <= 0:
+					selecteditem.visible = false
+					selecteditem.queue_free()
+				calculateweight()
+			else:
+				item.amount -= amount
+				selecteditem.get_node('number').set_text(str(item.amount))
+				if item.amount <= 0:
+					selecteditem.visible = false
+					selecteditem.queue_free()
+		elif state == 'backpack':
+			globals.state.backpack.stackables[item.code] -= amount
+			if globals.state.backpack.stackables.has(item.code):
+				selecteditem.get_node('number').set_text(str(globals.state.backpack.stackables[item.code]))
+			else:
+				selecteditem.visible = false
+				selecteditem.queue_free()
+			calculateweight()
 	categoryitems()
 	$gold.text = str(globals.resources.gold)
 	$amountselect.visible = false
@@ -400,18 +417,30 @@ func _on_search_text_changed(new_text):
 	else:
 		itemsbackpack()
 
+func _on_SpinBox_value_changed(value):
+	var text = ""
+	var item = selecteditem.get_meta('item')
+	var amount = $amountselect/SpinBox.value
+	if isBuying:
+		var cost = getcost(item, 'buy')
+		text += "You will purchase [color=green]" + item.name + "[/color] for " + str(cost) + " gold each. "
+		text += "\nCost for [color=yellow]" + str(amount) + "[/color] is [color=yellow]" + str(cost*amount) + "[/color] gold"
+	else:
+		var cost = getcost(item, 'sell')
+		text += "You will sell [color=green]" + item.name + "[/color] for " + str(cost) + " gold each. "
+		text += "\nOffer for [color=yellow]" + str(amount) + "[/color] is [color=yellow]" + str(cost*amount) + "[/color] gold"
+	$amountselect/RichTextLabel.bbcode_text = text
 
 func _on_add5_pressed():
-	if $amountselect/SpinBox.value == 1:
-		$amountselect/SpinBox.value = 0
 	$amountselect/SpinBox.value += 5
 
 
 func _on_add10_pressed():
-	if $amountselect/SpinBox.value == 1:
-		$amountselect/SpinBox.value = 0
 	$amountselect/SpinBox.value += 10
 
 
 func _on_addmax_pressed():
-	$amountselect/SpinBox.value = 99
+	if isBuying:
+		$amountselect/SpinBox.value = floor(globals.resources.gold / selecteditem.get_meta('price'))
+	else:
+		$amountselect/SpinBox.value = int(selecteditem.get_node('number').text)
