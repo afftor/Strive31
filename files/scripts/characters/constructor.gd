@@ -18,9 +18,9 @@ func getage(age):
 	if globals.rules.noadults == false:
 		agearray.append('adult')
 	if age == 'random' || agearray.find(age) < 0:
-		age = agearray[rand_range(0,agearray.size())]
+		age = globals.randomfromarray(agearray)
 	if (age == 'child' && globals.rules.children == false) || (age == 'adult' && globals.rules.noadults == true):
-		age = agearray[rand_range(0,agearray.size())]
+		age = globals.randomfromarray(agearray)
 	return age
 
 
@@ -31,7 +31,7 @@ func newslave(race, age, sex, origins = 'slave'):
 	if race == 'randomcommon':
 		race = globals.getracebygroup("starting")
 	elif race == 'randomany':
-		race = globals.allracesarray[rand_range(0,globals.allracesarray.size())]
+		race = globals.randomfromarray(globals.allracesarray)
 	person.race = race
 	person.age = getage(age)
 	person.mindage = person.age
@@ -65,18 +65,23 @@ func newslave(race, age, sex, origins = 'slave'):
 			person.sexuals.actions[ii] = 0
 	person.memory = person.origins
 	person.masternoun = ''
-	if randf() < 0.05:
-		var spec = globals.specarray[rand_range(0,globals.specarray.size())]
+	if randf() < variables.specializationchance/100.0:
 		globals.currentslave = person
-		if globals.evaluate(globals.jobs.specs[spec].reqs) == true:
-			person.spec = spec
+		var possible = []
+		for i in globals.specarray:
+			if globals.evaluate(globals.jobs.specs[i].reqs.replacen("person.consent == true","true").replacen("person.loyal >= 50","true")) == true:
+				possible.append(i)
+		if possible.size() > 0:
+			person.spec = possible[randi()%possible.size()]
+			if person.spec == 'bodyguard':
+				person.add_effect(globals.effectdict.bodyguardeffect)
 	if person.age == 'child' && randf() < 0.1:
 		person.vagvirgin = false
 	elif person.age == 'teen' && randf() < 0.3:
 		person.vagvirgin = false
 	elif person.age == 'adult' && randf() < 0.65:
 		person.vagvirgin = false
-	person.health = 100
+	person.health = 1000
 	return person
 
 func changerace(person, race = null):
@@ -90,7 +95,7 @@ func changerace(person, race = null):
 		if i in ['description', 'details']:
 			continue
 		if typeof(races[personrace][i]) == TYPE_ARRAY:
-			person[i] = races[personrace][i][rand_range(0,races[personrace][i].size())]
+			person[i] = globals.randomfromarray(races[personrace][i])
 		elif typeof(races[personrace][i]) == TYPE_DICTIONARY:
 			if person.get(i) == null:
 				continue
@@ -153,7 +158,7 @@ func get_caste(person, caste):
 	spin = person.skillpoints
 	array = ['sstr','sagi','smaf','send']
 	while spin > 0:
-		var temp = array[rand_range(0, array.size())]
+		var temp = globals.randomfromarray(array)
 		if rand_range(0,100) < 50 && person.stats[globals.basestatdict[temp]] < person.stats[globals.maxstatdict[temp]]:
 			person.stats[globals.basestatdict[temp]] += 1
 			person.skillpoints -= 1
@@ -176,14 +181,41 @@ func tohalfkin(person):
 	person.skincov = 'none'
 	person.bodyshape = 'humanoid'
 
+var portraits_by_race = {}
+
+func _fill_portraits_by_race():
+	for full_race in globals.allracesarray:
+		for raceWord in full_race.split(" "):
+			portraits_by_race[raceWord] = []
+
+	var extensions = globals.imageExtensions
+	for path in globals.dir_contents(globals.setfolders.portraits):
+		if !path.get_extension() in extensions:
+			continue
+		for raceWord in portraits_by_race:
+			if path.findn(raceWord) >= 0:
+				portraits_by_race[raceWord].append(path)
+
 func randomportrait(person):
-	var array = []
-	var racenames = person.race.split(" ")
-	for i in globals.dir_contents(globals.setfolders.portraits):
-		for k in racenames:
-			if i.findn(k) >= 0:
-				array.append(i)
-				continue
-	if array.size() > 0:
-		person.imageportait = array[randi()%array.size()]
+	if portraits_by_race.empty():
+		_fill_portraits_by_race()
+
+	var count = 0
+	var raceWords = person.race.split(" ")
+	for raceWord in raceWords:
+		count += portraits_by_race[raceWord].size()
+	if count == 0:
+		return
+	count = randi() % count
 	
+	for raceWord in raceWords:
+		var newCount = count - portraits_by_race[raceWord].size()
+		if newCount < 0:
+			var path = portraits_by_race[raceWord][count]
+			person.imageportait = path
+			path = path.replace(globals.setfolders.portraits, globals.setfolders.fullbody)
+			if globals.loadimage(path) != null:
+				person.imagefull = path
+			return
+		else:
+			count = newCount

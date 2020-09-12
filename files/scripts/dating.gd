@@ -26,8 +26,7 @@ var helpdescript = {
 	mood = '[center]Mood[/center]\nA high mood increases loyalty and reduces stress after interaction is finished\nMood grows from positive interactions and decreases from negative interactions. Its also affected by loyalty.',
 	fear = '[center]Fear[/center]\nFear helps to keep obedience high for long period of time. Its built with disciplinary actions but often comes with stress. ',
 	stress = '[center]Stress[/center]\nStress accumulates from injury in combat,  poor treatment or unsanitary conditions\nHigh amounts of stress over a long period of time can reduce performance and loyalty',
-	
-	}
+}
 
 func fear_set(value):
 	var difference = value - fear
@@ -83,7 +82,7 @@ var actionsdict = {
 		reqs = 'true',
 		descript = 'Have a friendly chat',
 		effect = 'chat',
-		disablereqs = "!person.traits.has('Mute')",
+		disablereqs = "person.traits.has('Mute')",
 	},
 	intimate = {
 		group = "Actions",
@@ -91,7 +90,7 @@ var actionsdict = {
 		descript = 'Have an intimate talk',
 		reqs = 'true',
 		effect = 'intimate',
-		disablereqs = "!person.traits.has('Mute')",
+		disablereqs = "person.traits.has('Mute')",
 	},
 	touch = {
 		group = "Actions",
@@ -138,16 +137,18 @@ var actionsdict = {
 	pushdown = {
 		group = "Actions",
 		name = 'Push down',
-		descript = "Force yourself on $name",
+		descript = "Force yourself on $name. \n[color=yellow]Requires that you can interact with the slave at least 1 more time today.[/color]",
 		reqs = "true",
 		effect = 'pushdown',
+		disablereqs = "!person.canInteract()",
 	},
 	proposal = {
 		group = "Actions",
 		name = 'Request intimacy',
-		descript = "Ask $name if they would like to be intimate",
+		descript = "Ask $name if they would like to be intimate. \n[color=yellow]Requires that the slave can do 1 more interaction.[/color]",
 		reqs = "true",
 		effect = 'propose',
+		disablereqs = "!person.canInteract()",
 	},
 	praise = {
 		group = "P&P",
@@ -248,7 +249,7 @@ var actionsdict = {
 		name = "Make Gift",
 		descript = "Make a small decorative gift for $name. \n[color=yellow]Requires 10 gold.[/color]",
 		reqs = "!location == 'dungeon'",
-		disablereqs = 'globals.resources.gold >= 10',
+		disablereqs = 'globals.resources.gold < 10',
 		effect = 'gift',
 		onetime = true,
 	},
@@ -257,7 +258,7 @@ var actionsdict = {
 		name = "Buy Sweets",
 		descript = "Purchase sweets from street vendor for $name\n[color=yellow]Requires 5 gold.[/color]",
 		reqs = "location == 'town'",
-		disablereqs = 'globals.resources.gold >= 5',
+		disablereqs = 'globals.resources.gold < 5',
 		effect = 'sweets',
 		onetime = true,
 	},
@@ -266,7 +267,7 @@ var actionsdict = {
 		name = "Drink Tea",
 		descript = "Serve tea for you and $name. [color=yellow]Requires 1 supply.[/color]",
 		reqs = 'location in ["livingroom","bedroom"]',
-		disablereqs = 'globals.itemdict.supply.amount >= 1',
+		disablereqs = 'globals.itemdict.supply.amount < 1',
 		effect = 'tea',
 	},
 	wine = {
@@ -274,7 +275,7 @@ var actionsdict = {
 		name = "Drink Wine",
 		descript = "Serve wine for you and $name (Alcohol eases intimacy request but may cause a knockout). [color=yellow]Requires 2 supplies.[/color]",
 		reqs = 'location in ["livingroom","bedroom","garden","town"]',
-		disablereqs = 'globals.itemdict.supply.amount >= 2',
+		disablereqs = 'globals.itemdict.supply.amount < 2',
 		effect = 'wine',
 	},
 	stop = {
@@ -295,7 +296,7 @@ onready var nakedspritesdict = {
 	Ayneris = {cons = 'aynerisneutralnaked', rape = 'aynerisangrynaked', clothcons = 'aynerisneutral', clothrape = 'aynerisangry'},
 	Zoe = {cons = "zoehappynaked", rape = 'zoesadnaked', clothcons = 'zoehappy', clothrape = 'zoesad'},
 	Melissa = {cons = "melissanakedfriendly", rape = 'melissanakedneutral', clothcons = 'melissafriendly', clothrape = 'melissaneutral'},
-	}
+}
 
 var locationdicts = {
 	livingroom = {code = 'livingroom',name = 'Living Room', background = 'mansion'},
@@ -325,7 +326,10 @@ func initiate(tempperson):
 	var text = ''
 	self.visible = true
 	self.mood = 0
-	self.drunkness = 0
+	if tempperson.effects.has('drunk'):
+		self.drunkness = max(0, tempperson.send)
+	else:
+		self.drunkness = 0
 	globals.spells.caster = globals.player
 	date = false
 	public = false
@@ -338,7 +342,7 @@ func initiate(tempperson):
 	
 	
 	person = tempperson
-	person.lastinteractionday = globals.resources.day
+	person.recordInteraction()
 	if person.race == 'Human':
 		modFearObed = 1.5
 	else:
@@ -366,7 +370,7 @@ func initiate(tempperson):
 	self.loyalStart = person.loyal
 	self.lustStart = person.lust
 	self.learningpointsStart = person.learningpoints
-	self.turns = 10
+	self.turns = int(variables.timeformeetinteraction)
 	$fullbody.set_texture(null)
 	if nakedspritesdict.has(person.unique):
 		if person.obed >= 50 || person.stress < 10:
@@ -481,7 +485,7 @@ func updatelist():
 			newnode.connect("pressed",self,'doaction', [i.effect])
 			newnode.connect("mouse_entered",self,'actiontooltip', [i.descript])
 			newnode.connect("mouse_exited",globals,'hidetooltip')
-			if i.has('disablereqs') && evaluate(i.disablereqs) == false:
+			if i.has('disablereqs') && evaluate(i.disablereqs):
 				newnode.disabled = true
 	if category == 'Location':
 		for i in locationdicts.values():
@@ -555,7 +559,7 @@ func doaction(action):
 		elif location == 'dungeon':
 			self.fear += 4
 			self.showntext += decoder("\n\n[color=yellow]Location influence:[/color] [name2] finds this place to be rather grim...")
-	drunkness()
+	checkPassOut()
 	updatelist()
 
 func checkhistory(action):
@@ -569,7 +573,7 @@ func chat(person, counter):
 	var text = ''
 	text += "You attempt to initiate a friendly chat with [name2]. "
 	
-	if counter < 3 || randf() >= counter/10+0.1:
+	if counter < 3 || randf() >= counter/10.0+0.1:
 		text += "[name2] spends some time engaging in a friendly chat with you. "
 		self.mood += 2
 	else:
@@ -583,7 +587,7 @@ func intimate(person, counter):
 	var text = ''
 	text += "You talk to [name2] about personal matters. "
 	
-	if randf() >= counter/10 && self.mood >= 7 && person.loyal >= 10:
+	if randf() >= counter/10.0 && self.mood >= 7 && person.loyal >= 10:
 		text += "[he2] opens to you"
 		self.mood += 3
 		person.loyal += rand_range(2,5)
@@ -683,12 +687,12 @@ func frenchkiss(person, counter):
 	
 	if (self.mood >= 10 && person.lust >= 20) || person.loyal >= 25:
 		text += "[he2] closes eyes passionately accepting your kiss. "
-		if !person.traits.has("Bisexual") && !person.traits.has("Homosexual") && person.sex == globals.player.sex:
-			self.mood += 1
-			person.lust += 1
-		else:
+		if checkAcceptSexPairing(person):
 			self.mood += 3
 			person.lust += 3
+		else:
+			self.mood += 1
+			person.lust += 1
 	else:
 		self.mood -= 4
 		text += "[he2] abruptly stops you, showing [his2] disinterest. "
@@ -699,21 +703,32 @@ func pushdown(person, counter):
 	var text = ''
 	var mode
 	text += "You forcefully push [name2] down giving [him2] a sultry look. "
-	if person.effects.has("captured"):
-		self.mood -= 10
-		text += "[he2] resists and pushes you back. "
-		mode = 'abuse'
-	elif self.mood*4 + person.loyal + person.lust >= 100 || (person.traits.has("Likes it rough") && self.mood*3 + person.loyal + person.lust >= 75):
-		text += "[he2] closes eyes and silently accepts you. "
-		self.mood += 3
-		person.lust += 3
-		mode = 'rapeconsent'
+	if person.consent:
+		text += "[he2] is briefly overwhelmed, but looks at you eagerly. "
+		self.mood += 6
+		person.lust += 6
+		mode = 'sex'
 	else:
-		self.mood -= 6
-		text += "[he2] resists and pushes you back. "
-		mode = 'abuse'
+		var difficulty = 400
+		if person.effects.has('captured'):
+			difficulty += 100
+		if person.effects.has('drunk'):
+			difficulty /= 2
+		difficulty -= person.obed*3 + person.loyal*2 + person.lust - person.lewdness/3
+		if person.traits.has("Likes it rough"):
+			difficulty -= 60
+
+		if difficulty > 0 && !person.traits.has('Sex-crazed'):
+			self.mood -= 10
+			text += "[he2] resists and pushes you back. "
+			mode = 'abuse'
+		else:
+			text += "[he2] closes eyes and silently accepts you. "
+			self.mood += 3
+			person.lust += 3
+			mode = 'rapeconsent'
 	showsexswitch(text,mode)
-	return text
+	return ''
 
 func propose(person, counter):
 	var text = ''
@@ -723,35 +738,35 @@ func propose(person, counter):
 		mode = 'sex'
 		globals.state.sexactions += 1
 		showsexswitch(text, mode)
-		return text
+		text = ''
 	else:
 		text += "You ask [name2] if [he2] would like to take your relationship to the next level. "
-		var difficulty =  self.mood*3 + person.loyal*2 + person.lust + drunkness*3
-		if person.effects.has('captured'): difficulty -= 80
-		if person.sex == globals.player.sex && !person.traits.has('Homosexual') && !person.traits.has("Bisexual"):
-			difficulty -= 10
+		var difficulty =  300 - (self.mood + person.obed*3 + person.loyal*2 + person.lust + drunkness*10)
+		if person.effects.has('captured'):
+			difficulty += 100
+		if !checkAcceptSexPairing(person):
+			difficulty += 60
 		if globals.state.relativesdata.has(person.id) && (int(globals.state.relativesdata[person.id].father) == int(globals.player.id) || int(globals.state.relativesdata[person.id].mother) == int(globals.player.id)):
-			difficulty -= 10
+			difficulty += 60
 		if person.traits.has('Prude'):
-			difficulty -= 5
-		if difficulty <= 100:
+			difficulty +=30
+		if difficulty >= 0:
 			text += "[he2] shows a troubled face and rejects your proposal. "
 			self.mood -= 4
-			return text
 		else:
 			person.lust += 3
+			person.consent = true
 			mode = 'sex'
-			globals.state.sexactions += 1
-			showsexswitch(text, mode)
 			text += "[he2] gives a meek nod and you lead [him2] to bedroom."
 			text += "\n\n[color=green]Unlocked sexual actions with [name2].[/color]"
 			if person.levelupreqs.has('code') && person.levelupreqs.code == 'relationship':
 				text += "\n\n[color=green]After getting closer with [name2], you felt like [he2] unlocked new potential. [/color]"
 				person.levelup()
-			person.consent = true
+			globals.state.sexactions += 1
+			showsexswitch(text, mode)
+			text = ''
 			
-			return text
-	
+	return text
 	
 
 var sexmode
@@ -906,7 +921,7 @@ func teach(person, counter):
 	text += "You spend some time with [name2], teaching [him2]. "
 	
 	if stress < 10+person.wit/2 || counter < 4:
-		person.learningpoints += value
+		person.learningpoints += max(0, round(value))
 		self.mood -= 1
 		self.stress += 10 - person.wit/15
 		text += "[name2] learns new things under your watch. " 
@@ -976,23 +991,22 @@ func wine(person, counter):
 	var text = ''
 	text += "You serve fresh wine for you and [name2]. "
 	
-	if self.mood < 5 || person.obed < 80:
+	if self.mood < 23 && person.obed < 80:
 		text = "[he2] refuses to drink with you. "
 	else:
 		if counter < 3:
 			text += "[he2] drinks with you and [his2] mood seems to improve."
 			self.mood += 4
 			self.stress -= rand_range(6,12)
-			drunkness += 1
 		else:
 			self.mood += 2
 			text += "[he2] keeps you company, but the wine does not seem to affect [him2] as heavily as before. "
+		if person.traits.has("Alcohol Intolerance"):
+			drunkness += 2
+		else:
 			drunkness += 1
 		
 		globals.itemdict.supply.amount -= 2
-	
-	if person.traits.has("Alcohol Intolerance"):
-		drunkness += 1
 	
 	return text
 
@@ -1035,11 +1049,22 @@ func stop(person, counter):
 	turns = 1
 	return text
 
-func drunkness():
+func checkAcceptSexPairing(person):
+	if person.traits.has("Bisexual"):
+		return true
+	if person.sex == globals.player.sex || (person.sex in ['female', 'futanari'] && globals.player.sex in ['female', 'futanari']):
+		return person.traits.has('Homosexual')
+	return true
+
+func checkPassOut():
 	if drunkness > max(0, person.send*2) + 1:
 		person.away.duration = 1
+		person.away.at = 'rest'
 		endencounter()
 		$end/RichTextLabel.bbcode_text += decoder('\n\n[color=yellow][name2] has passed out from alcohol overdose. [/color]')
+	elif drunkness > max(0, person.send) + 1 && !person.effects.has('drunk'):
+		person.add_effect(globals.effectdict.drunk)
+		$end/RichTextLabel.bbcode_text += decoder("\n\n[color=yellow][name2] drunkenly sways in place and slightly slurs [his2] words. [/color]")
 
 func strChange(value):
 	if value > 0:
@@ -1089,4 +1114,5 @@ func _on_confirmsex_pressed():
 	get_parent()._on_startbutton_pressed()
 	yield(get_parent(),'animfinished')
 	get_parent().sexmode = 'meet'
+	get_parent().backgroundinstant('mansion')
 

@@ -30,7 +30,7 @@ func traits(tag):
 			for i in traits:
 				if traits[i]['tags'].has(tag[0]) && traits[i]['tags'].has(tag[1]):
 					rval.append(traits[i])
-	return rval[rand_range(0, rval.size())]
+	return globals.randomfromarray(rval)
 
 #warning-ignore:unused_class_variable
 var traitscript = load("res://files/scripts/traits.gd")

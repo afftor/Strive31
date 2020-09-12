@@ -273,6 +273,8 @@ func emilymansion(stage = 0):
 	for i in globals.slaves:
 		if i.unique == 'Emily':
 			emily = i
+	if emily == null:
+		return
 	if stage == 0:
 		text = textnode.EmilyMansion
 		sprite = [['emilyhappy','pos1','opac']]
@@ -486,7 +488,9 @@ func emilyreturn():
 	for i in globals.slaves:
 		if i.unique == 'Emily':
 			emily = i
-	emily.away.at = 'none'
+	if emily == null:
+		return
+	emily.away.at = ''
 	emily.away.duration = 0
 	var text = textnode.EmilyReturn
 	if globals.state.sidequests.emily == 10:
@@ -566,6 +570,7 @@ func tishadorms(stage=0):
 			text += textnode.TishaDormsEmilyPresent
 			text += textnode.TishaDormsInfo
 			globals.state.sidequests.emily = 13
+			globals.main.get_node("outside").mageorder()
 			state = true
 		else:
 			if globals.spelldict.domination.learned == true && globals.spells.spellcost(globals.spelldict.domination) <= globals.resources.mana:
@@ -579,6 +584,7 @@ func tishadorms(stage=0):
 		text += textnode.TishaDormsInfo
 		state = true
 	elif stage == 3:
+		globals.state.reputation.wimborn -= 2
 		text = textnode.TishaDormsThreat
 		text += textnode.TishaDormsInfo
 		state = true
@@ -590,7 +596,7 @@ func tishadorms(stage=0):
 	if stage >= 2:
 		globals.state.sidequests.emily = 13
 		globals.main.get_node("outside").mageorder()
-	globals.main.dialogue(state,self,text,buttons)
+	globals.main.dialogue(state,self,text,buttons,sprite)
 
 func tishabackstreets(stage = 0):
 	var emily
@@ -714,9 +720,6 @@ func tishagornguild(stage = 0):
 		buttons.append({text ='Not bother her',function = 'tishagornguild', args = 10})
 	elif stage == 9:
 		globals.main.closescene()
-		for i in globals.slaves:
-			if i.unique == "Emily":
-				i.tags.erase('nosex')
 		text = textnode.TishaOfferJob
 		sprite = [['tishanakedhappy', 'pos1']]
 		var person = globals.characters.create("Tisha")
@@ -731,16 +734,12 @@ func tishagornguild(stage = 0):
 		state = true
 		globals.state.sidequests.emily = 16
 		globals.resources.upgradepoints += 10
-		for i in globals.slaves:
-			if i.unique == 'Emily':
-				i.consent = true
-				i.tags.erase("nosex")
+		emily.consent = true
+		emily.tags.erase("nosex")
 	elif stage == 10:
 		globals.main.closescene()
 		sprite = [['tishaneutral', 'pos1']]
-		for i in globals.slaves:
-			if i.unique == "Emily":
-				i.tags.erase('nosex')
+		emily.tags.erase('nosex')
 		text = textnode.TishaLeave
 		state = true
 		globals.state.sidequests.emily = 16
@@ -779,7 +778,9 @@ func emilytishasex(stage = 0):
 		emily.metrics.partners.append(tisha.id)
 		tisha.metrics.partners.append(emily.id)
 		emily.away.duration = 7
+		emily.away.at = 'vacation'
 		tisha.away.duration = 7
+		tisha.away.at = 'vacation'
 		state = false
 		globals.resources.mana += 25
 		globals.charactergallery.emily.scenes[2].unlocked = true
@@ -1443,9 +1444,9 @@ func frostforddryad():
 			globals.state.mainquest = 31
 			buttons.append({text = 'Continue', function = "frostforddryadzoe", args = 0})
 	elif globals.state.mainquest == 32:
-		if globals.itemdict.natureessenceing.amount >= 15 && globals.itemdict.fluidsubstanceing.amount >= 5 && globals.resources.food >= 500:
-			globals.itemdict.natureessenceing.amount -= 15
-			globals.itemdict.fluidsubstanceing.amount -= 5
+		if globals.state.getCountStackableItem('natureessenceing','any') >= 15 && globals.state.getCountStackableItem('fluidsubstanceing','any') >= 5 && globals.resources.food >= 500:
+			globals.state.removeStackableItem('natureessenceing', 15, 'any')
+			globals.state.removeStackableItem('fluidsubstanceing', 5, 'any')
 			globals.resources.food -= 500
 			text = textnode.MainQuestFrostfordForestReturnZoe
 			sprite = [['zoeneutral','pos2','opac'], ['forestspirit','pos1','opac']]
@@ -1848,7 +1849,7 @@ func finalemelissa(stage = 0):
 		globals.main.music_set('stop')
 		finaleperson.removefrommansion()
 	elif stage == 3:
-		text = textnode.MainQuestFinaleGoodReleaseHade2
+		text = finaleperson.dictionary(textnode.MainQuestFinaleGoodReleaseHade2)
 		globals.main.closescene()
 		var sprite = [["melissaworried", 'pos1', 'opac']]
 		buttons.append({text = finaleperson.dictionary("Rush to $name"), function = 'ending'})
@@ -1917,6 +1918,8 @@ func calirun():
 	for i in globals.slaves:
 		if i.unique == 'Cali':
 			cali = i
+	if cali == null:
+		return
 	globals.slaves.erase(cali)
 	globals.main.dialogue(true,self,'During the night Cali has escaped from the mansion in unknown direction.')
 
@@ -2537,8 +2540,10 @@ func calireturn():
 	for i in globals.slaves:
 		if i.unique == 'Cali':
 			cali = i
+	if cali == null:
+		return
 	var sprite = [['calihappy','pos1']]
-	cali.away.at = 'none'
+	cali.away.at = ''
 	cali.away.duration = 0
 	globals.main.dialogue(true,self,textnode.CaliGoodEndNoRewardReturn,null,sprite)
 	globals.main._on_mansion_pressed()
@@ -3005,6 +3010,7 @@ func aynerisrapieramberguard(stage = 0):
 		globals.main.shake(0.5)
 	elif stage == 8:
 		ayneris.away.duration = 1
+		ayneris.away.at = 'rest'
 		globals.main._on_mansion_pressed()
 		ayneris.stress += 25
 		if OS.get_name() != 'HTML5':
@@ -3016,6 +3022,7 @@ func aynerisrapieramberguard(stage = 0):
 		globals.state.unstackables[str(item.id)] = item
 	elif stage == 9:
 		ayneris.away.duration = 1
+		ayneris.away.at = 'rest'
 		ayneris.stress += 40
 		globals.main._on_mansion_pressed()
 		if OS.get_name() != 'HTML5':
@@ -3054,6 +3061,7 @@ func zoebookevent(stage = 0):
 			globals.state.sidequests.zoe = 4
 			globals.state.upcomingevents.append({code = 'zoebookproceed', duration = 4})
 			zoe.away.duration = 3
+			zoe.away.at = 'study'
 		elif stage == 2:
 			state = true
 			text = textnode.zoebookrefuse
@@ -3103,6 +3111,7 @@ func zoepassitems(stage = 0):
 		globals.main.closescene()
 		text += "\n\n[color=green]Learned new spell: Summon Tentacles[/color]"
 		zoe.loyal += 10
+		globals.charactergallery.zoe.nakedunlocked = true
 		sprite = [['zoeneutralnaked','pos1','opac']]
 		state = true
 	elif stage == 3:
@@ -3114,6 +3123,7 @@ func zoepassitems(stage = 0):
 		zoe.loyal -= 25
 		zoe.obed -= 60
 		globals.charactergallery.zoe.scenes[0].unlocked = true
+		globals.charactergallery.zoe.nakedunlocked = true
 		if zoe.vagvirgin == true:
 			zoe.vagvirgin = false
 			text += textnode.zoebookwatch2virgin

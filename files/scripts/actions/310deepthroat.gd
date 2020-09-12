@@ -37,11 +37,11 @@ func requirements():
 				valid = false
 #			elif i.penis != null && givers.size() > 1:
 #				valid = false
-		for i in takers:
+#		for i in takers:
 #			if i.mouth != null && givers.size() > 1:
 #				valid = false
-			if i.acc1 == null:
-				valid = false
+#			if i.acc1 == null:
+#				valid = false
 	return valid
 
 func givereffect(member):
@@ -57,7 +57,7 @@ func givereffect(member):
 
 func takereffect(member):
 	var result
-	var effects = {pain = 3, tags = ['punish','pervert'], obed = rand_range(10,15), stress = rand_range(3,6)}
+	var effects = {pain = 3, tags = ['punish','pervert'], obed = rand_range(10,15)}
 	if (member.person.traits.find("Likes it rough") >= 0 && member.lewd >= 30) || member.person.traits.find('Masochist') >= 0:
 		result = 'good'
 		effects.sens = 150

@@ -234,7 +234,7 @@ func _process(delta):
 			i.get_node("hp").set_meta('hp', hpPercent)
 			#i.get_node("hp").value = (combatant.hp/combatant.hpmax)*100
 		i.get_node("hp/Label").text = str(ceil(combatant.hp)) + "/" + str(combatant.hpmax)
-		if combatant.group == 'enemy' && playergroup[0].effects.has('mindreadeffect'):
+		if combatant.group == 'enemy' && playergroup.size() > 0 && playergroup[0].effects.has('mindreadeffect'):
 			i.get_node("hp/Label").visible = true
 		elif combatant.group == 'enemy':
 			i.get_node('hp/Label').visible = false
@@ -294,7 +294,7 @@ func _input(event):
 	if event.is_echo() == true || event.is_pressed() == false || get_node("abilitites/Panel").visible == true || is_visible_in_tree() == false:
 		return
 	#Cancel skill by rightclick
-	if event.is_action_pressed("RMB") && period == 'skilltarget':
+	if period == 'skilltarget' && (event.is_action_pressed("RMB") || event.is_action_pressed("escape")):
 		period = 'base'
 		selectedcharacter.selectcombatant()
 	#Select ability by 1-8 nums
@@ -302,8 +302,14 @@ func _input(event):
 		if self.visible == true && $win.visible == false && $grouppanel/skilline.get_children().size() > int(event.as_text()) && $grouppanel/skilline.get_child(int(event.as_text())).disabled == false:
 			get_node("grouppanel/skilline").get_child(int(event.as_text())).emit_signal('pressed')
 	#select characters
-	if event.as_text() in ['F1','F2','F3','F4'] && $win.visible == false && get_node("grouppanel/groupline").get_children().size() > int(event.as_text().replace("F","")):
-		$grouppanel/groupline.get_child(int(event.as_text().replace("F",""))).emit_signal('pressed')
+	if event.as_text().length() in [2,3] && event.as_text()[0] == 'F' && $win.visible == false:
+		var value = int(event.as_text().right(1))
+		if period == 'base':
+			if playergroup.size() >= value:
+				playergroup[value-1].node.emit_signal('pressed')
+		elif period == 'skilltarget':
+			if enemygroup.size() >= value:
+				enemygroup[value-1].node.emit_signal('pressed')
 	#End turn
 	if event.is_action_pressed("F") == true && $confirm.disabled == false && $win.visible == false:
 		_on_confirm_pressed()
@@ -376,7 +382,7 @@ class combatant:
 				self.passives[passive.effect] = passive
 		
 		ai = 'attack'
-		if scene.get_parent().get_node("explorationnode").deeperregion:
+		if scene.get_parent().get_node("explorationnode").deeperregion && !scene.nocaptures:
 			attack = ceil(attack * 1.25)
 			hpmax = ceil(hpmax * 1.5)
 			hp = hpmax
@@ -488,7 +494,7 @@ class combatant:
 			else:
 				node.hint_tooltip = ''
 		elif group == 'enemy':
-			if scene.playergroup[0].effects.has('mindreadeffect'):
+			if scene.playergroup.size() > 0 && scene.playergroup[0].effects.has('mindreadeffect'):
 				node.get_node('Panel').visible = true
 				node.get_parent().move_child(node, node.get_parent().get_children().size())
 				for i in ['attack','speed','protection','armor']:
@@ -506,7 +512,10 @@ class combatant:
 			var skill = globals.abilities.abilitydict[i]
 			var newbutton = scene.get_node("grouppanel/skilline/skill").duplicate()
 			scene.get_node("grouppanel/skilline").add_child(newbutton)
-			newbutton.set_disabled(cooldowns.has(skill.code))
+			var cost = skill.costmana
+			if globals.state.spec == 'Mage':
+				cost = round(cost/2)
+			newbutton.set_disabled(cooldowns.has(skill.code) || skill.costenergy > energy || cost > globals.resources.mana)
 			newbutton.show()
 			
 			newbutton.get_node("number").set_text(str(scene.get_node("grouppanel/skilline").get_children().size()-1))
@@ -573,7 +582,7 @@ class combatant:
 					i.attack += 50
 					scene.combatlog += "\n[color=red]Cult leader absorbs the power of defeated ally and grows stronger![/color]"
 		if group == 'player':
-			scene.playergroup.remove(scene.playergroup.find(person.id))
+			scene.playergroup.remove(scene.playergroup.find(self))
 			if person == globals.player:
 				globals.main.animationfade(1)
 				if OS.get_name() != 'HTML5':
@@ -585,12 +594,14 @@ class combatant:
 			else:
 				var _slave = person
 				if globals.rules.permadeath == false:
+					scene.combatlog += "\n[color=#ff4949]" + _slave.name + " has been defeated. [/color]"
 					_slave.stats.health_cur = 15
 					_slave.away.duration = 3
 					_slave.away.at = 'rest'
 					_slave.work = 'rest'
 					globals.state.playergroup.erase(person.id)
 				else:
+					scene.combatlog += "\n[color=#ff4949]" + _slave.name + " has died. [/color]"
 					globals.state.playergroup.erase(person.id)
 					for i in globals.state.playergroup:
 						globals.state.findslave(i).stress += rand_range(25,40)
@@ -621,12 +632,6 @@ func checkforresults():
 		lose()
 		return
 	var counter = 0
-	var text = ''
-	
-	for i in playergroup:
-		if i.state == 'defated':
-			text += '\n[color=#ff4949]' + i.name + ' has fallen. [/color]'
-			playergroup.remove(playergroup.find(i))
 	for i in enemygroup:
 		if i.state == 'defeated':
 			counter += 1
@@ -714,7 +719,7 @@ func physdamage(caster, target, skill):
 	if target.passives.has('defenseless'):
 		armor = 0
 		protection = 1
-	if target.passives.has("armorbreaker"):
+	if caster.passives.has("armorbreaker"):
 		armor = max(0, armor-8)
 	if caster.passives.has('exhaust'):
 		power = power * 0.66
@@ -1188,8 +1193,6 @@ func endcombatcheck():
 	return 'continue'
 
 func checkforinheritdebuffs(combatant):
-	if combatant.person == globals.player:
-		return
 	if combatant.energy > 0 && combatant.passives.has('exhausted'):
 		removebuff('exhaust', combatant)
 		combatant.passives.erase("exhaust")

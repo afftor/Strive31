@@ -17,7 +17,6 @@ func getslavedescription(tempperson, mode = 'default'):
 	if text.find('[furcolor]'):
 		text = text.replace('[furcolor]', getdescription('furcolor'))
 	
-	
 	return text
 
 func basics():
@@ -208,8 +207,7 @@ func getdescription(value):
 	var text
 	if descriptions.has(value) && descriptions[value].has(person[value]):
 		text = descriptions[value][person[value]]
-		text = text.split('|',true)
-		text = text[rand_range(0,text.size())]
+		text = globals.randomfromarray( text.split('|',true) )
 	elif descriptions.has(value) && descriptions[value].has('default'):
 		text = descriptions[value].default
 	else:
@@ -322,13 +320,12 @@ static func getstatus(person):
 
 func getBabyDescription(person):
 	var text = '$He has ' + person.haircolor + ' hair and ' + person.eyecolor + ' eyes. $His skin is ' + person.skin + '. '
-	var dict = {}
-	dict = {
-	none = '',
-	plants = "It is covered in some leaves and green plant matter. ",
-	scales = "It is covered in a few scales. ",
-	feathers = "It has bird feathers in some places. ",
-	full_body_fur = "It shows the beginnings of fur. ",
+	var dict = {
+		none = '',
+		plants = "It is covered in some leaves and green plant matter. ",
+		scales = "It is covered in a few scales. ",
+		feathers = "It has bird feathers in some places. ",
+		full_body_fur = "It shows the beginnings of fur. ",
 	}
 	text += dict[person.skincov]
 	if person.tail != 'none':
@@ -336,14 +333,14 @@ func getBabyDescription(person):
 	if person.horns != 'none':
 		text += '$He has pair of tiny horns on $his head. '
 	dict = {
-	human = 'normal',
-	short_furry = 'short and furry',
-	long_pointy_furry = 'long and furry',
-	pointy = 'pointy',
-	long_round_furry = 'of a bunny',
-	long_droopy_furry = 'of a bunny',
-	feathery = "feathery",
-	fins = 'fin-like',
+		human = 'normal',
+		short_furry = 'short and furry',
+		long_pointy_furry = 'long and furry',
+		pointy = 'pointy',
+		long_round_furry = 'of a bunny',
+		long_droopy_furry = 'of a bunny',
+		feathery = "feathery",
+		fins = 'fin-like',
 	}
 	text += '$His ears are ' + dict[person.ears] + '. '
 	
@@ -376,7 +373,7 @@ var tattoosdescript = { #this goes like : start + tattoo theme + end + tattoo de
 	arms = {start = "$His arm has a skillfully created ", end = " image of"},
 	legs = {start = "$His ankle holds a piece of ", end = " art, representing"},
 	ass = {start = "$His butt has a large ", end = " themed image showing "},
-	}
+}
 	
 var tattoooptions = {
 	none = {name = 'none', descript = "", applydescript = "Select a tattoo theme."},
@@ -385,164 +382,166 @@ var tattoooptions = {
 	degrading = {name = 'derogatory', descript = " rude words and lewd drawings", function = "degradingtattoo", applydescript = "A derogatory themed tattoo will enhance $name's lust and enforce obedience. "},
 	animalistic = {name = 'beastly', descript = " realistic beasts and insects", function = "animaltattoo", applydescript = "An animalistic themed tattoo will boost $name's energy regeneration. "},
 	magic = {name = "energy", descript = " empowering patterns and runes", function = "manatattoo", applydescript = "A tattoo consisting of magic runes will increase $name's Magic Affinity. "},
-	}
+}
 
 
 var descriptions = { #Store descriptions for various body parts. Separate alternative with | sign to make description pick one at random
-bodyshape = {
-	humanoid = '$His body is quite [color=yellow]normal[/color]. ', 
-	bestial = "$His body resembles a human's, except for some [color=yellow]bestial features[/color] in $his face and body structure. ",
-	shortstack = '$His body is rather [color=yellow]petite[/color], about half the size of the average person. ',
-	jelly = '$His body is [color=yellow]jelly-like[/color] and partly transparent. ',
-	halfbird = '$His body has [color=yellow]wings for arms and avian legs[/color] making everyday tasks difficult. ',
-	halfsnake = 'The lower portion of $his body consists of a long-winding [color=yellow]snake’s tail[/color]. ', 
-	halffish = '$His body is [color=yellow]scaly and sleek[/color], possessing fins and webbed digits. ',
-	halfspider = "The lower portion of $his body consists of a [color=yellow]spider's legs and abdomen[/color]. ",
-	halfhorse = 'While $his upper body is human, $his lower body is [color=yellow]equine[/color] in nature. ',
-	halfsquid = 'The lower portion of $his body consists of a [color=yellow]number of tentacular appendages[/color], similar to those of an octopus. ', 
-},age = { 
-	child = '$He looks like a [color=aqua]child[/color] that has barely hit puberty. ',
-	teen = "$He's a young-looking [color=aqua]teen[/color]. ",
-	adult = "$He's a fully-grown [color=aqua]adult[/color] $sex. ",
-},beauty = {
-	ugly = '$He is rather [color=yellow]unsavory[/color] to look at. ',
-	boring = '$His looks are [color=yellow]bland and unimpressive[/color]. ',
-	normal = '$He appears to be pretty [color=yellow]average[/color] looking. ',
-	cute = '$His looks are quite [color=yellow]cute[/color] and appealing. ',
-	pretty = '$He looks unusually [color=yellow]pretty[/color] and attracts some attention. ',
-	beautiful = '$He looks exceptionally [color=yellow]beautiful[/color], having no visible flaws and easily evoking envy. ', 
-},
-hairlength = {
-	ear = '$His [color=aqua][haircolor][/color] hair is cut [color=aqua]short[/color]. ',
-	neck = '$His [color=aqua][haircolor][/color] hair falls down to just [color=aqua]below $his neck[/color]. ',
-	shoulder = '$His wavy [color=aqua][haircolor][/color] hair is [color=aqua]shoulder length[/color]. ',
-	waist = '$His gorgeous [color=aqua][haircolor][/color] hair [color=aqua]sways down to $his waist[/color]. ',
-	hips = '$His [color=aqua][haircolor][/color] hair cascades down, [color=aqua]reaching $his hips[/color]. ',
-},
-hairstyle = {
-	straight = 'It [color=aqua]hangs freely[/color] from $his head. ',
-	ponytail = 'It is tied in a [color=aqua]high ponytail[/color]. ',
-	twintails = 'It is managed in girly [color=aqua]twin-tails[/color]. ',
-	braid = 'It is combed into a single [color=aqua]braid[/color]. ',
-	'two braids' : 'It is combed into [color=aqua]two braids[/color]. ',
-	bun = "It is tied into a neat [color=aqua]bun[/color]. ",
-},
-eyecolor = {
-	default = '$His eyes are [color=aqua][eyecolor][/color]. ',
-},
-eyeshape = {
-	normal = "",
-	slit = "$He has [color=aqua]vertical, animalistic pupils[/color]. "
-},
-horns = {
-	none = '',
-	short = 'There is a pair of [color=aqua]tiny, pointed horns[/color] on top of $his head. ',
-	'long_straight' : '$He has a pair of [color=aqua]long, bull-like horns[/color]. ',
-	curved = 'There are [color=aqua]curved horns[/color] coiling around $his head. ',
+	bodyshape = {
+		humanoid = '$His body is quite [color=yellow]normal[/color]. ', 
+		bestial = "$His body resembles a human's, except for some [color=yellow]bestial features[/color] in $his face and body structure. ",
+		shortstack = '$His body is rather [color=yellow]petite[/color], about half the size of the average person. ',
+		jelly = '$His body is [color=yellow]jelly-like[/color] and partly transparent. ',
+		halfbird = '$His body has [color=yellow]wings for arms and avian legs[/color] making everyday tasks difficult. ',
+		halfsnake = 'The lower portion of $his body consists of a long-winding [color=yellow]snake’s tail[/color]. ', 
+		halffish = '$His body is [color=yellow]scaly and sleek[/color], possessing fins and webbed digits. ',
+		halfspider = "The lower portion of $his body consists of a [color=yellow]spider's legs and abdomen[/color]. ",
+		halfhorse = 'While $his upper body is human, $his lower body is [color=yellow]equine[/color] in nature. ',
+		halfsquid = 'The lower portion of $his body consists of a [color=yellow]number of tentacular appendages[/color], similar to those of an octopus. ', 
 	},
-ears = {
-	human = '',
-	short_furry = '$He has a pair of fluffy, [color=aqua]medium-sized animal-like ears[/color]. ',
-	long_pointy_furry = '$He has a pair of fluffy, [color=aqua]lengthy, animal-like ears[/color]. ',
-	pointy = '$He has quite long, [color=aqua]pointed[/color] ears. ',
-	long_round_furry = '$He has a pair of [color=aqua]standing bunny ears[/color] rising above $his head. ',
-	long_droopy_furry = '$He has a pair of [color=aqua]droopy, bunny ears[/color] on $his head. ',
-	feathery = "There's a pair of clutched [color=aqua]feathery ears[/color] on the sides of " + '$His head. ',
-	fins = '$His ears look like a pair of [color=aqua]fins[/color]. ',
-},
-skin = {
-	pale = '$His skin is a [color=aqua]pale[/color] white. ',
-	fair = '$His skin is healthy and [color=aqua]fair[/color] color. ',
-	olive = '$His skin is of an unusual [color=aqua]olive[/color] tone. ', 
-	'tan' : '$His skin is a [color=aqua]tanned[/color] bronze color. ',
-	brown = '$His skin is a mixed [color=aqua]brown[/color] color. ',
-	dark = '$His skin is deep [color=aqua]dark[/color]. ',
-	jelly = '$His skin is [color=aqua]semi-transparent and jelly-like[/color]. ', 
-	blue = '$His skin is dark [color=aqua]blue[/color]. ',
-	"pale blue" : '$His skin is [color=aqua]light pale blue[/color]. ',
-	green = '$His skin is [color=aqua]green[/color]. ',
-	red = '$His skin is bright [color=aqua]red[/color]. ',
-	purple = '$His skin is [color=aqua]purple[/color]. ',
-	teal = '$His skin is [color=aqua]teal[/color]. ',
-},
-skincov = {
-	none = '',
-	plants = 'Various leaves and bits of [color=aqua]plant matter[/color] cover parts of $his body. ',
-	scales = '$His skin is partly covered with [color=aqua]scales[/color]. ',
-	feathers = '$His body is covered in [color=aqua]bird-like feathers[/color] in many places. ',
-	full_body_fur = '$His body is covered in thick, soft [color=aqua]fur of [furcolor]',
-},
-furcolor ={ # fur color
-	none = '',
-	white = 'marble color[/color]. ',
-	gray = 'gray color[/color]. ',
-	orange_white = 'orange-white pattern[/color]. ',
-	black_white = 'black-white pattern[/color]. ',
-	black_gray = 'black-gray pattern[/color]. ',
-	black = 'jet-black color[/color]. ',
-	orange = 'common fox pattern[/color]. ',
-	brown = 'light-brown tone[/color]. ',
-},
-#arms = {
-#	scales = '$His' + globals.fastif(person['legs'] == 'scales', ' arms and legs', ' arms') + ' are covered in [color=aqua]scales[/color]. ',
-#	winged = "$His arms closely resemblance a [color=aqua]bird's wings[/color]. ",
-#	webbed = '$His' + globals.fastif(person['legs'] == 'webbed', ' hands and feet', ' hands') + ' have [color=aqua]webbed digits[/color]. ', 
-#	fur_covered = '$His' + globals.fastif(person['legs'] == 'fur_covered', ' arms and legs', ' arms') + ' are covered in [color=aqua]fur[/color]. ',
-#},
-wings = {
-	none = '',
-	feathered_black = 'On $his back, $he has folded, [color=aqua]black, feathery wings[/color]. ',
-	feathered_white = 'On $his back, $he has folded, [color=aqua]white, feathery wings[/color]. ',
-	feathered_brown = 'On $his back, $he has folded, [color=aqua]brown, feathery wings[/color]. ',
-	insect = 'On $his back rests translucent [color=aqua]fairy wings[/color]. ',
-	leather_black = 'Hidden on $his back is a pair of bat-like, [color=aqua]black leather wings[/color]. ',
-	leather_red = 'Hidden on $his back is a pair of bat-like, [color=aqua]red leather wings[/color]. ',
-},
-tail = {
-	none = '',
-	cat = 'Below $his waist, you spot a slim [color=aqua]cat tail[/color] covered with fur. ',
-	fox = '$He has a large, fluffy [color=aqua]fox tail[/color]. ',
-	wolf = "Below $his waist there's a short, fluffy, [color=aqua]wolf tail[/color]. ",
-	bunny = '$He has a [color=aqua]small ball of fluff[/color] behind $his rear. ',
-	racoon = '$He has a plump, fluffy [color=aqua]raccoon tail[/color]. ',
-	scruffy = 'Behind $his back you notice a long tail covered in a thin layer of fur which ends in a [color=aqua]scruffy brush[/color]. ',
-	demon = '$He has a long, thin, [color=aqua]demonic tail[/color] ending in a pointed tip. ',
-	dragon = 'Trailing somewhat behind $his back is a [color=aqua]scaled tail[/color]. ',
-	bird = '$He has a [color=aqua]feathery bird tail[/color] on $his rear. ', 
-	fish = '$His rear ends in long, sleek [color=aqua]fish tail[/color]. ', 
-	"snake tail" : '',
-	tentacles = '',
-	horse = '',
-	"spider abdomen" : ''
-},
-height = {
-	tiny = '$His stature is [color=aqua]extremely small[/color], barely half the size of a normal person. ',
-	petite = '$His stature is quite [color=aqua]petite[/color]. ',
-	short = '$His height is quite [color=aqua]short[/color]. ',
-	average = '$He is of [color=aqua]average[/color] height. ',
-	tall = '$He is quite [color=aqua]tall[/color] compared to the average person. ',
-	towering = '$He is unusually tall, [color=aqua]towering[/color] over others. ',
-},
-titssize = {
-	flat = '$His chest is barely visible and nearly [color=yellow]flat[/color]. ',
-	small = '$He has [color=yellow]small[/color], round boobs. ',
-	average= '$His nice, [color=yellow]perky[/color] breasts are firm and inviting. ',
-	big = '$His [color=yellow]big[/color] tits are pleasantly soft, but still have a nice spring to them. ',
-	huge = '$His [color=yellow]giant[/color] tits are mind-blowingly big. ',
-	masculine = '$His chest is of definitive [color=yellow]masculine[/color] shape. ',
-},
-asssize = {#ass strings
-	flat = '$His butt is skinny and [color=yellow]flat[/color]. ',
-	small = '$He has a [color=yellow]small[/color], firm butt. ',
-	average= '$He has a nice, [color=yellow]pert[/color] ass you could bounce a coin off. ',
-	big = '$He has a pleasantly [color=yellow]plump[/color], heart-shaped ass that jiggles enticingly with each step. ',
-	huge = '$He has a [color=yellow]huge[/color], attention-grabbing ass. ',
-	masculine = '$His ass definitively has a [color=yellow]masculine[/color] shape. ',
-},
-balls = {
-	small = '$He has a pair of [color=yellow]tiny[/color] balls. ',
-	average = '$He has an [color=yellow]average-sized[/color] ballsack. ',
-	big = '$He has a [color=yellow]huge[/color] pair of balls weighing down $his scrotum. ',
-},
+	age = { 
+		child = '$He looks like a [color=aqua]child[/color] that has barely hit puberty. ',
+		teen = "$He's a young-looking [color=aqua]teen[/color]. ",
+		adult = "$He's a fully-grown [color=aqua]adult[/color] $sex. ",
+	},
+	beauty = {
+		ugly = '$He is rather [color=yellow]unsavory[/color] to look at. ',
+		boring = '$His looks are [color=yellow]bland and unimpressive[/color]. ',
+		normal = '$He appears to be pretty [color=yellow]average[/color] looking. ',
+		cute = '$His looks are quite [color=yellow]cute[/color] and appealing. ',
+		pretty = '$He looks unusually [color=yellow]pretty[/color] and attracts some attention. ',
+		beautiful = '$He looks exceptionally [color=yellow]beautiful[/color], having no visible flaws and easily evoking envy. ', 
+	},
+	hairlength = {
+		ear = '$His [color=aqua][haircolor][/color] hair is cut [color=aqua]short[/color]. ',
+		neck = '$His [color=aqua][haircolor][/color] hair falls down to just [color=aqua]below $his neck[/color]. ',
+		shoulder = '$His wavy [color=aqua][haircolor][/color] hair is [color=aqua]shoulder length[/color]. ',
+		waist = '$His gorgeous [color=aqua][haircolor][/color] hair [color=aqua]sways down to $his waist[/color]. ',
+		hips = '$His [color=aqua][haircolor][/color] hair cascades down, [color=aqua]reaching $his hips[/color]. ',
+	},
+	hairstyle = {
+		straight = 'It [color=aqua]hangs freely[/color] from $his head. ',
+		ponytail = 'It is tied in a [color=aqua]high ponytail[/color]. ',
+		twintails = 'It is managed in girly [color=aqua]twin-tails[/color]. ',
+		braid = 'It is combed into a single [color=aqua]braid[/color]. ',
+		'two braids' : 'It is combed into [color=aqua]two braids[/color]. ',
+		bun = "It is tied into a neat [color=aqua]bun[/color]. ",
+	},
+	eyecolor = {
+		default = '$His eyes are [color=aqua][eyecolor][/color]. ',
+	},
+	eyeshape = {
+		normal = "",
+		slit = "$He has [color=aqua]vertical, animalistic pupils[/color]. "
+	},
+	horns = {
+		none = '',
+		short = 'There is a pair of [color=aqua]tiny, pointed horns[/color] on top of $his head. ',
+		'long_straight' : '$He has a pair of [color=aqua]long, bull-like horns[/color]. ',
+		curved = 'There are [color=aqua]curved horns[/color] coiling around $his head. ',
+	},
+	ears = {
+		human = '',
+		short_furry = '$He has a pair of fluffy, [color=aqua]medium-sized animal-like ears[/color]. ',
+		long_pointy_furry = '$He has a pair of fluffy, [color=aqua]lengthy, animal-like ears[/color]. ',
+		pointy = '$He has quite long, [color=aqua]pointed[/color] ears. ',
+		long_round_furry = '$He has a pair of [color=aqua]standing bunny ears[/color] rising above $his head. ',
+		long_droopy_furry = '$He has a pair of [color=aqua]droopy, bunny ears[/color] on $his head. ',
+		feathery = "There's a pair of clutched [color=aqua]feathery ears[/color] on the sides of " + '$His head. ',
+		fins = '$His ears look like a pair of [color=aqua]fins[/color]. ',
+	},
+	skin = {
+		pale = '$His skin is a [color=aqua]pale[/color] white. ',
+		fair = '$His skin is healthy and [color=aqua]fair[/color] color. ',
+		olive = '$His skin is of an unusual [color=aqua]olive[/color] tone. ', 
+		'tan' : '$His skin is a [color=aqua]tanned[/color] bronze color. ',
+		brown = '$His skin is a mixed [color=aqua]brown[/color] color. ',
+		dark = '$His skin is deep [color=aqua]dark[/color]. ',
+		jelly = '$His skin is [color=aqua]semi-transparent and jelly-like[/color]. ', 
+		blue = '$His skin is dark [color=aqua]blue[/color]. ',
+		"pale blue" : '$His skin is [color=aqua]light pale blue[/color]. ',
+		green = '$His skin is [color=aqua]green[/color]. ',
+		red = '$His skin is bright [color=aqua]red[/color]. ',
+		purple = '$His skin is [color=aqua]purple[/color]. ',
+		teal = '$His skin is [color=aqua]teal[/color]. ',
+	},
+	skincov = {
+		none = '',
+		plants = 'Various leaves and bits of [color=aqua]plant matter[/color] cover parts of $his body. ',
+		scales = '$His skin is partly covered with [color=aqua]scales[/color]. ',
+		feathers = '$His body is covered in [color=aqua]bird-like feathers[/color] in many places. ',
+		full_body_fur = '$His body is covered in thick, soft [color=aqua]fur of [furcolor]',
+	},
+	furcolor ={ # fur color
+		none = '',
+		white = 'marble color[/color]. ',
+		gray = 'gray color[/color]. ',
+		orange_white = 'orange-white pattern[/color]. ',
+		black_white = 'black-white pattern[/color]. ',
+		black_gray = 'black-gray pattern[/color]. ',
+		black = 'jet-black color[/color]. ',
+		orange = 'common fox pattern[/color]. ',
+		brown = 'light-brown tone[/color]. ',
+	},
+	#arms = {
+	#	scales = '$His' + globals.fastif(person['legs'] == 'scales', ' arms and legs', ' arms') + ' are covered in [color=aqua]scales[/color]. ',
+	#	winged = "$His arms closely resemblance a [color=aqua]bird's wings[/color]. ",
+	#	webbed = '$His' + globals.fastif(person['legs'] == 'webbed', ' hands and feet', ' hands') + ' have [color=aqua]webbed digits[/color]. ', 
+	#	fur_covered = '$His' + globals.fastif(person['legs'] == 'fur_covered', ' arms and legs', ' arms') + ' are covered in [color=aqua]fur[/color]. ',
+	#},
+	wings = {
+		none = '',
+		feathered_black = 'On $his back, $he has folded, [color=aqua]black, feathery wings[/color]. ',
+		feathered_white = 'On $his back, $he has folded, [color=aqua]white, feathery wings[/color]. ',
+		feathered_brown = 'On $his back, $he has folded, [color=aqua]brown, feathery wings[/color]. ',
+		insect = 'On $his back rests translucent [color=aqua]fairy wings[/color]. ',
+		leather_black = 'Hidden on $his back is a pair of bat-like, [color=aqua]black leather wings[/color]. ',
+		leather_red = 'Hidden on $his back is a pair of bat-like, [color=aqua]red leather wings[/color]. ',
+	},
+	tail = {
+		none = '',
+		cat = 'Below $his waist, you spot a slim [color=aqua]cat tail[/color] covered with fur. ',
+		fox = '$He has a large, fluffy [color=aqua]fox tail[/color]. ',
+		wolf = "Below $his waist there's a short, fluffy, [color=aqua]wolf tail[/color]. ",
+		bunny = '$He has a [color=aqua]small ball of fluff[/color] behind $his rear. ',
+		racoon = '$He has a plump, fluffy [color=aqua]raccoon tail[/color]. ',
+		scruffy = 'Behind $his back you notice a long tail covered in a thin layer of fur which ends in a [color=aqua]scruffy brush[/color]. ',
+		demon = '$He has a long, thin, [color=aqua]demonic tail[/color] ending in a pointed tip. ',
+		dragon = 'Trailing somewhat behind $his back is a [color=aqua]scaled tail[/color]. ',
+		bird = '$He has a [color=aqua]feathery bird tail[/color] on $his rear. ', 
+		fish = '$His rear ends in long, sleek [color=aqua]fish tail[/color]. ', 
+		"snake tail" : '',
+		tentacles = '',
+		horse = '',
+		"spider abdomen" : ''
+	},
+	height = {
+		tiny = '$His stature is [color=aqua]extremely small[/color], barely half the size of a normal person. ',
+		petite = '$His stature is quite [color=aqua]petite[/color]. ',
+		short = '$His height is quite [color=aqua]short[/color]. ',
+		average = '$He is of [color=aqua]average[/color] height. ',
+		tall = '$He is quite [color=aqua]tall[/color] compared to the average person. ',
+		towering = '$He is unusually tall, [color=aqua]towering[/color] over others. ',
+	},
+	titssize = {
+		flat = '$His chest is barely visible and nearly [color=yellow]flat[/color]. ',
+		small = '$He has [color=yellow]small[/color], round boobs. ',
+		average= '$His nice, [color=yellow]perky[/color] breasts are firm and inviting. ',
+		big = '$His [color=yellow]big[/color] tits are pleasantly soft, but still have a nice spring to them. ',
+		huge = '$His [color=yellow]giant[/color] tits are mind-blowingly big. ',
+		masculine = '$His chest is of definitive [color=yellow]masculine[/color] shape. ',
+	},
+	asssize = {#ass strings
+		flat = '$His butt is skinny and [color=yellow]flat[/color]. ',
+		small = '$He has a [color=yellow]small[/color], firm butt. ',
+		average= '$He has a nice, [color=yellow]pert[/color] ass you could bounce a coin off. ',
+		big = '$He has a pleasantly [color=yellow]plump[/color], heart-shaped ass that jiggles enticingly with each step. ',
+		huge = '$He has a [color=yellow]huge[/color], attention-grabbing ass. ',
+		masculine = '$His ass definitively has a [color=yellow]masculine[/color] shape. ',
+	},
+	balls = {
+		small = '$He has a pair of [color=yellow]tiny[/color] balls. ',
+		average = '$He has an [color=yellow]average-sized[/color] ballsack. ',
+		big = '$He has a [color=yellow]huge[/color] pair of balls weighing down $his scrotum. ',
+	},
 }
 

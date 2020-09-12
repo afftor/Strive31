@@ -49,7 +49,7 @@ func patronlist():
 		patrons.erase(i)
 
 func _input(event):
-	if globals.main.get_node("screenchange").visible:
+	if globals.main == null || globals.main.get_node("screenchange").visible:
 		return
 	if event.is_pressed() && event.is_action("escape") && stage in ['credits','patrons']:
 		stage = 'alise'

@@ -53,9 +53,9 @@ func zoneenter(zone):
 	else:
 		lastzone = currentzone.code
 	zone = self.zones[zone]
-	outside.location = zone.code
 	if zone.combat == false:
 		progress = 0
+		deeperregion = false
 	if progress == 0:
 		main.background_set(zone.background, true)
 		yield(main, "animfinished")
@@ -76,7 +76,6 @@ func zoneenter(zone):
 	else:
 		progressbar.set_value(progressvalue)
 	currentzone = zone
-	outside.currentzone = zone
 	outside.clearbuttons()
 	showmap(currentzone)
 	text += zone.description
@@ -130,7 +129,10 @@ func zoneenter(zone):
 	elif (globals.state.sidequests.cali == 25) && zone.code == 'wimbornoutskirts':
 		array.append({name = "Find the Bandit",function = 'event',args = 'calistraybandit'})
 	elif (globals.state.sidequests.cali == 26) && zone.code == 'grove':
-		array.append({name = "Find Cali's village",function = 'event',args = 'calireturnhome'})
+		for i in globals.slaves:
+			if i.unique == 'Cali':
+				array.append({name = "Find Cali's village",function = 'event',args = 'calireturnhome'})
+				break
 	elif zone.code == 'dragonnests' && endofarea && globals.state.decisions.has('dragonkilled') == false:
 		array.append({name = "Approach Cave Entrance", function = 'event',args = 'dragonbossenc'})
 	elif zone.code == 'culthideout' && endofarea && globals.state.decisions.has('cultbosskilled') == false:
@@ -270,7 +272,7 @@ func enemyencounter():
 	if patrol != 'none':
 		text = encounterdictionary(enemygroup.description) + "Your bad reputation around here will certainly lead to a difficult fight..."
 		encounterbuttons(patrol)
-	elif scoutawareness < enemygroup.awareness:
+	elif scoutawareness < enemyawareness:
 		ambush = true
 		text = encounterdictionary(enemygroup.descriptionambush)
 		if enemygroup.special == null:
@@ -309,13 +311,12 @@ func buildslave(i):
 			race = globals.weightedrandom(currentzone.races)
 
 		'any':
-			race = globals.allracesarray[rand_range(0,globals.allracesarray.size())]
+			race = globals.randomfromarray(globals.allracesarray)
 
 		'bandits':
 			if rand_range(0,100) <= variables.banditishumanchance:
 				race = 'Human'
 			else:
-
 				race = globals.getracebygroup('bandits') #globals.banditraces[rand_range(0,globals.banditraces.size())]
 
 		'amberguard', 'wimborn', 'frostford', 'gorn':
@@ -343,7 +344,7 @@ func buildslave(i):
 	if i.has('gear'):
 
 		for k in ['armor','weapon','costume','underwear','accessory']:
-			if k == 'armor' && globals.player.level < 2:
+			if k == 'armor' && rand_range(1, 4) < globals.player.level:
 				continue
 			if !combatdata.enemyequips[i.gear].has(k):
 				continue
@@ -370,11 +371,16 @@ func enemyinfo():
 	if enemygroup.units.size() <= 3:
 		text = "Number: " + str(enemygroup.units.size())
 	else:
-		text += "Estimate number: " + str(max(round(enemygroup.units.size() + rand_range(-2,2)),1))
-	if enemygroup.units[0].capture != null:
-		text += "\nEstimated level: " + str(enemygroup.units[0].capture.level)
-	else:
-		text += "\nEstimated level: " + str(max(1,enemygroup.units[0].level + round(rand_range(-1,1))))
+		text = "Estimate number: " + str(max(round(enemygroup.units.size() + rand_range(-2,2)),3))
+	var total = 0
+	for i in enemygroup.units:
+		if i.capture != null:
+			total += i.capture.level
+		elif deeperregion:
+			total += ceil(i.level * 1.3)
+		else:
+			total += i.level
+	text += "\nEstimated level: " + str(max(1,round(total/enemygroup.units.size()) + round(rand_range(-1,1))))
 	text += '\nGroup: ' + enemygroup.units[0].faction
 	if enemygroup.captured != null && enemygroup.captured.size() >= 1:
 		text += "\n\nHave other persons involved. "
@@ -388,19 +394,30 @@ func enemyinfoclear():
 func enemylevelup(person, levelarray):
 	var level = round(rand_range(levelarray[0], levelarray[1]))
 	var statdict = ['sstr','sagi','smaf','send']
-	var skillpoints = (level-person.level)*variables.skillpointsperlevel
-	person.level = level
+	var skillpoints = abs(level-person.level)*variables.skillpointsperlevel
 	while skillpoints > 0 && statdict.size() > 0:
-		if randf() <= 0.2:
-			person.skillpoints += 1
-			skillpoints -= 1
-			continue
 		var tempstat = statdict[randi()%statdict.size()]
-		if person.stats[globals.maxstatdict[tempstat].replace('_max',"_base")] >= person.stats[globals.maxstatdict[tempstat]]:
+		#slaves can be constructed with levels greater than they will recieve for the region of encounter
+		if person.level < level:
+			if randf() <= 0.2:
+				person.skillpoints += 1
+			elif person.stats[globals.maxstatdict[tempstat].replace('_max',"_base")] >= person.stats[globals.maxstatdict[tempstat]]:
+				statdict.erase(tempstat)
+				continue
+			else:
+				person.stats[globals.maxstatdict[tempstat].replace('_max',"_base")] += 1
+		elif person.stats[globals.maxstatdict[tempstat].replace('_max',"_base")] <= 0:
 			statdict.erase(tempstat)
 			continue
-		person.stats[globals.maxstatdict[tempstat].replace('_max',"_base")] += 1
+		else:
+			person.stats[globals.maxstatdict[tempstat].replace('_max',"_base")] -= 1
 		skillpoints -= 1
+	if skillpoints > 0 && statdict.empty():
+		if person.level < level:
+			person.skillpoints += skillpoints
+		else:
+			person.skillpoints = max(person.skillpoints - skillpoints, 0)
+	person.level = level
 	person.health = person.stats.health_max
 
 func buildenemies(enemyname = null):
@@ -415,7 +432,7 @@ func buildenemies(enemyname = null):
 	for i in tempunits:
 		addnumbers = false
 		var count = round(rand_range(i[1], i[2]))
-		if deeperregion:
+		if deeperregion && (enemyname == null || enemyname.find("guards") >= 0):
 			count = round(count * rand_range(1.2,1.6))
 		if count >= 2:
 			addnumbers = true
@@ -576,6 +593,7 @@ func chestlockpick(person):
 	
 	text = person.dictionary(text)
 	if unlock == false:
+		outside.playergrouppanel()
 		treasurechestoptions(text)
 	else:
 		showlootscreen(text)
@@ -588,7 +606,7 @@ func chestbash(person):
 		unlock = true
 		text = "$name easily smashes the chest's lock mechanism."
 	else:
-		if 60 - (chest.agility - person.sagi) * 10 >= rand_range(0,100):
+		if 60 - (chest.strength - person.sstr) * 10 >= rand_range(0,100):
 			text = "With some luck, $name manages to crack the chest open. "
 			unlock = true
 		else:
@@ -597,6 +615,7 @@ func chestbash(person):
 	
 	text = person.dictionary(text)
 	if unlock == false:
+		outside.playergrouppanel()
 		treasurechestoptions(text)
 	else:
 		showlootscreen(text)
@@ -717,6 +736,7 @@ func slaversenc(stage = 0):
 		buttons.append({name = 'Attack Slavers', function = 'slaversenc', args = 1})
 		buttons.append({name = 'Greet Slavers',function = 'slaversenc',args = 2})
 		buttons.append({name = 'Leave',function = 'enemyleave'})
+		outside.mindread = false
 	elif stage == 1:
 		enemyfight()
 		return
@@ -729,10 +749,9 @@ func slaversenc(stage = 0):
 		progress += 1
 		zoneenter(currentzone.code)
 	elif stage == 4:
-		globals.main.get_node("outside").closefunction = ['slaversenc',2]
+		outside.get_node("playergrouppanel/VBoxContainer").visible = false
 		globals.main.get_node("outside").slavearray = enemygroup.captured
-		globals.main.get_node("outside").guildlocation = 'outside'
-		globals.main.get_node("outside").slaveguildslaves()
+		globals.main.get_node("outside").slaveguildslaves('slavers')
 	outside.buildbuttons(buttons,self)
 	#globals.main.dialogue(state, self, text, buttons, sprites)
 	
@@ -921,6 +940,10 @@ func enemydefeated():
 						gold *= 2
 					goldearned += gold
 				else:
+					var enchant = false
+					if i.ends_with("+"):
+						enchant = true
+						i = i.replace("+","")
 					if globals.itemdict.has(i):
 						var item = globals.itemdict[i]
 						if item.type != 'gear':
@@ -930,6 +953,8 @@ func enemydefeated():
 								enemyloot.stackables[item.code] = 1
 						else:
 							var tempitem = globals.items.createunstackable(item.code)
+							if enchant:
+								globals.items.enchantrand(tempitem)
 							enemyloot.unstackables.append(tempitem)
 		expearned += unit.rewardexp
 	if deeperregion:
@@ -964,12 +989,15 @@ func enemydefeated():
 	winpanel.visible = true
 	winpanel.get_node("wintext").set_bbcode(text)
 	for i in range(0, defeated.units.size()):
-		defeated.units[i].stress += rand_range(20, 50)
-		defeated.units[i].obed += rand_range(10, 20)
-		defeated.units[i].health -= rand_range(40,70)
+		var person = defeated.units[i]
+		if globals.races[person.race.replace("Halfkin", "Beastkin")].uncivilized && person.spec != 'tamer':
+			person.add_trait('Uncivilized')
+		person.stress += rand_range(20, 50)
+		person.obed += rand_range(10, 20)
+		person.health -= rand_range(40,70)
 		if defeated.names[i] == 'Captured':
-			defeated.units[i].obed += rand_range(10,20)
-			defeated.units[i].loyal += rand_range(5,15)
+			person.obed += rand_range(10,20)
+			person.loyal += rand_range(5,15)
 	buildcapturelist()
 	builditemlists()
 	
@@ -980,29 +1008,34 @@ func enemydefeated():
 func buildcapturelist():
 	var winpanel = get_node("winningpanel")
 	var text = "Defeated and Captured | Free ropes left: "
-	text += str(globals.state.backpack.stackables.rope) if globals.state.backpack.stackables.has('rope') else '0'
+	text += str(globals.state.backpack.stackables.get('rope', 0))
 	winpanel.get_node("Panel/Label").set_text(text)
 	for i in get_node("winningpanel/ScrollContainer/VBoxContainer").get_children():
 		if i.get_name() != 'Button':
 			i.visible = false
 			i.queue_free()
 	for i in range(0, defeated.units.size()):
+		var person = defeated.units[i]
 		var newbutton = winpanel.get_node("ScrollContainer/VBoxContainer/Button").duplicate()
 		winpanel.get_node("ScrollContainer/VBoxContainer").add_child(newbutton)
 		newbutton.visible = true
-		newbutton.get_node("capture").connect("pressed",self,'captureslave', [defeated.units[i]])
-		if !globals.state.backpack.stackables.has('rope') || globals.state.backpack.stackables.rope < 1:
+		newbutton.get_node("capture").connect("pressed",self,'captureslave', [person])
+		if globals.state.backpack.stackables.get('rope', 0) < variables.consumerope:
 			newbutton.get_node('capture').set_disabled(true)
-		newbutton.get_node("Label").set_text(defeated.names[i] + ' ' + defeated.units[i].sex+ ' ' + defeated.units[i].race)
-		newbutton.connect("pressed", self, 'defeatedselected', [defeated.units[i]])
-		newbutton.connect("mouse_entered", globals, 'slavetooltip', [defeated.units[i]])
+		newbutton.get_node("Label").set_text(defeated.names[i] + ' ' + person.sex+ ' ' + person.race)
+		if defeated.names[i] == 'Captured':
+			newbutton.get_node("Label").set('custom_colors/font_color', Color(0.25,0.3,0.75))
+		else:
+			newbutton.get_node("Label").set('custom_colors/font_color', Color(0.8,0.2,0.2))
+		newbutton.connect("pressed", self, 'defeatedselected', [person])
+		newbutton.connect("mouse_entered", globals, 'slavetooltip', [person])
 		newbutton.connect("mouse_exited", globals, 'slavetooltiphide')
-		newbutton.get_node("choice").set_meta('person', defeated.units[i])
-		newbutton.get_node("mindread").connect("pressed",self,'mindreadslave', [defeated.units[i]])
+		newbutton.get_node("choice").set_meta('person', person)
+		newbutton.get_node("mindread").connect("pressed",self,'mindreadslave', [person])
 		if globals.resources.mana < globals.spells.spellcost(globals.spelldict.mindread) || !globals.spelldict.mindread.learned:
 			newbutton.get_node('mindread').set_disabled(true)
 		newbutton.get_node("choice").add_to_group('winoption')
-		newbutton.get_node("choice").connect("item_selected",self, 'defeatedchoice', [defeated.units[i], newbutton.get_node("choice")])
+		newbutton.get_node("choice").connect("item_selected",self, 'defeatedchoice', [person, newbutton.get_node("choice")])
 
 func mindreadslave(person):
 	globals.spells.person = person
@@ -1011,23 +1044,16 @@ func mindreadslave(person):
 
 func captureslave(person):
 	var location
-	if variables.consumerope != 0:
+	if variables.consumerope > 0:
 		globals.state.backpack.stackables.rope -= variables.consumerope
 	for i in person.gear:
 		i = null
-	if globals.races[person.race.replace("Halfkin", "Beastkin")].uncivilized == true:
-		person.add_trait('Uncivilized')
 	captureeffect(person)
 	var index = defeated.units.find(person)
 	if defeated.names[index] == 'Captured' || defeated.faction[index] in ['stranger','elf']:
-		if currentzone.tags.find("wimborn") >= 0:
-			location = 'wimborn'
-		elif currentzone.tags.find("frostford") >= 0:
-			location = 'frostford'
-		elif currentzone.tags.find("gorn") >= 0:
-			location = 'gorn'
-		elif currentzone.tags.find("amberguard") >= 0:
-			location = 'amberguard'
+		for place in ['wimborn','frostford','gorn','amberguard']:
+			if currentzone.tags.has(place):
+				location = place
 		if location != null:
 			globals.state.reputation[location] -= 1
 	defeated.names.remove(defeated.units.find(person))
@@ -1069,7 +1095,7 @@ func builditemlists():
 		get_node("winningpanel/lootpanel/enemyloot/VBoxContainer").add_child(newbutton)
 		newbutton.visible = true
 		if i.icon != null:
-			newbutton.get_node("image").set_texture(load(i.icon))
+			newbutton.get_node("image").set_texture(globals.loadimage(i.icon))
 		if i.enchant != '':
 			newbutton.get_node("enchant").visible = true
 		newbutton.connect("pressed",self,'moveitemtobackpack',[newbutton])
@@ -1099,7 +1125,7 @@ func builditemlists():
 		newbutton.visible = true
 		newbutton.get_node("amount").visible = false
 		if i.icon != null:
-			newbutton.get_node("image").set_texture(load(i.icon))
+			newbutton.get_node("image").set_texture(globals.loadimage(i.icon))
 		newbutton.connect("pressed",self,'moveitemtoenemy',[newbutton])
 		if i.enchant != '':
 			newbutton.get_node("enchant").visible = true
@@ -1186,6 +1212,7 @@ func itemtooltiphide():
 
 
 func defeatedselected(person):
+	get_tree().get_current_scene().get_node("MainScreen/slave_tab").person = person
 	get_tree().get_current_scene().popup(person.descriptionsmall())
 
 
@@ -1223,14 +1250,13 @@ func _on_confirmwinning_pressed(): #0 leave, 1 capture, 2 rape, 3 kill
 			globals.state.reputation[location] -= 1
 		if defeated.select[i] == 0:
 			if defeated.names[i] != 'Captured':
-				text += defeated.units[i].dictionary("You have left $race $child alone.\n")
+				text += defeated.units[i].dictionary("You have left the $race $child alone.\n")
 			else:
-				text += defeated.units[i].dictionary("You have released $race $child and set $him free.\n")
+				text += defeated.units[i].dictionary("You have released the $race $child and set $him free.\n")
 				globals.state.reputation[location] += rand_range(1,2)
 				if randf() < 0.25 + globals.state.reputation[location]/20 && reward == false:
 					reward = true
 					rewardslave = defeated.units[i]
-					rewardslavename = defeated.names[i]
 		elif defeated.select[i] == 1:
 			if !defeated.faction[i] in ['bandit','monster']:
 				globals.state.reputation[location] -= rand_range(0,1)
@@ -1263,7 +1289,7 @@ func _on_confirmwinning_pressed(): #0 leave, 1 capture, 2 rape, 3 kill
 		if orgyarray.size() >= 2: ### See if there's more than 1 enemy to rape
 			text += "After freeing those left from their clothes, you joyfully start to savour their bodies one after another. "
 		else:
-			text += "You undress your prisoner and without further hesitation mercilessly rape " + orgyarray[0].dictionary("$race $child") + ". \n"
+			text += "You undress your prisoner and without further hesitation mercilessly rape the " + orgyarray[0].dictionary("$race $child") + ". \n"
 		for i in globals.state.playergroup:
 			var person = globals.state.findslave(i)
 			if killed == true && person.fear < 50 && person.loyal < 40:
@@ -1294,12 +1320,11 @@ func _on_confirmwinning_pressed(): #0 leave, 1 capture, 2 rape, 3 kill
 		main.popup(text)
 
 var rewardslave
-var rewardslavename
 
 func capturereward():
 	var text = ""
 	var buttons = [['Take no reward','capturedecide',1],['Ask for material reward','capturedecide',2],['Ask for sex','capturedecide',3],['Ask to join you','capturedecide',4]]
-	text = "As you are about to move on, " + rewardslavename + " person, that you have rescued, appeals to you. $His name is $name and $he's very thankful for your help. $race $child wishes to repay you somehow.  "
+	text = "As you are about to move on, the $race $child that you have rescued appeals to you. $His name is $name and $he's very thankful for your help. $name wishes to repay you somehow. "
 	
 	
 	main.dialogue(false,self,rewardslave.dictionary(text),buttons)
@@ -1370,7 +1395,6 @@ func wimborn():
 			outside.addbutton({name = 'Teleport to Mansion - 25 gold', function = 'teleportmansion', textcolor = 'green', tooltip = '25 gold', disabled = true}, self)
 
 func gorn():
-	outside.location = 'gorn'
 	main.music_set('gorn')
 	var array = []
 	array.append({name = "Visit local Slaver Guild", function = 'gornslaveguild'})
@@ -1545,7 +1569,6 @@ func closescene():
 
 func amberguard():
 	var array = []
-	outside.location = 'amberguard'
 	main.music_set('frostford')
 #	if globals.state.portals.amberguard.enabled == false:
 #		globals.state.portals.amberguard.enabled = true
@@ -1750,7 +1773,6 @@ func gornayda():
 	scriptedareas.aydashop.gornayda()
 
 func frostford():
-	outside.location = 'frostford'
 	main.music_set('frostford')
 	var array = []
 	if globals.state.mainquest in [28, 29, 30, 31, 33, 34, 35]:
@@ -1759,6 +1781,7 @@ func frostford():
 		var text = globals.questtext.MainQuestFrostfordCityhallZoe
 		var buttons = []
 		var sprite = [['zoeneutral','pos1','opac']]
+		globals.charactergallery.zoe.unlocked = true
 		buttons.append({text = 'Accept', function = "frostfordzoe", args = 1})
 		buttons.append({text = 'Refuse', function = "frostfordzoe", args = 2})
 		main.dialogue(false, self, text, buttons, sprite)
@@ -1841,7 +1864,6 @@ func umbra():
 	var array = []
 	if globals.state.mainquest >= 38 && globals.state.portals.has('dragonnests') == false:
 		globals.events.umbraportalenc()
-	outside.location = 'umbra'
 	array.append({name = "Black Market (shop)", function = 'umbrashop'})
 	array.append({name = "Buy Slaves", function = 'umbrabuyslaves'})
 	array.append({name = "Sell Servants", function = 'umbrasellslaves'})
@@ -1854,11 +1876,12 @@ func umbrashop():
 func umbrabuyslaves():
 	outside.mindread = false
 	outside.slavearray = globals.guildslaves.umbra
-	outside.slaveguildslaves()
+	outside.get_node("playergrouppanel/VBoxContainer").visible = false
+	outside.slaveguildslaves('umbra')
 
 func umbrasellslaves():
+	outside.get_node("playergrouppanel/VBoxContainer").visible = false
 	outside.sellslavelist('umbra')
-	outside.sellslavelocation = 'umbra'
 
 func chloeforest():
 	globals.events.chloeforest()

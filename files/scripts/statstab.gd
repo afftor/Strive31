@@ -52,6 +52,7 @@ func _on_trainingabils_pressed():
 	
 	$trainingabilspanel/learningpoints.text = "Free Learn Points: " + str(person.learningpoints)
 	get_node("trainingabilspanel/abilitytext").set_bbcode('')
+	get_node("trainingabilspanel/abilityconfirm").set_disabled(true)
 	$trainingabilspanel/abilityicon.texture = null
 	var array = []
 	for i in globals.abilities.abilitydict.values():
@@ -181,6 +182,7 @@ func _on_castspell_pressed():
 	person = globals.currentslave
 	get_node("selectspellpanel").visible = true
 	get_node("selectspellpanel/spellusedescription").set_bbcode('')
+	get_node("selectspellpanel/spellusebutton").set_disabled(true)
 	var spelllist = get_node("selectspellpanel/ScrollContainer/selectspelllist")
 	var button = get_node("selectspellpanel/ScrollContainer/selectspelllist/spellbutton")
 	for i in spelllist.get_children():
@@ -424,7 +426,8 @@ func levelreqs():
 func levelup(command):
 	globals.jobs.call(command, person)
 	globals.get_tree().get_current_scene().close_dialogue()
-	get_parent().slavetabopen()
+	if command != 'vacation':
+		get_parent().slavetabopen()
 
 
 func action(actionname):

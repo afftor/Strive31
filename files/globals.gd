@@ -4,15 +4,26 @@ extends Node
 
 var effectdict = {}
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
-var gameversion = '0.5.25'
+var gameversion = '0.5.26'
 var state = progress.new()
 var developmode = false
 var gameloaded = false
 
 var mainscreen = 'mainmenu'
 
-var filedir = 'res://files'
-var backupdir = 'res://backup'
+var gameDir = "res://"
+var fileDir = "res://files/"
+var backupDir = "res://backup/"
+#for those that want to move appData to program folder, swap next two lines
+#var appDataDir = "res://appData/"
+var appDataDir = "user://"
+var saveDirDefault = appDataDir + "saves/"
+# saveDir is the current path which is created by modpanel.gd using saveDirDefault and saveID
+var saveDir = null
+var settingsFile = appDataDir + "settings.ini"
+var progressFile = appDataDir + "progressdata"
+
+var imageExtensions = ["png","jpg","webp"]
 
 var resources = resource.new()
 var person = load("res://files/scripts/person/person.gd")
@@ -61,64 +72,64 @@ var main
 var slaves = [] setget slaves_set
 var allracesarray = []
 var specarray = ['geisha','ranger','executor','bodyguard','assassin','housekeeper','trapper','nympho','merchant','tamer']
-var player = person.new()
+var player
 var partner
 
 var spritedict = gallery.sprites
 var musicdict = {
-combat1 = load("res://files/music/battle1.ogg"),
-combat2 = load("res://files/music/battle2.ogg"),
-combat3 = load("res://files/music/battle3.ogg"),
-mansion1 = load("res://files/music/mansion1.ogg"),
-mansion2 = load("res://files/music/mansion2.ogg"),
-mansion3 = load("res://files/music/mansion3.ogg"),
-mansion4 = load("res://files/music/mansion4.ogg"),
-wimborn = load("res://files/music/wimborn.ogg"),
-gorn = load("res://files/music/gorn.ogg"),
-frostford = load("res://files/music/frostford.ogg"),
-explore = load("res://files/music/exploration.ogg"),
-maintheme = load("res://files/music/opening.ogg"),
-ending = load("res://files/music/ending.ogg"),
-dungeon = load("res://files/music/dungeon.ogg"),
-intimate = load("res://files/music/intimate.ogg"),
+	combat1 = load("res://files/music/battle1.ogg"),
+	combat2 = load("res://files/music/battle2.ogg"),
+	combat3 = load("res://files/music/battle3.ogg"),
+	mansion1 = load("res://files/music/mansion1.ogg"),
+	mansion2 = load("res://files/music/mansion2.ogg"),
+	mansion3 = load("res://files/music/mansion3.ogg"),
+	mansion4 = load("res://files/music/mansion4.ogg"),
+	wimborn = load("res://files/music/wimborn.ogg"),
+	gorn = load("res://files/music/gorn.ogg"),
+	frostford = load("res://files/music/frostford.ogg"),
+	explore = load("res://files/music/exploration.ogg"),
+	maintheme = load("res://files/music/opening.ogg"),
+	ending = load("res://files/music/ending.ogg"),
+	dungeon = load("res://files/music/dungeon.ogg"),
+	intimate = load("res://files/music/intimate.ogg"),
 }
 var sounddict = {
-door = load("res://files/sounds/door.wav"),
-stab = load("res://files/sounds/stab.wav"),
-win = load("res://files/sounds/win.wav"),
-teleport = load("res://files/sounds/teleport.wav"),
-fall = load("res://files/sounds/fall.wav"),
-page = load("res://files/sounds/page.wav"),
-attack = load("res://files/sounds/normalattack.wav"),
+	door = load("res://files/sounds/door.wav"),
+	stab = load("res://files/sounds/stab.wav"),
+	win = load("res://files/sounds/win.wav"),
+	teleport = load("res://files/sounds/teleport.wav"),
+	fall = load("res://files/sounds/fall.wav"),
+	page = load("res://files/sounds/page.wav"),
+	attack = load("res://files/sounds/normalattack.wav"),
 }
 var backgrounds = gallery.backgrounds
 var scenes = gallery.scenes
 var mansionupgradesdict = mansionupgrades.dict
 var gradeimages = {
-"slave" : load("res://files/buttons/mainscreen/40.png"),
-poor = load("res://files/buttons/mainscreen/41.png"),
-commoner = load("res://files/buttons/mainscreen/42.png"),
-rich = load("res://files/buttons/mainscreen/43.png"),
-noble = load("res://files/buttons/mainscreen/44.png"),
+	"slave" : load("res://files/buttons/mainscreen/40.png"),
+	poor = load("res://files/buttons/mainscreen/41.png"),
+	commoner = load("res://files/buttons/mainscreen/42.png"),
+	rich = load("res://files/buttons/mainscreen/43.png"),
+	noble = load("res://files/buttons/mainscreen/44.png"),
 }
 var specimages = {
-Null = null,
-geisha = load("res://files/buttons/mainscreen/33.png"),
-ranger = load("res://files/buttons/mainscreen/37.png"),
-executor = load("res://files/buttons/mainscreen/39.png"),
-bodyguard = load("res://files/buttons/mainscreen/31.png"),
-assassin = load("res://files/buttons/mainscreen/30.png"),
-housekeeper = load("res://files/buttons/mainscreen/34.png"),
-trapper = load("res://files/buttons/mainscreen/38.png"),
-nympho = load("res://files/buttons/mainscreen/36.png"),
-merchant = load("res://files/buttons/mainscreen/35.png"),
-tamer = load("res://files/buttons/mainscreen/32.png"),
+	Null = null,
+	geisha = load("res://files/buttons/mainscreen/33.png"),
+	ranger = load("res://files/buttons/mainscreen/37.png"),
+	executor = load("res://files/buttons/mainscreen/38.png"),
+	bodyguard = load("res://files/buttons/mainscreen/31.png"),
+	assassin = load("res://files/buttons/mainscreen/30.png"),
+	housekeeper = load("res://files/buttons/mainscreen/34.png"),
+	trapper = load("res://files/buttons/mainscreen/39.png"),
+	nympho = load("res://files/buttons/mainscreen/36.png"),
+	merchant = load("res://files/buttons/mainscreen/35.png"),
+	tamer = load("res://files/buttons/mainscreen/32.png"),
 }
 
 var sexicon = {
-female = load("res://files/buttons/sexicons/female.png"),
-male = load("res://files/buttons/sexicons/male.png"),
-futanari = load("res://files/buttons/sexicons/futa.png"),
+	female = load("res://files/buttons/sexicons/female.png"),
+	male = load("res://files/buttons/sexicons/male.png"),
+	futanari = load("res://files/buttons/sexicons/futa.png"),
 }
 
 #var combatencounterdata = explorationscrips.enemygroup
@@ -128,10 +139,10 @@ var noimage = load("res://files/buttons/noimagesmall.png")
 var punishcategories = ['spanking','whipping','nippleclap','clitclap','nosehook','mashshow','facesit','afacesit','grovel']
 
 var playerspecs = {
-Slaver = "+100% gold from selling captured slaves\n+33% gold reward from slave delivery tasks",
-Hunter = "+100% gold drop from random encounters\n+20% gear drop chance\nBonus to preventing ambushes",
-Alchemist = "Start with an alchemy room\nDouble potion production\nSelling potions earn 100% more gold",
-Mage = "-50% mana cost of spells\nCombat spell deal 20% more damage",
+	Slaver = "+100% gold from selling captured slaves\n+33% gold reward from slave delivery tasks",
+	Hunter = "+100% gold drop from random encounters\n+20% gear drop chance\nBonus to preventing ambushes",
+	Alchemist = "Start with an alchemy room\nDouble potion production\nSelling potions earn 100% more gold",
+	Mage = "-50% mana cost of spells\nCombat spell deal 20% more damage",
 }
 
 func _init():
@@ -139,6 +150,8 @@ func _init():
 		developmode = true
 	randomize()
 	loadsettings()
+	if rules.fullscreen == true:
+		OS.set_window_fullscreen(true)
 	effectdict = effects.effectlist 
 #	var tempvars = load("res://mods/variables.gd").duplicate()
 #	var tempnode = Node.new()
@@ -172,14 +185,14 @@ func loadsettings():
 	var settings = File.new()
 	var dir = Directory.new()
 	for i in setfolders.values():
-		if dir.dir_exists(i) == false:
-			dir.make_dir(i)
+		if !dir.dir_exists(i):
+			dir.make_dir_recursive(i)
 		
-	if settings.file_exists("user://settings.ini") == false:
-		settings.open("user://settings.ini", File.WRITE)
+	if settings.file_exists(settingsFile) == false:
+		settings.open(settingsFile, File.WRITE)
 		settings.store_line(var2str(rules))
 		settings.close()
-	settings.open("user://settings.ini", File.READ)
+	settings.open(settingsFile, File.READ)
 	var temp = str2var(settings.get_as_text())
 	for i in rules:
 		if temp.has(i):
@@ -187,10 +200,10 @@ func loadsettings():
 	settings.close()
 	var data = {chars = charactergallery, folders = setfolders}
 	
-	if settings.file_exists("user://progressdata") == false:
+	if settings.file_exists(progressFile) == false:
 		overwritesettings()
 	
-	settings.open_encrypted_with_pass("user://progressdata", File.READ, 'tehpass')
+	settings.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
 	var storedsettings = settings.get_var()
 	temp = storedsettings.chars
 	
@@ -204,7 +217,7 @@ func loadsettings():
 						charactergallery[character][part][scene].unlocked = temp[character][part][scene].unlocked
 	if storedsettings.has('folders') == false:
 		overwritesettings()
-		settings.open_encrypted_with_pass("user://progressdata", File.READ, 'tehpass')
+		settings.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
 		storedsettings = settings.get_var()
 	temp = storedsettings.folders
 	for i in temp:
@@ -214,7 +227,7 @@ func loadsettings():
 	modfolder = setfolders.mods
 	if storedsettings.has('savelist') == false:
 		overwritesettings()
-		settings.open_encrypted_with_pass("user://progressdata", File.READ, 'tehpass')
+		settings.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
 		storedsettings = settings.get_var()
 	temp = storedsettings.savelist
 	for i in temp:
@@ -222,7 +235,7 @@ func loadsettings():
 	settings.close()
 
 var charactergallery = gallery.charactergallery setget savechars
-var setfolders = {portraits = 'user://portraits/', fullbody = 'user://bodies/', mods = 'user://mods/'} setget savefolders
+var setfolders = {portraits = appDataDir +'portraits/', fullbody = appDataDir + 'bodies/', mods = appDataDir + 'mods/'} setget savefolders
 var savelist = {}
 var modfolder = setfolders.mods
 
@@ -235,10 +248,10 @@ func savefolders(value):
 
 func overwritesettings():
 	var settings = File.new()
-	settings.open("user://settings.ini", File.WRITE)
+	settings.open(settingsFile, File.WRITE)
 	settings.store_line(var2str(rules))
 	settings.close()
-	settings.open_encrypted_with_pass("user://progressdata", File.WRITE, 'tehpass')
+	settings.open_encrypted_with_pass(progressFile, File.WRITE, 'tehpass')
 	var data = {chars = charactergallery, folders = setfolders, savelist = savelist}
 	settings.store_var(data)
 	settings.close()
@@ -272,15 +285,17 @@ func slaves_set(person):
 
 func loadimage(path):
 	#var file = File.new()
-	if typeof(path) == TYPE_OBJECT:
+	if path == null || typeof(path) == TYPE_OBJECT:
 		return path
-	if path == null:
-		return
-	if path.find('res:') >= 0:
+	if ResourceLoader.exists(path):
 		return load(path)
+	if !File.new().file_exists(path):
+		return null
 	var image = Image.new()
-	if File.new().file_exists(path):
-		image.load(path)
+	var retVal = image.load(path)
+	if retVal != OK:
+		printErrorCode("loadimage("+str(path)+")", retVal)
+		return null
 	var temptexture = ImageTexture.new()
 	temptexture.create_from_image(image)
 	return temptexture
@@ -295,29 +310,29 @@ func slavecount():
 
 
 var rules = {
-futa = true,
-futaballs = false,
-furry = true,
-furrynipples = true,
-male_chance = 15,
-futa_chance = 10,
-children = false,
-noadults = false,
-slaverguildallraces = false,
-fontsize = 18,
-musicvol = 24,
-soundvol = 24,
-receiving = true,
-fullscreen = false,
-oldresize = true,
-fadinganimation = true,
-permadeath = false,
-autoattack = true,
-enddayalise = 1,
-spritesindialogues = true,
-instantcombatanimation = false,
-randomcustomportraits = true,
-thumbnails = false,
+	futa = true,
+	futaballs = false,
+	furry = true,
+	furrynipples = true,
+	male_chance = 15,
+	futa_chance = 10,
+	children = false,
+	noadults = false,
+	slaverguildallraces = false,
+	fontsize = 18,
+	musicvol = 24,
+	soundvol = 24,
+	receiving = true,
+	fullscreen = false,
+	oldresize = true,
+	fadinganimation = true,
+	permadeath = false,
+	autoattack = true,
+	enddayalise = 1,
+	spritesindialogues = true,
+	instantcombatanimation = false,
+	randomcustomportraits = true,
+	thumbnails = false,
 }
 
 var scenedict = {
@@ -469,6 +484,7 @@ class progress:
 	var slaveguildvisited = 0
 	var umbrafirstvisit = true
 	var itemlist = {}
+	var curRopeBreakChance = 0
 	var spelllist = {}
 	var mainquest = 0
 	var mainquestcomplete = false
@@ -506,25 +522,25 @@ class progress:
 	var relativesdata = {}
 	var descriptsettings = {full = true, basic = true, appearance = true, genitals = true, piercing = true, tattoo = true, mods = true}
 	var mansionupgrades = {
-	farmcapacity = 0,
-	farmhatchery = 0,
-	farmtreatment = 0,
-	farmmana = 0,
-	foodcapacity = 0,
-	foodpreservation = 0,
-	jailcapacity = 1,
-	jailtreatment = 0,
-	jailincenses = 0,
-	mansioncommunal = 4,
-	mansionpersonal = 1,
-	mansionbed = 0,
-	mansionluxury = 0,
-	mansionalchemy = 0,
-	mansionlibrary = 0,
-	mansionlab = 0,
-	mansionkennels = 0,
-	mansionnursery = 0,
-	mansionparlor = 0,
+		farmcapacity = 0,
+		farmhatchery = 0,
+		farmtreatment = 0,
+		farmmana = 0,
+		foodcapacity = 0,
+		foodpreservation = 0,
+		jailcapacity = 1,
+		jailtreatment = 0,
+		jailincenses = 0,
+		mansioncommunal = 4,
+		mansionpersonal = 1,
+		mansionbed = 0,
+		mansionluxury = 0,
+		mansionalchemy = 0,
+		mansionlibrary = 0,
+		mansionlab = 0,
+		mansionkennels = 0,
+		mansionnursery = 0,
+		mansionparlor = 0,
 	}
 	var plotsceneseen = []
 	var capturedgroup = []
@@ -643,6 +659,29 @@ class progress:
 					globals.itemdict[item].amount = 0
 		return count
 
+	# calculates and returns the number of ropes recovered after use, mainly for adding to appropriate inventory. displays infotext if ropes are lost
+	func calcRecoverRope(numPersons, usedFor = 'capture'):
+		var lostRope = 0
+		if usedFor == 'capture':
+			if variables.consumerope <= 0:
+				return 0
+			for i in range(numPersons):
+				if rand_range(0, 100) < curRopeBreakChance:
+					lostRope += variables.consumerope
+					curRopeBreakChance = 0
+				else:
+					curRopeBreakChance += variables.ropewearoutrate
+			numPersons *= variables.consumerope
+		elif usedFor == 'sex':
+			for i in range(numPersons):
+				if rand_range(0, 100) < curRopeBreakChance / 2:
+					lostRope += 1
+					curRopeBreakChance = 0
+				else:
+					curRopeBreakChance += variables.ropewearoutrate / 2
+		if globals.main && lostRope > 0:
+			globals.main.infotext(str(lostRope) + ' rope%s wore out from use' % ('s' if lostRope > 1 else ''),'red')
+		return numPersons - lostRope
 	
 
 func addrelations(person, person2, value):
@@ -671,7 +710,7 @@ static func count_sleepers():
 	var communal = 0
 	var rval = {}
 	for i in globals.slaves:
-		if i.away.at != 'hidden':
+		if i.away.duration == 0 || i.away.at in ['rest','lab','in labor']:
 			if i.sleep == 'personal':
 				personal_room += 1
 			elif i.sleep == 'your':
@@ -699,9 +738,9 @@ func impregnation(mother, father = null, anyfather = false):
 		else:
 			gender = ['male']
 		if anyfather == false:
-			father = globals.newslave('randomcommon', 'random', gender[rand_range(0,gender.size())])
+			father = globals.newslave('randomcommon', 'random', randomfromarray(gender))
 		else:
-			father = globals.newslave('randomany', 'random', gender[rand_range(0,gender.size())])
+			father = globals.newslave('randomany', 'random', randomfromarray(gender))
 	else:
 		if father.penis == 'none':
 			return
@@ -731,6 +770,7 @@ func impregnation(mother, father = null, anyfather = false):
 
 		
 	var baby = globals.newslave(babyrace, age, 'random', mother.origins)
+	baby.cleartraits()
 	baby.state = 'fetus'
 	baby.surname = mother.surname
 	var array = ['skin','tail','ears','wings','horns','arms','legs','bodyshape','haircolor','eyecolor','eyeshape','eyesclera']
@@ -741,19 +781,17 @@ func impregnation(mother, father = null, anyfather = false):
 			baby[i] = mother[i]
 	if baby.race.find('Halfkin')>=0 && mother.race.find('Beastkin') >= 0 && father.race.find('Beastkin') < 0:
 		baby.bodyshape = 'humanoid'
-	if father.beautybase > mother.beautybase:
-		baby.beautybase = father.beautybase + rand_range(-2,5)
-	else:
-		baby.beautybase = mother.beautybase + rand_range(-2,5)
-	baby.cleartraits()
 	
 	var traitpool = father.traits + mother.traits
 	for i in traitpool:
 		if rand_range(0,100) <= variables.traitinheritchance:
 			baby.add_trait(i)
-	
 	if rand_range(0,100) <= variables.babynewtraitchance:
 		baby.add_trait(globals.origins.traits('any').name)
+	if father.beautybase > mother.beautybase:
+		baby.beautybase = father.beautybase + rand_range(-2,5)
+	else:
+		baby.beautybase = mother.beautybase + rand_range(-2,5)
 	
 	connectrelatives(mother, baby, 'mother')
 	if realfather != -1:
@@ -1149,8 +1187,8 @@ func save():
 func save_game(var savename):
 	var savegame = File.new()
 	var dir = Directory.new()
-	if dir.dir_exists("user://saves") == false:
-		dir.make_dir("user://saves")
+	if !dir.dir_exists(saveDir):
+		dir.make_dir_recursive(saveDir)
 	savegame.open(savename, File.WRITE)
 	var nodedata = save()
 	savelistentry(savename)
@@ -1166,8 +1204,39 @@ func savelistentry(savename):
 			date[i] = '0' + str(date[i])
 		else:
 			date[i] = str(date[i])
-	var entry = {name = "Master " + player.name + "\nDay: " + str(resources.day) + '\nGold: [color=yellow] ' + str(resources.gold) + '[/color]\nSlaves: ' + str(slavecount()), path = savename, date = date.hour + ":" + date.minute + " " + date.day + '.' + date.month + '.' + date.year, portrait = player.imageportait}
-	savelist[savename] = entry
+
+	savelist[savename] = {
+		name = globals.state.defaultmasternoun + " " + player.name + "\nDay: " + str(resources.day) + '\nGold: [color=yellow] ' + str(resources.gold) + '[/color]\nSlaves: ' + str(slavecount()),
+		path = savename,
+		date = date.hour + ":" + date.minute + " " + date.day + '.' + date.month + '.' + date.year,
+		portrait = player.imageportait
+	}
+
+func saveListNewEntry(savePath):
+	var saveFile = File.new()
+	saveFile.open(savePath, File.READ)
+	var saveData = parse_json(saveFile.get_as_text())
+	if !(typeof(saveData) == TYPE_DICTIONARY && saveData.has('slaves') && saveData.has('state') && saveData.has('player') && saveData.has('resources')):
+		return false
+
+	var date = OS.get_datetime()
+	for i in date:
+		if int(date[i]) < 10:
+			date[i] = '0' + str(date[i])
+		else:
+			date[i] = str(date[i])
+
+	var count = 0
+	for person in saveData.slaves:
+		if person.away.at != 'hidden':
+			count += 1
+	savelist[savePath] = {
+		name = saveData.state.defaultmasternoun + " " + saveData.player.name + "\nDay: " + str(saveData.resources.day) + '\nGold: [color=yellow] ' + str(saveData.resources.gold) + '[/color]\nSlaves: ' + str(count),
+		path = savePath,
+		date = date.hour + ":" + date.minute + " " + date.day + '.' + date.month + '.' + date.year,
+		portrait = saveData.player.imageportait
+	}
+	return true
 
 func load_game(text):
 	var savegame = File.new()
@@ -1252,11 +1321,9 @@ func load_game(text):
 		spelldict[i].learned = true
 	state.spelllist = {}
 	if globals.state.sebastianorder.taken == true:
-		state.sebastianslave = person.new()
 		state.sebastianslave = dict2inst(currentline.sebastianslave)
 	state.babylist.clear()
 	for i in currentline.slaves:
-		newslave = person.new()
 		if i['@path'].find('.gdc') >= 0:
 			i['@path'] = i['@path'].replace('.gdc', '.gd')
 		newslave = dict2inst(i)
@@ -1264,7 +1331,6 @@ func load_game(text):
 			newslave.beautybase = round(i.face.beauty)
 		slaves.append(newslave)
 	for i in currentline.babylist:
-		newslave = person.new()
 		if i['@path'].find('.gdc'):
 			i['@path'] = i['@path'].replace('.gdc', '.gd')
 		newslave = dict2inst(i)
@@ -1276,6 +1342,8 @@ func load_game(text):
 		Input.set_custom_mouse_cursor(null)
 	else:
 		state.customcursor = "res://files/buttons/kursor1.png"
+	if !state.mansionupgrades.has("farmmana"):
+		state.mansionupgrades.farmmana = 0
 	
 	
 	gameloaded = true
@@ -1290,28 +1358,42 @@ func repairsave():
 		person.id = str(person.id)
 		if person.sexexp.has('partners') == false:
 			person.sexexp = {partners = {}, watchers = {}, actions = {}, seenactions = {}, orgasms = {}, orgasmpartners = {}}
-	for i in globals.state.unstackables.values():
-		if i.enchant == null:
-			i.enchant = ''
-	globals.state.playergroup.clear()
+		if person.skin == "pale_blue":
+			person.skin = "pale blue"
+	for item in globals.state.unstackables.values():
+		if item.enchant == null:
+			item.enchant = ''
+		if item.code == 'weaponshortsword':
+			for e in item.effects:
+				if e.has('type') && e.type == 'incombat':
+					if e.effect == 'damage':
+						if e.effectvalue == 6 && e.descript == "+9 Damage":
+							e.effectvalue = 9
+					elif e.effect == 'passive':
+						e.type = 'passive'
+						e.effect = 'armorbreaker'
+						e.erase('effectvalue')
 
 var showalisegreet = false
 
-func dir_contents(target = "user://saves"):
+func dir_contents(target = saveDir):
 	var dir = Directory.new()
 	var array = []
-	if dir.open(target) == OK:
-		dir.list_dir_begin()
+	if target.ends_with('/'):
+		target.erase(target.length()-1,1)
+	var retCode = dir.open(target)
+	if retCode == OK:
+		dir.list_dir_begin(true)
 		var file_name = dir.get_next()
 		while file_name != "":
-			if !dir.current_is_dir():
-				array.append(target + "/" + file_name)
-			elif !file_name in ['.','..', null] && dir.current_is_dir():
+			if dir.current_is_dir():
 				array += dir_contents(target + "/" + file_name)
+			else:
+				array.append(target + "/" + file_name)
 			file_name = dir.get_next()
 		return array
 	else:
-		print("An error occurred when trying to access the path.")
+		printErrorCode("ERROR: could not access path: "+ str(target), retCode)
 
 var currentslave
 var currentsexslave
@@ -1345,7 +1427,7 @@ func weightedrandom(array): #array must be made out of dictionaries with {value 
 			counter += i[1]
 
 func randomfromarray(array):
-	return array[rand_range(0,array.size())]
+	return array[randi() % array.size()]
 
 func buildportrait(node, person):
 	var array = ['race','hairlength','ears'] #add more pieces of layers in order they should be added
@@ -1383,7 +1465,7 @@ func getracebygroup(group):
 
 
 func addnonfurrycounterpart(array):
-	for i in array:
+	for i in array.duplicate():
 		if i.find('Beastkin') >= 0:
 			array.append(i.replace('Beastkin', 'Halfkin'))
 
@@ -1403,3 +1485,83 @@ func checkfurryrace(text):
 		else:
 			text = 'Halfkin ' + text
 	return text
+
+var errorText = [
+	"OK",
+	"Generic",
+	"Unavailable",
+	"Unconfigured",
+	"Unauthorized",
+	"Parameter Range",
+	"Out of memory",
+	"File: not found",
+	"File: Bad drive",
+	"File: Bad path",
+	"File: No permission",
+	"File: Already in use",
+	"File: Can't open",
+	"File: Can't write",
+	"File: Can't read",
+	"File: Unrecognized",
+	"File: Corrupt",
+	"File: Missing dependencies",
+	"File: End of file",
+	"Can't open",
+	"Can't create",
+	"Query failed",
+	"Already in use",
+	"Locked",
+	"Timeout",
+	"Can't connect",
+	"Can't resolve",
+	"Connection",
+	"Can't acquire resource",
+	"Can't fork",
+	"Invalid data",
+	"Invalid parameter",
+	"Already exists",
+	"Does not exist",
+	"Database: can't read",
+	"Database: can't write",
+	"Compilation failed",
+	"Method not found",
+	"Link failed",
+	"Script failed",
+	"Cyclic link",
+	"Invalid declaration",
+	"Duplicate symbol",
+	"Parse",
+	"Busy",
+	"Skip",
+	"Help",
+	"Bug"
+]
+
+func printErrorCode(msg, code=ERR_BUG, showOK = false):
+	if code != OK:
+		globals.traceFile("ERROR: " +str(msg)+ "  Error code("+ str(code)+ "): "+ str(errorText[code]))
+		print("ERROR: ", msg, "  Error code(", code, "): ", errorText[code])
+	elif showOK: 
+		print("OK: ", msg)
+
+#debugging function useful for diagnosing problems when Strive crashes and fails to produce normal error logs
+#recommended use: spread calls to this function(with unique strings) around code likely to be the source of the crash, run Strive, and view the trace file
+var firstTrace = true
+func traceFile(string):
+	string += '\n'
+	var file = File.new()
+	var type
+	if firstTrace:
+		type = File.WRITE
+		firstTrace = false
+	else:
+		type = File.READ_WRITE
+	if file.open("res://DEBUG_TRACE.txt", type) == OK:
+		if !firstTrace:
+			file.seek_end()
+		file.store_string(string)
+		file.close()
+
+func shellOpenFolder(path):
+	var retCode = OS.shell_open(ProjectSettings.globalize_path(path))
+	printErrorCode("OS shell opening " + path, retCode)

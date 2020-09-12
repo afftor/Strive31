@@ -23,9 +23,9 @@ theme = ExtResource( 1 )
 script = ExtResource( 2 )
 
 [node name="TabContainer" type="TabContainer" parent="."]
-margin_left = 7.0
+margin_left = 5.0
 margin_top = 12.0
-margin_right = 834.0
+margin_right = 835.0
 margin_bottom = 567.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -44,39 +44,39 @@ size_flags_vertical = 2
 [node name="TextureRect" type="TextureRect" parent="TabContainer/Settings"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 820.0
+margin_left = 823.0
 margin_top = -13.0
-margin_right = 548.0
-margin_bottom = 312.0
-rect_rotation = 89.9789
+margin_right = 544.0
+margin_bottom = 317.0
+rect_rotation = 90.0
 texture = SubResource( 1 )
 expand = true
 
 [node name="fadinganimation" type="CheckBox" parent="TabContainer/Settings"]
-margin_left = 17.0
-margin_top = 67.0
-margin_right = 319.0
-margin_bottom = 94.0
+margin_left = 20.0
+margin_top = 70.0
+margin_right = 322.0
+margin_bottom = 97.0
 hint_tooltip = "Fade to black on window transition"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Use animation on screen change"
 
 [node name="spritesindialogues" type="CheckBox" parent="TabContainer/Settings"]
-margin_left = 17.0
-margin_top = 93.0
-margin_right = 261.0
-margin_bottom = 120.0
+margin_left = 20.0
+margin_top = 97.0
+margin_right = 264.0
+margin_bottom = 124.0
 hint_tooltip = "Show custom character sprites during dialogues?"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Show Sprites in Dialogues"
 
 [node name="randomcustomportraits" type="CheckBox" parent="TabContainer/Settings"]
-margin_left = 17.0
-margin_top = 145.0
-margin_right = 261.0
-margin_bottom = 172.0
+margin_left = 20.0
+margin_top = 151.0
+margin_right = 264.0
+margin_bottom = 178.0
 hint_tooltip = "The game will attempt to assign a random portrait when generating a new slave
 Portraits are selected from default portrait folder
 Available portraits are based on paths (including both file and folder names) similarities to slave's race
@@ -87,21 +87,35 @@ size_flags_vertical = 2
 text = "Use random portraits"
 
 [node name="thumbnails" type="CheckBox" parent="TabContainer/Settings"]
-margin_left = 17.0
-margin_top = 172.0
-margin_right = 261.0
-margin_bottom = 199.0
+margin_left = 20.0
+margin_top = 178.0
+margin_right = 264.0
+margin_bottom = 205.0
 hint_tooltip = "The game will create thumbnails from user portraits and body images on first attempt
 This can save some RAM when using very big user image folders."
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Create Thumbnails"
 
+[node name="errorLogging" type="CheckBox" parent="TabContainer/Settings"]
+margin_left = 20.0
+margin_top = 205.0
+margin_right = 264.0
+margin_bottom = 232.0
+hint_tooltip = "The game will create a log folder and file in the application data folder (near the saves, portraits,
+and mods), which will record all text that would be printed to the terminal while the game runs.
+This is especially useful for sudden crashes or any OS that does not automatically open a
+terminal when the game starts.
+This option will only go into effect after the game restarts."
+size_flags_horizontal = 2
+size_flags_vertical = 2
+text = "Use file error logging"
+
 [node name="Label2" type="Label" parent="TabContainer/Settings"]
 margin_left = 482.0
-margin_top = 23.0
+margin_top = 61.0
 margin_right = 609.0
-margin_bottom = 43.0
+margin_bottom = 81.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "Main Font Size"
@@ -109,10 +123,10 @@ text = "Main Font Size"
 [node name="fullscreen" type="CheckBox" parent="TabContainer/Settings"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 17.0
-margin_top = -474.0
-margin_right = 202.0
-margin_bottom = -434.0
+margin_left = 20.0
+margin_top = -462.0
+margin_right = 205.0
+margin_bottom = -435.0
 hint_tooltip = "Switch to full screen mode"
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -120,9 +134,9 @@ text = "Fullscreen Mode"
 
 [node name="fontsize" type="SpinBox" parent="TabContainer/Settings"]
 margin_left = 403.0
-margin_top = 13.0
+margin_top = 51.0
 margin_right = 481.0
-margin_bottom = 51.0
+margin_bottom = 89.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 min_value = 10.0
@@ -131,9 +145,9 @@ value = 10.0
 
 [node name="musicslider" type="HSlider" parent="TabContainer/Settings"]
 margin_left = 424.0
-margin_top = 87.0
+margin_top = 125.0
 margin_right = 581.0
-margin_bottom = 104.0
+margin_bottom = 142.0
 size_flags_horizontal = 2
 value = 1.0
 
@@ -148,9 +162,9 @@ text = "Music Volume"
 
 [node name="soundslider" type="HSlider" parent="TabContainer/Settings"]
 margin_left = 424.0
-margin_top = 137.0
+margin_top = 175.0
 margin_right = 581.0
-margin_bottom = 154.0
+margin_bottom = 192.0
 size_flags_horizontal = 2
 value = 1.0
 
@@ -164,11 +178,11 @@ size_flags_vertical = 0
 text = "Sound Volume"
 
 [node name="instantcombatanimation" type="CheckBox" parent="TabContainer/Settings"]
-margin_left = 17.0
-margin_top = 119.0
-margin_right = 261.0
-margin_bottom = 146.0
-hint_tooltip = "Show custom character sprites during dialogues?"
+margin_left = 20.0
+margin_top = 124.0
+margin_right = 264.0
+margin_bottom = 151.0
+hint_tooltip = "Speed up combat by making attack animations nearly instantaneous"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Skip combat animation"
@@ -187,19 +201,19 @@ size_flags_vertical = 2
 [node name="TextureRect" type="TextureRect" parent="TabContainer/Game"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 820.0
+margin_left = 823.0
 margin_top = -13.0
-margin_right = 548.0
-margin_bottom = 312.0
-rect_rotation = 89.9789
+margin_right = 544.0
+margin_bottom = 317.0
+rect_rotation = 90.0
 texture = SubResource( 1 )
 expand = true
 
 [node name="furry" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 20.0
-margin_top = 63.0
+margin_top = 66.0
 margin_right = 90.0
-margin_bottom = 90.0
+margin_bottom = 93.0
 hint_tooltip = "Allow random generation of furry characters"
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -207,9 +221,9 @@ text = "Furry"
 
 [node name="furrynipples" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 135.0
-margin_top = 62.0
+margin_top = 66.0
 margin_right = 480.0
-margin_bottom = 89.0
+margin_bottom = 93.0
 hint_tooltip = "Furry characters will posses more nipples"
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -237,9 +251,9 @@ text = "Futa with testicles"
 
 [node name="slaverguildallraces" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 20.0
-margin_top = 85.0
+margin_top = 93.0
 margin_right = 365.0
-margin_bottom = 112.0
+margin_bottom = 120.0
 hint_tooltip = "This option will allow starting town's slavers' guild to offer slaves of any possible race. 
 Turning this off will only make it offer local races."
 size_flags_horizontal = 2
@@ -248,9 +262,9 @@ text = "Allow all possible races in slavers guild"
 
 [node name="receiving" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 20.0
-margin_top = 107.0
+margin_top = 120.0
 margin_right = 295.0
-margin_bottom = 134.0
+margin_bottom = 147.0
 hint_tooltip = "This option will enable unlock of sex options
 which put you on receiving side i.e. be fucked in the ass"
 size_flags_horizontal = 2
@@ -259,9 +273,9 @@ text = "Enable Receiving Sex Options"
 
 [node name="children" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 20.0
-margin_top = 151.0
+margin_top = 174.0
 margin_right = 210.0
-margin_bottom = 178.0
+margin_bottom = 201.0
 hint_tooltip = "Turn on 'childlike' age for characters."
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -269,9 +283,9 @@ text = "Childlike characters"
 
 [node name="permadeath" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 20.0
-margin_top = 129.0
+margin_top = 147.0
 margin_right = 175.0
-margin_bottom = 156.0
+margin_bottom = 174.0
 hint_tooltip = "Members of your party reaching 0 hp in combat will die 
 instead of going on the rest"
 size_flags_horizontal = 2
@@ -280,9 +294,9 @@ text = "Permadeath"
 
 [node name="noadults" type="CheckBox" parent="TabContainer/Game"]
 margin_left = 223.0
-margin_top = 151.0
+margin_top = 174.0
 margin_right = 452.0
-margin_bottom = 178.0
+margin_bottom = 201.0
 hint_tooltip = "Turn off 'adult' characters generation."
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -291,9 +305,9 @@ text = "Disable adult characters"
 [node name="malesslider" type="HSlider" parent="TabContainer/Game"]
 editor/display_folded = true
 margin_left = 18.0
-margin_top = 238.0
+margin_top = 254.0
 margin_right = 253.0
-margin_bottom = 254.0
+margin_bottom = 270.0
 size_flags_horizontal = 2
 value = 1.0
 rounded = true
@@ -302,9 +316,9 @@ ticks_on_borders = true
 
 [node name="malesliderlabel" type="Label" parent="TabContainer/Game"]
 margin_left = 18.0
-margin_top = 215.0
+margin_top = 230.0
 margin_right = 259.0
-margin_bottom = 235.0
+margin_bottom = 250.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "Gender occurrence balance: "
@@ -312,9 +326,9 @@ text = "Gender occurrence balance: "
 [node name="futaslider" type="HSlider" parent="TabContainer/Game"]
 editor/display_folded = true
 margin_left = 18.0
-margin_top = 284.0
+margin_top = 300.0
 margin_right = 253.0
-margin_bottom = 300.0
+margin_bottom = 316.0
 hint_tooltip = "Futas occur only among females"
 size_flags_horizontal = 2
 value = 1.0
@@ -324,9 +338,9 @@ ticks_on_borders = true
 
 [node name="futasliderlabel" type="Label" parent="TabContainer/Game"]
 margin_left = 18.0
-margin_top = 260.0
+margin_top = 276.0
 margin_right = 240.0
-margin_bottom = 280.0
+margin_bottom = 296.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "Random futa occurrence: "
@@ -377,11 +391,11 @@ size_flags_vertical = 2
 [node name="TextureRect" type="TextureRect" parent="TabContainer/Supporter section"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 820.0
+margin_left = 823.0
 margin_top = -13.0
-margin_right = 548.0
-margin_bottom = 312.0
-rect_rotation = 89.9789
+margin_right = 544.0
+margin_bottom = 317.0
+rect_rotation = 90.0
 texture = SubResource( 1 )
 expand = true
 
@@ -466,6 +480,7 @@ margin_right = -228.0
 margin_bottom = -171.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
+popup_exclusive = true
 
 [node name="Panel" type="Panel" parent="screenpopup"]
 anchor_left = 1.0
@@ -706,6 +721,7 @@ step = 100.0
 value = 100.0
 rounded = true
 
+[connection signal="toggled" from="TabContainer/Settings/errorLogging" to="." method="_on_errorLogging_toggled"]
 [connection signal="pressed" from="TabContainer/Settings/fullscreen" to="." method="_on_fullscreen_pressed"]
 [connection signal="value_changed" from="TabContainer/Settings/fontsize" to="." method="_on_fontsize_value_changed"]
 [connection signal="value_changed" from="TabContainer/Game/malesslider" to="." method="_on_malesslider_value_changed"]

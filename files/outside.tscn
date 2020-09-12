@@ -1,4 +1,4 @@
-[gd_scene load_steps=121 format=2]
+[gd_scene load_steps=120 format=2]
 
 [ext_resource path="res://files/theme.tres" type="Theme" id=1]
 [ext_resource path="res://files/scripts/outside.gd" type="Script" id=2]
@@ -181,16 +181,16 @@ texture = ExtResource( 19 )
 region_rect = Rect2( 0, 0, 403, 133 )
 
 [sub_resource type="StyleBoxTexture" id=17]
-texture = ExtResource( 41 )
+texture = ExtResource( 40 )
 region_rect = Rect2( 0, 0, 500, 500 )
+margin_left = 15.0
+margin_right = 15.0
+margin_top = 15.0
+margin_bottom = 15.0
 
 [sub_resource type="StyleBoxTexture" id=18]
-texture = ExtResource( 42 )
-region_rect = Rect2( 0, 0, 50, 50 )
-margin_left = 10.0
-margin_right = 10.0
-margin_top = 10.0
-margin_bottom = 10.0
+texture = ExtResource( 41 )
+region_rect = Rect2( 0, 0, 500, 500 )
 
 [sub_resource type="StyleBoxTexture" id=19]
 texture = ExtResource( 42 )
@@ -201,10 +201,18 @@ margin_top = 10.0
 margin_bottom = 10.0
 
 [sub_resource type="StyleBoxTexture" id=20]
+texture = ExtResource( 42 )
+region_rect = Rect2( 0, 0, 50, 50 )
+margin_left = 10.0
+margin_right = 10.0
+margin_top = 10.0
+margin_bottom = 10.0
 
 [sub_resource type="StyleBoxTexture" id=21]
 
 [sub_resource type="StyleBoxTexture" id=22]
+
+[sub_resource type="StyleBoxTexture" id=23]
 texture = ExtResource( 43 )
 region_rect = Rect2( 0, 0, 50, 50 )
 margin_left = 10.0
@@ -212,7 +220,7 @@ margin_right = 10.0
 margin_top = 10.0
 margin_bottom = 10.0
 
-[sub_resource type="StyleBoxTexture" id=23]
+[sub_resource type="StyleBoxTexture" id=24]
 texture = ExtResource( 44 )
 region_rect = Rect2( 0, 0, 150, 18 )
 margin_left = 5.0
@@ -220,55 +228,39 @@ margin_right = 5.0
 margin_top = 5.0
 margin_bottom = 5.0
 
-[sub_resource type="StyleBoxTexture" id=24]
+[sub_resource type="StyleBoxTexture" id=25]
 texture = ExtResource( 45 )
 region_rect = Rect2( 0, 0, 150, 18 )
-margin_left = 3.0
-margin_right = 3.0
-margin_top = 3.0
-margin_bottom = 3.0
+margin_left = 5.0
+margin_right = 5.0
+margin_top = 5.0
+margin_bottom = 5.0
 
-[sub_resource type="StyleBoxTexture" id=25]
+[sub_resource type="StyleBoxTexture" id=26]
 texture = ExtResource( 48 )
 region_rect = Rect2( 0, 0, 529, 529 )
 
-[sub_resource type="DynamicFont" id=26]
+[sub_resource type="DynamicFont" id=27]
 size = 63
 use_filter = true
 extra_spacing_char = 2
 font_data = ExtResource( 50 )
 
-[sub_resource type="DynamicFont" id=27]
+[sub_resource type="DynamicFont" id=28]
 size = 20
 use_filter = true
 extra_spacing_top = 3
 font_data = ExtResource( 17 )
 
-[sub_resource type="DynamicFont" id=28]
+[sub_resource type="DynamicFont" id=29]
 size = 24
 use_filter = true
 extra_spacing_top = 1
 font_data = ExtResource( 17 )
 
-[sub_resource type="StyleBoxTexture" id=29]
+[sub_resource type="StyleBoxTexture" id=30]
 texture = ExtResource( 79 )
 region_rect = Rect2( 0, 0, 613, 833 )
-
-[sub_resource type="StyleBoxTexture" id=30]
-texture = ExtResource( 44 )
-region_rect = Rect2( 0, 0, 150, 18 )
-margin_left = 5.0
-margin_right = 5.0
-margin_top = 5.0
-margin_bottom = 5.0
-
-[sub_resource type="StyleBoxTexture" id=31]
-texture = ExtResource( 45 )
-region_rect = Rect2( 0, 0, 150, 18 )
-margin_left = 5.0
-margin_right = 5.0
-margin_top = 5.0
-margin_bottom = 5.0
 
 [node name="outside" type="Control"]
 anchor_right = 1.0
@@ -941,49 +933,38 @@ fill_mode = 3
 editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 24.0
-margin_top = 14.0
-margin_right = -31.0
-margin_bottom = -41.0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = -20.0
+margin_bottom = -20.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
-[node name="Control" type="Control" parent="playergroupdetails"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -40.0
-margin_top = -27.0
-margin_right = 55.0
-margin_bottom = 64.0
-size_flags_horizontal = 2
-size_flags_vertical = 2
-
-[node name="TextureRect" type="TextureRect" parent="playergroupdetails/Control"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-texture = ExtResource( 40 )
-expand = true
+[node name="BackPanel" type="Panel" parent="playergroupdetails"]
+margin_right = 1322.0
+margin_bottom = 730.0
+custom_styles/panel = SubResource( 17 )
 
 [node name="Panel" type="Panel" parent="playergroupdetails"]
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -518.0
-margin_top = 31.0
-margin_right = -17.0
-margin_bottom = -69.0
+margin_left = -630.0
+margin_top = 40.0
+margin_right = -30.0
+margin_bottom = -80.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-custom_styles/panel = SubResource( 17 )
+custom_styles/panel = SubResource( 18 )
 
 [node name="itemdescript" type="RichTextLabel" parent="playergroupdetails/Panel"]
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -232.0
-margin_top = 26.0
-margin_right = -25.0
-margin_bottom = -160.0
+margin_left = -315.0
+margin_top = 40.0
+margin_right = -40.0
+margin_bottom = -150.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 bbcode_enabled = true
@@ -993,9 +974,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -227.0
+margin_left = -268.0
 margin_top = -120.0
-margin_right = -49.0
+margin_right = -90.0
 margin_bottom = -81.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -1006,9 +987,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -227.0
+margin_left = -268.0
 margin_top = -70.0
-margin_right = -49.0
+margin_right = -90.0
 margin_bottom = -31.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -1018,9 +999,9 @@ text = "Discard"
 editor/display_folded = true
 anchor_bottom = 1.0
 margin_left = 5.0
-margin_top = -19.0
-margin_right = 251.0
-margin_bottom = 4.0
+margin_top = -24.0
+margin_right = 240.0
+margin_bottom = -7.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
@@ -1030,52 +1011,58 @@ anchor_bottom = 1.0
 margin_left = 10.0
 margin_top = 40.0
 margin_right = -10.0
-margin_bottom = -10.0
-size_flags_horizontal = 2
-size_flags_vertical = 2
+margin_bottom = -11.0
+rect_min_size = Vector2( 215, 0 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
 scroll_horizontal_enabled = false
+scroll_vertical_enabled = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="playergroupdetails/Panel/TabContainer/Items"]
+margin_right = 215.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 215, 0 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_constants/separation = 0
 
 [node name="Button" type="Button" parent="playergroupdetails/Panel/TabContainer/Items/VBoxContainer"]
 visible = false
-margin_right = 200.0
+margin_right = 215.0
 margin_bottom = 40.0
-rect_min_size = Vector2( 200, 40 )
+rect_min_size = Vector2( 215, 40 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
-custom_styles/hover = SubResource( 18 )
-custom_styles/pressed = SubResource( 19 )
-custom_styles/focus = SubResource( 20 )
-custom_styles/disabled = SubResource( 21 )
-custom_styles/normal = SubResource( 22 )
+custom_styles/hover = SubResource( 19 )
+custom_styles/pressed = SubResource( 20 )
+custom_styles/focus = SubResource( 21 )
+custom_styles/disabled = SubResource( 22 )
+custom_styles/normal = SubResource( 23 )
 toggle_mode = true
 
 [node name="icon" type="TextureRect" parent="playergroupdetails/Panel/TabContainer/Items/VBoxContainer/Button"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -160.0
+margin_right = -175.0
 rect_min_size = Vector2( 40, 40 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 expand = true
+stretch_mode = 5
 
 [node name="amount" type="Label" parent="playergroupdetails/Panel/TabContainer/Items/VBoxContainer/Button"]
-margin_left = 25.0
-margin_top = 26.0
-margin_right = 40.0
-margin_bottom = 46.0
+margin_left = 38.0
+margin_top = 19.0
+margin_right = 53.0
+margin_bottom = 39.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 
 [node name="name" type="Label" parent="playergroupdetails/Panel/TabContainer/Items/VBoxContainer/Button"]
-margin_left = 55.0
+margin_left = 75.0
 margin_top = 11.0
-margin_right = 189.0
-margin_bottom = 27.0
+margin_right = 205.0
+margin_bottom = 31.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 clip_text = true
@@ -1087,46 +1074,49 @@ anchor_bottom = 1.0
 margin_left = 10.0
 margin_top = 40.0
 margin_right = -10.0
-margin_bottom = -10.0
-size_flags_horizontal = 2
-size_flags_vertical = 2
+margin_bottom = -11.0
+rect_min_size = Vector2( 215, 0 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
 scroll_horizontal_enabled = false
-scroll_vertical = 1
+scroll_vertical_enabled = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="playergroupdetails/Panel/TabContainer/Spells"]
+margin_right = 215.0
+rect_min_size = Vector2( 215, 0 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_constants/separation = 0
 
 [node name="Button" type="Button" parent="playergroupdetails/Panel/TabContainer/Spells/VBoxContainer"]
 visible = false
-margin_right = 200.0
+margin_right = 215.0
 margin_bottom = 40.0
-rect_min_size = Vector2( 200, 40 )
+rect_min_size = Vector2( 215, 40 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
-custom_styles/hover = SubResource( 18 )
-custom_styles/pressed = SubResource( 19 )
-custom_styles/focus = SubResource( 20 )
-custom_styles/disabled = SubResource( 21 )
-custom_styles/normal = SubResource( 22 )
+custom_styles/hover = SubResource( 19 )
+custom_styles/pressed = SubResource( 20 )
+custom_styles/focus = SubResource( 21 )
+custom_styles/disabled = SubResource( 22 )
+custom_styles/normal = SubResource( 23 )
 toggle_mode = true
 
 [node name="name" type="Label" parent="playergroupdetails/Panel/TabContainer/Spells/VBoxContainer/Button"]
-margin_left = 11.0
+margin_left = 15.0
 margin_top = 10.0
-margin_right = 130.0
-margin_bottom = 26.0
+margin_right = 155.0
+margin_bottom = 30.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "SpellName"
 clip_text = true
 
 [node name="cost" type="Label" parent="playergroupdetails/Panel/TabContainer/Spells/VBoxContainer/Button"]
-margin_left = 154.0
+margin_left = 160.0
 margin_top = 11.0
-margin_right = 194.0
-margin_bottom = 27.0
+margin_right = 200.0
+margin_bottom = 31.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "1"
@@ -1138,9 +1128,9 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -750.0
-margin_top = -58.0
+margin_top = -69.0
 margin_right = -575.0
-margin_bottom = -16.0
+margin_bottom = -27.0
 rect_min_size = Vector2( 70, 30 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -1216,22 +1206,22 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -530.0
-margin_top = -58.0
-margin_right = -26.0
-margin_bottom = -30.0
+margin_top = -66.0
+margin_right = -130.0
+margin_bottom = -38.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-custom_styles/fg = SubResource( 23 )
-custom_styles/bg = SubResource( 24 )
+custom_styles/fg = SubResource( 24 )
+custom_styles/bg = SubResource( 25 )
 step = 1.0
 value = 40.0
 percent_visible = false
 
 [node name="Label" type="Label" parent="playergroupdetails/TextureProgress"]
-margin_left = 86.0
+margin_left = 120.0
 margin_top = 29.0
-margin_right = 243.0
-margin_bottom = 45.0
+margin_right = 277.0
+margin_bottom = 49.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
 align = 1
@@ -1239,10 +1229,10 @@ align = 1
 [node name="return" type="Button" parent="playergroupdetails"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 25.0
-margin_top = -58.0
-margin_right = 188.0
-margin_bottom = -16.0
+margin_left = 28.0
+margin_top = -69.0
+margin_right = 191.0
+margin_bottom = -27.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Return to Mansion"
@@ -1250,19 +1240,19 @@ text = "Return to Mansion"
 [node name="quicksell" type="Button" parent="playergroupdetails"]
 anchor_top = 1.0
 anchor_bottom = 1.0
-margin_left = 193.0
-margin_top = -58.0
-margin_right = 352.0
-margin_bottom = -15.0
+margin_left = 211.0
+margin_top = -69.0
+margin_right = 370.0
+margin_bottom = -27.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Quicksell Captives"
 
 [node name="TabContainer" type="TabContainer" parent="playergroupdetails"]
-margin_left = 23.0
-margin_top = 17.0
-margin_right = 496.0
-margin_bottom = 315.0
+margin_left = 30.0
+margin_top = 16.0
+margin_right = 600.0
+margin_bottom = 366.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 
@@ -1282,9 +1272,9 @@ size_flags_vertical = 2
 
 [node name="Button" type="Button" parent="playergroupdetails/TabContainer/Party/HBoxContainer"]
 visible = false
-margin_right = 350.0
+margin_right = 400.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 350, 50 )
+rect_min_size = Vector2( 400, 50 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 toggle_mode = true
@@ -1300,7 +1290,6 @@ margin_right = -10.0
 margin_bottom = -10.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-scroll_vertical = 1
 
 [node name="HBoxContainer" type="VBoxContainer" parent="playergroupdetails/TabContainer/Captured Slaves"]
 size_flags_horizontal = 2
@@ -1308,18 +1297,18 @@ size_flags_vertical = 2
 
 [node name="Button" type="Button" parent="playergroupdetails/TabContainer/Captured Slaves/HBoxContainer"]
 visible = false
-margin_right = 350.0
+margin_right = 400.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 350, 50 )
+rect_min_size = Vector2( 400, 50 )
 size_flags_horizontal = 2
 size_flags_vertical = 2
 toggle_mode = true
 clip_text = true
 
 [node name="setfree" type="TextureButton" parent="playergroupdetails/TabContainer/Captured Slaves/HBoxContainer/Button"]
-margin_left = 410.0
+margin_left = 460.0
 margin_top = 3.0
-margin_right = 455.0
+margin_right = 505.0
 margin_bottom = 48.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -1327,9 +1316,9 @@ texture_normal = ExtResource( 46 )
 expand = true
 
 [node name="inspect" type="TextureButton" parent="playergroupdetails/TabContainer/Captured Slaves/HBoxContainer/Button"]
-margin_left = 360.0
+margin_left = 410.0
 margin_top = 3.0
-margin_right = 405.0
+margin_right = 455.0
 margin_bottom = 48.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -1343,7 +1332,7 @@ margin_left = 952.0
 margin_top = 60.0
 margin_right = 1322.0
 margin_bottom = 420.0
-custom_styles/panel = SubResource( 25 )
+custom_styles/panel = SubResource( 26 )
 
 [node name="map" type="ScrollContainer" parent="minimappanel"]
 show_behind_parent = true
@@ -1366,7 +1355,7 @@ margin_right = 1030.0
 margin_bottom = 149.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
-custom_fonts/font = SubResource( 26 )
+custom_fonts/font = SubResource( 27 )
 custom_colors/font_color = Color( 0.886275, 0.960938, 0.457947, 1 )
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 text = "Test"
@@ -2141,7 +2130,7 @@ margin_right = -246.0
 margin_bottom = -419.0
 size_flags_horizontal = 2
 size_flags_vertical = 0
-custom_fonts/font = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "Available spells"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="mageorderservices"]
@@ -2489,7 +2478,7 @@ margin_left = 375.0
 margin_top = 29.0
 margin_right = 424.0
 margin_bottom = 58.0
-custom_fonts/font = SubResource( 28 )
+custom_fonts/font = SubResource( 29 )
 text = "100"
 
 [node name="TextureRect2" type="TextureRect" parent="shoppanel/inventory/ScrollContainer/GridContainer/Button"]
@@ -2590,7 +2579,7 @@ margin_left = 363.0
 margin_top = 29.0
 margin_right = 412.0
 margin_bottom = 58.0
-custom_fonts/font = SubResource( 28 )
+custom_fonts/font = SubResource( 29 )
 text = "100"
 
 [node name="TextureRect" type="TextureRect" parent="shoppanel/inventory/ScrollContainer2/GridContainer/Button"]
@@ -2635,7 +2624,7 @@ margin_bottom = 679.0
 mouse_filter = 2
 size_flags_horizontal = 2
 size_flags_vertical = 2
-custom_styles/panel = SubResource( 29 )
+custom_styles/panel = SubResource( 30 )
 
 [node name="noitems" type="Label" parent="shoppanel/inventory"]
 visible = false
@@ -2659,8 +2648,8 @@ margin_top = -44.0
 margin_right = -925.0
 margin_bottom = -19.0
 size_flags_horizontal = 2
-custom_styles/fg = SubResource( 30 )
-custom_styles/bg = SubResource( 31 )
+custom_styles/fg = SubResource( 24 )
+custom_styles/bg = SubResource( 25 )
 step = 1.0
 value = 10.0
 percent_visible = false
@@ -2995,7 +2984,6 @@ margin_right = 144.0
 margin_bottom = 191.0
 mouse_filter = 0
 value = 50.0
-exp_edit = true
 texture_under = ExtResource( 87 )
 texture_progress = ExtResource( 88 )
 
@@ -3006,7 +2994,6 @@ margin_right = 144.0
 margin_bottom = 211.0
 mouse_filter = 0
 value = 50.0
-exp_edit = true
 texture_under = ExtResource( 87 )
 texture_progress = ExtResource( 89 )
 
@@ -3116,6 +3103,7 @@ texture_hover = ExtResource( 32 )
 [connection signal="pressed" from="shoppanel/inventory/amountselect/add10" to="shoppanel/inventory" method="_on_add10_pressed"]
 [connection signal="pressed" from="shoppanel/inventory/amountselect/addmax" to="shoppanel/inventory" method="_on_addmax_pressed"]
 [connection signal="pressed" from="shoppanel/inventory/amountselect/cancel" to="shoppanel/inventory" method="_on_cancel_pressed"]
+[connection signal="value_changed" from="shoppanel/inventory/amountselect/SpinBox" to="shoppanel/inventory" method="_on_SpinBox_value_changed"]
 [connection signal="text_changed" from="shoppanel/inventory/search" to="shoppanel/inventory" method="_on_search_text_changed"]
 [connection signal="pressed" from="sebastiannode/sebastianconfirm" to="." method="_on_sebastianconfirm_pressed"]
 [connection signal="pressed" from="sebastiannode/sebastiancancel" to="." method="_on_sebastiancancel_pressed"]

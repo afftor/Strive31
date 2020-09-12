@@ -21,6 +21,7 @@ func gornayda():
 			if globals.state.sidequests.ayda == 0:
 				text = textnode.MainQuestGornAydaFirstMeet
 				globals.state.sidequests.ayda = 1
+				globals.charactergallery.ayda.unlocked = true
 			else:
 				text = textnode.GornAydaReturn
 			

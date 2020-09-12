@@ -20,24 +20,17 @@ func _ready():
 		get(i).get_node('Control').connect('mouse_entered', self, 'stattooltip',[i])
 		get(i).get_node('Control').connect('mouse_exited', globals, 'hidetooltip') 
 	
-#warning-ignore:return_value_discarded
 	$stats/customization/relativespanel/relativestext.connect("meta_hover_started",self,'relativeshover')
-#warning-ignore:return_value_discarded
 	$stats/customization/relativespanel/relativestext.connect("meta_hover_ended",globals, 'slavetooltiphide')
-#warning-ignore:return_value_discarded
 	$stats/customization/relativespanel/relativestext.connect("meta_clicked",self, "relativesselected")
-	
-#warning-ignore:return_value_discarded
 	$stats/trainingabilspanel/upgradepointsbuy.connect("pressed", self, "buyattributepoint")
 	
 	for i in ['cour','conf','wit','charm']:
-#warning-ignore:return_value_discarded
 		get_node("stats/trainingabilspanel/" +i + '/Button').connect("pressed", self, 'mentalup',[i])
-#warning-ignore:return_value_discarded
 		get_node("stats/trainingabilspanel/" +i + '/Button2').connect("pressed", self, 'mentalup5',[i])
 
 func _input(event):
-	if globals.main.get_node("screenchange").visible || $stats/customization/nicknamepanel.is_visible() :
+	if (globals.main != null && globals.main.get_node("screenchange").visible) || $stats/customization/nicknamepanel.is_visible():
 		return
 	if event == InputEventKey:
 		var dict = {49 : 1, 50 : 2, 51 : 3, 52 : 4,53 : 5,54 : 6,55 : 7,56 : 8,}
@@ -88,8 +81,7 @@ func slavetabopen():
 		yield(get_tree().get_current_scene(), 'animfinished')
 	globals.currentslave = person
 	self.visible = true
-#warning-ignore:unused_variable
-	var file = File.new()
+
 	text = person.description()
 	$stats/basics/slavedescript.set_bbcode(text)
 	text = person.status()
@@ -143,7 +135,11 @@ func slavetabopen():
 			i.visible = false
 		else:
 			i.visible = true
-	$stats/customization/hairstyle.set_text(person.hairstyle)
+	var hairstyleBtn = $stats/customization/hairstyle
+	for i in range(hairstyleBtn.get_item_count()):
+		if hairstyleBtn.get_item_text(i) == person.hairstyle:
+			hairstyleBtn.select(i)
+			break
 	updatestats()
 	if globals.state.mansionupgrades.mansionparlor >= 1:
 		$stats/customization/tattoo.set_disabled(false)
@@ -185,33 +181,33 @@ func buildmetrics():
 	var text = ""
 	$stats/statisticpanel.visible = true
 	text += "[center]Personal achievments[/center]\n"
-	text += "In your possession: " + str(person.metrics.ownership) + " day"+globals.fastif(person.metrics.ownership == 1, '','s')+";\n"
-	text += "Spent in jail: " + str(person.metrics.jail) + " day"+globals.fastif(person.metrics.jail == 1, '','s')+";\n"
-	text += "Worked in brothel: " + str(person.metrics.brothel) + " day"+globals.fastif(person.metrics.brothel == 1, '','s')+";\n"
-	text += "Won battles: " + str(person.metrics.win) + " time"+globals.fastif(person.metrics.win == 1, '','s')+";\n"
-	text += "Captured enemies: " + str(person.metrics.capture) + " enem"+globals.fastif(person.metrics.capture == 1, 'y','ies')+";\n"
-	text += "Earned gold: " + str(person.metrics.goldearn) + " piece"+globals.fastif(person.metrics.goldearn == 1, '','s')+";\n"
-	text += "Earned food: " + str(person.metrics.foodearn) + " unit"+globals.fastif(person.metrics.foodearn == 1, '','s')+";\n"
-	text += "Produced mana: " + str(person.metrics.manaearn) + " mana;\n"
-	text += "Used items: " + str(person.metrics.item) + " time"+globals.fastif(person.metrics.item == 1, '','s')+";\n"
-	text += "Affected by spells: " + str(person.metrics.spell) + " time"+globals.fastif(person.metrics.spell == 1, '','s')+";\n"
-	text += "Modified in lab: " + str(person.metrics.mods) + " time"+globals.fastif(person.metrics.mods == 1, '','s')+";\n"
+	text += "In your possession: " + str(person.metrics.ownership) + " day"+globals.fastif(person.metrics.ownership == 1, '','s')+"\n"
+	text += "Spent in jail: " + str(person.metrics.jail) + " day"+globals.fastif(person.metrics.jail == 1, '','s')+"\n"
+	text += "Worked in brothel: " + str(person.metrics.brothel) + " day"+globals.fastif(person.metrics.brothel == 1, '','s')+"\n"
+	text += "Won battles: " + str(person.metrics.win) + " time"+globals.fastif(person.metrics.win == 1, '','s')+"\n"
+	text += "Captured enemies: " + str(person.metrics.capture) + " enem"+globals.fastif(person.metrics.capture == 1, 'y','ies')+"\n"
+	text += "Earned gold: " + str(person.metrics.goldearn) + " piece"+globals.fastif(person.metrics.goldearn == 1, '','s')+"\n"
+	text += "Earned food: " + str(person.metrics.foodearn) + " unit"+globals.fastif(person.metrics.foodearn == 1, '','s')+"\n"
+	text += "Produced mana: " + str(person.metrics.manaearn) + " mana\n"
+	text += "Used items: " + str(person.metrics.item) + " time"+globals.fastif(person.metrics.item == 1, '','s')+"\n"
+	text += "Affected by spells: " + str(person.metrics.spell) + " time"+globals.fastif(person.metrics.spell == 1, '','s')+"\n"
+	text += "Modified in lab: " + str(person.metrics.mods) + " time"+globals.fastif(person.metrics.mods == 1, '','s')+"\n"
 	$stats/statisticpanel/statstext.set_bbcode(text)
 	text = "[center]Sexual achievments[/center]\n"
-	text += "Had intimacy: " + str(person.metrics.sex) + " time"+globals.fastif(person.metrics.sex == 1, '','s')+";\n"
-	text += "Orgasms: " + str(person.metrics.orgasm) + " time"+globals.fastif(person.metrics.orgasm == 1, '','s')+";\n"
+	text += "Had intimacy: " + str(person.metrics.sex) + " time"+globals.fastif(person.metrics.sex == 1, '','s')+"\n"
+	text += "Orgasms: " + str(person.metrics.orgasm) + " time"+globals.fastif(person.metrics.orgasm == 1, '','s')+"\n"
 	if person.vagina != 'none':
-		text += "Vaginal penetrations: " + str(person.metrics.vag)+";\n"
-	text += "Anal penetrations: " + str(person.metrics.anal)+";\n"
-	text += "Gave oral: " + str(person.metrics.oral) + " time"+globals.fastif(person.metrics.oral == 1, '','s')+";\n"
-	text += "Was forced: " + str(person.metrics.roughsex) + " time"+globals.fastif(person.metrics.roughsex == 1, '','s')+";\n"
-	#text += person.dictionary("Of those $he liked: ") + str(person.metrics.roughsexlike) + " time"+globals.fastif(person.metrics.roughsexlike == 1, '','s')+";\n"
-	text += "Had partners: " + str(person.sexexp.partners.size()) + " partner"+globals.fastif(person.sexexp.partners.size() == 1, '','s')+";\n"
+		text += "Vaginal penetrations: " + str(person.metrics.vag) + " time"+globals.fastif(person.metrics.vag == 1, '','s')+"\n"
+	text += "Anal penetrations: " + str(person.metrics.anal) + " time"+globals.fastif(person.metrics.anal == 1, '','s')+"\n"
+	text += "Gave oral: " + str(person.metrics.oral) + " time"+globals.fastif(person.metrics.oral == 1, '','s')+"\n"
+	text += "Was forced: " + str(person.metrics.roughsex) + " time"+globals.fastif(person.metrics.roughsex == 1, '','s')+"\n"
+	#text += person.dictionary("Of those $he liked: ") + str(person.metrics.roughsexlike) + " time"+globals.fastif(person.metrics.roughsexlike == 1, '','s')+"\n"
+	text += "Had partners: " + str(person.sexexp.partners.size()) + " partner"+globals.fastif(person.sexexp.partners.size() == 1, '','s')+"\n"
 	if person.preg.has_womb == true || person.metrics.preg > 0:
-		text += "Was pregnant: " + str(person.metrics.preg) + " time"+globals.fastif(person.metrics.preg == 1, '','s')+";\n"
-		text += "Gave birth: " + str(person.metrics.birth) + " time"+globals.fastif(person.metrics.birth == 1, '','s')+";\n"
-	#text += "Participated in threesomes: " + str(person.metrics.threesome) + " time"+globals.fastif(person.metrics.threesome == 1, '','s')+";\n"
-	#text += "Participated in orgies: " + str(person.metrics.orgy) + " time"+globals.fastif(person.metrics.orgy == 1, '','s')+";\n"
+		text += "Was pregnant: " + str(person.metrics.preg) + " time"+globals.fastif(person.metrics.preg == 1, '','s')+"\n"
+		text += "Gave birth: " + str(person.metrics.birth) + " time"+globals.fastif(person.metrics.birth == 1, '','s')+"\n"
+	#text += "Participated in threesomes: " + str(person.metrics.threesome) + " time"+globals.fastif(person.metrics.threesome == 1, '','s')+"\n"
+	#text += "Participated in orgies: " + str(person.metrics.orgy) + " time"+globals.fastif(person.metrics.orgy == 1, '','s')+"\n"
 	$stats/statisticpanel/statssextext.set_bbcode(text)
 	text = ''
 	for i in person.relations:
@@ -385,7 +381,7 @@ func _on_brandbutton_pressed():
 			confirm.visible = false
 	elif person.brand == 'basic' && globals.state.branding == 2:
 		find_node('enhbrandingtext').visible = true
-		if globals.resources.mana >= 15:
+		if globals.resources.mana >= 15 && globals.player.energy >= 20:
 			confirm.visible = true
 			confirm.set_meta('value', 2)
 
@@ -399,7 +395,7 @@ func _on_confirm_pressed():
 	popup.visible = false
 	if confirm.get_meta('value') == 1:
 		person.brand = 'basic'
-		person.stress = 15 + person.conf/5 - person.loyal/10
+		person.stress += 15 + person.conf/5 - person.loyal/10
 		get_tree().get_current_scene().popup(person.dictionary('You perform a Ritual of Branding on $name. As symbols are engraved onto $his neck, $he yelps in pain. \n\nWith this you put serious claim on $his future life: $He will be unable to raise a hand against you and will be far less tempted to escape. '))
 		globals.resources.mana -= 10
 		globals.player.energy -= 20
@@ -420,16 +416,18 @@ func _on_remove_pressed():
 ##############Sleep
 
 var sleepdict = {
-'communal': 0,
-'personal': 1,
-'your': 2,
-'jail': 3,
+	'communal': 0,
+	'personal': 1,
+	'your': 2,
+	'jail': 3,
 }
 
 func _on_sleep_item_selected( ID ):
 	for i in sleepdict:
 		if sleepdict[i] == ID:
 			person.sleep = i
+	if person.sleep == 'jail':
+		person.work = 'rest'
 	get_parent().get_parent().rebuild_slave_list()
 	slavetabopen()
 
@@ -454,12 +452,12 @@ func _on_slavedescript_meta_clicked( meta ):
 		get_tree().get_current_scene().showracedescript(person)
 	elif globals.state.descriptsettings.has(meta):
 		globals.state.descriptsettings[meta] = !globals.state.descriptsettings[meta]
-	slavetabopen()
+		if person == globals.player:
+			globals.main._on_selfinspectlooks_pressed()
+		else:
+			slavetabopen()
 
 var relativesdata
-
-var counter = 0
-var slavearray = []
 
 func _on_relativesbutton_pressed():
 	var text = ''
@@ -470,8 +468,6 @@ func _on_relativesbutton_pressed():
 		return
 	var entry = relativesdata[person.id]
 	var entry2
-	counter = 0
-	slavearray.clear()
 	text += '[center]Parents[/center]\n'
 	for i in ['father','mother']:
 		if int(entry[i]) <= 0:
@@ -506,15 +502,12 @@ func _on_relativesbutton_pressed():
 			else:
 				text += "Daughter: "
 			text += getentrytext(entry2) + "\n"
-	$stats/customization/relativespanel/relativestext.set_meta("slaves", slavearray)
 	$stats/customization/relativespanel/relativestext.bbcode_text = text
 
 func getentrytext(entry):
 	var text = ''
 	if globals.state.findslave(entry.id) != null:
-		text += '[url=person' + str(counter) + '][color=yellow]' + entry.name + '[/color][/url]'
-		slavearray.append(globals.state.findslave(entry.id))
-		counter += 1
+		text += '[url=id' + str(entry.id) + '][color=yellow]' + entry.name + '[/color][/url]'
 	else:
 		text += entry.name
 	if entry.state == 'dead':
@@ -525,11 +518,10 @@ func getentrytext(entry):
 	return text
 
 func relativeshover(meta):
-	var tempslave = slavearray[int(meta.replace('person',''))]
-	globals.slavetooltip(tempslave)
+	globals.slavetooltip( globals.state.findslave( int(meta.replace('id',''))))
 
 func relativesselected(meta):
-	var tempslave = slavearray[int(meta.replace('person',''))]
+	var tempslave = globals.state.findslave( int(meta.replace('id','')))
 	$stats/customization/relativespanel.visible = false
 	globals.slavetooltiphide()
 	globals.openslave(tempslave)
@@ -565,7 +557,6 @@ func _on_confirmdescript_pressed():
 
 func _on_gear_pressed():
 	globals.main._on_inventory_pressed()
-	globals.main.get_node('inventory').selectcategory(globals.main.get_node('inventory/everything'))
 	globals.main.get_node('inventory/gear').pressed = true
 	globals.main.get_node('inventory').selectcategory(globals.main.get_node('inventory/gear'))
 	globals.main.get_node('inventory').selectbuttonslave(person)
@@ -573,7 +564,6 @@ func _on_gear_pressed():
 
 func _on_items_pressed():
 	globals.main._on_inventory_pressed()
-	globals.main.get_node('inventory').selectcategory(globals.main.get_node('inventory/everything'))
 	globals.main.get_node('inventory/potion').pressed = true
 	globals.main.get_node('inventory').selectcategory(globals.main.get_node('inventory/potion'))
 	globals.main.get_node('inventory').selectbuttonslave(person)
@@ -585,66 +575,66 @@ func _on_items_pressed():
 
 #warning-ignore:unused_class_variable
 var tattoosdescript = { #this goes like : start + tattoo theme + end + tattoo description: I.e On $his face you see a notable nature themed tattoo, depicting flowers and vines
-face = {start = "On $his cheek you see a notable ", end = " themed tattoo, depicting"},
-chest = {start = "$His chest is decorated with a", end = " tattoo, portraying"},
-waist = {start = "On lower part of $his back, you spot a ", end = " tattooed image of "},
-arms = {start = "$His arm has a skillfully created ", end = " image of "},
-legs = {start = "$His ankle holds a piece of ", end = " art, representing"},
-ass = {start = "$His butt has a large ", end = " themed image showing "},
+	face = {start = "On $his cheek you see a notable ", end = " themed tattoo, depicting"},
+	chest = {start = "$His chest is decorated with a", end = " tattoo, portraying"},
+	waist = {start = "On lower part of $his back, you spot a ", end = " tattooed image of "},
+	arms = {start = "$His arm has a skillfully created ", end = " image of "},
+	legs = {start = "$His ankle holds a piece of ", end = " art, representing"},
+	ass = {start = "$His butt has a large ", end = " themed image showing "},
 }
 
 var tattoooptions = {
-none = {name = 'none', descript = "", applydescript = "Select a theme for future tattoo"},
-nature = {name = 'nature', descript = " flowers and vines", function = "naturetattoo", applydescript = "Nature thematic tattoo will increase $name's beauty. "},
-tribal = {name = 'tribal',descript = " totemic markings and symbols", function = "tribaltattoo", applydescript = "Tribal thematic tattoo will increase $name's scouting performance. "},
-degrading = {name = 'derogatory', descript = " rude words and lewd drawings", function = "degradingtattoo",  applydescript = "Derogatory tattoo will promote $name's lust and enforce obedience. "},
-animalistic = {name = 'beastly', descript = " realistic beasts and insects", function = "animaltattoo", applydescript = "Animalistic tattoo will boost $name's energy regeneration. "},
-magic = {name = "energy", descript = " empowering patterns and runes", function = "manatattoo", applydescript = "Magic tattoo will increase $name's Magic Affinity. "},
+	none = {name = 'none', descript = "", applydescript = "Select a theme for future tattoo"},
+	nature = {name = 'nature', descript = " flowers and vines", function = "naturetattoo", applydescript = "Nature thematic tattoo will increase $name's beauty. "},
+	tribal = {name = 'tribal',descript = " totemic markings and symbols", function = "tribaltattoo", applydescript = "Tribal thematic tattoo will increase $name's scouting performance. "},
+	degrading = {name = 'derogatory', descript = " rude words and lewd drawings", function = "degradingtattoo",  applydescript = "Derogatory tattoo will promote $name's lust and enforce obedience. "},
+	animalistic = {name = 'beastly', descript = " realistic beasts and insects", function = "animaltattoo", applydescript = "Animalistic tattoo will boost $name's energy regeneration. "},
+	magic = {name = "energy", descript = " empowering patterns and runes", function = "manatattoo", applydescript = "Magic tattoo will increase $name's Magic Affinity. "},
 }
 
 var tattoolevels = {
-nature = {
-1 : {bonusdescript = "+5 Beauty", effect = 'nature1'},
-2 : {bonusdescript = "+10 Beauty", effect = 'nature2'},
-3 : {bonusdescript = "+15 Beauty", effect = 'nature3'},
-highest = "+15 Beauty",
-},
-tribal = {
-1 : {bonusdescript = "+3 Awareness", effect = 'tribal1'},
-2 : {bonusdescript = "+6 Awareness", effect = 'tribal2'},
-3 : {bonusdescript = "+9 Awareness", effect = 'tribal3'},
-highest = "+9 Awareness",
-},
-degrading = {
-1 : {bonusdescript = "+5 Lust and Obedience per day", effect = 'degrading1'},
-2 : {bonusdescript = "+10 Lust and Obedience per day", effect = 'degrading2'},
-3 : {bonusdescript = "+15 Lust and Obedience per day", effect = 'degrading3'},
-4 : {bonusdescript = "+20 Lust and Obedience per day", effect = 'degrading4'},
-highest = "+20 Lust and Obedience per day",
-},
-animalistic = {
-1 : {bonusdescript = "+8 Energy per day", effect = 'animalistic1'},
-2 : {bonusdescript = "+16 Energy per day", effect = 'animalistic2'},
-3 : {bonusdescript = "+24 Energy per day", effect = 'animalistic3'},
-highest = "+24 Energy per day",
-},
-magic = {
-1 : {bonusdescript = "+0 Magic Affinity", effect = 'magic1'},
-2 : {bonusdescript = "+1 Magic Affinity", effect = 'magic2'},
-3 : {bonusdescript = "+1 Magic Affinity", effect = 'magic3'},
-4 : {bonusdescript = "+1 Magic Affinity", effect = 'magic4'},
-5 : {bonusdescript = "+2 Magic Affinity", effect = 'magic5'},
-highest = '+2 Magic Affinity',
-},
+	nature = {
+		1 : {bonusdescript = "+5 Beauty", effect = 'nature1'},
+		2 : {bonusdescript = "+10 Beauty", effect = 'nature2'},
+		3 : {bonusdescript = "+15 Beauty", effect = 'nature3'},
+		highest = "+15 Beauty",
+	},
+	tribal = {
+		1 : {bonusdescript = "+3 Awareness", effect = 'tribal1'},
+		2 : {bonusdescript = "+6 Awareness", effect = 'tribal2'},
+		3 : {bonusdescript = "+9 Awareness", effect = 'tribal3'},
+		highest = "+9 Awareness",
+	},
+	degrading = {
+		1 : {bonusdescript = "+5 Lust and Obedience per day", effect = 'degrading1'},
+		2 : {bonusdescript = "+10 Lust and Obedience per day", effect = 'degrading2'},
+		3 : {bonusdescript = "+15 Lust and Obedience per day", effect = 'degrading3'},
+		4 : {bonusdescript = "+20 Lust and Obedience per day", effect = 'degrading4'},
+		highest = "+20 Lust and Obedience per day",
+	},
+	animalistic = {
+		1 : {bonusdescript = "+8 Energy per day", effect = 'animalistic1'},
+		2 : {bonusdescript = "+16 Energy per day", effect = 'animalistic2'},
+		3 : {bonusdescript = "+24 Energy per day", effect = 'animalistic3'},
+		highest = "+24 Energy per day",
+	},
+	magic = {
+		1 : {bonusdescript = "+0 Magic Affinity", effect = 'magic1'},
+		2 : {bonusdescript = "+1 Magic Affinity", effect = 'magic2'},
+		3 : {bonusdescript = "+1 Magic Affinity", effect = 'magic3'},
+		4 : {bonusdescript = "+1 Magic Affinity", effect = 'magic4'},
+		5 : {bonusdescript = "+2 Magic Affinity", effect = 'magic5'},
+		highest = '+2 Magic Affinity',
+	},
 }
 
 var tattoodict = {
-none = {value = 0, code = 'none'},
-nature = {value = 1, code = 'nature'},
-tribal = {value = 2, code = 'tribal'},
-degrading = {value = 3, code = 'degrading'},
-animalistic = {value = 4, code = 'animalistic'},
-magic = {value = 5, code = 'magic'},
+	none = {value = 0, code = 'none'},
+	nature = {value = 1, code = 'nature'},
+	tribal = {value = 2, code = 'tribal'},
+	degrading = {value = 3, code = 'degrading'},
+	animalistic = {value = 4, code = 'animalistic'},
+	magic = {value = 5, code = 'magic'},
 }
 
 var selectedpart = ''
@@ -748,16 +738,16 @@ func _on_tattoooptions_item_selected( ID ):
 
 
 var piercingdict = {
-earlobes = {name = 'earlobes', options = ['earrings', 'stud'], requirement = null, id = 1},
-eyebrow = {name = 'eyebrow', options = ['stud'], requirement = null, id = 2},
-nose = {name = 'nose', options = ['stud', 'ring'], requirement = null, id = 3},
-lips = {name = 'lips', options = ['stud', 'ring'], requirement = null, id = 4},
-tongue = {name = 'tongue', options = ['stud'], requirement = null, id = 5},
-navel = {name = 'navel', options = ['stud'], requirement = null, id = 6},
-nipples = {name = 'nipples', options = ['ring', 'stud', 'chain'], requirement = 'lewdness', id = 7},
-clit = {name = 'clit', options = ['ring', 'stud'], requirement = 'lewdness, pussy', id = 8},
-labia = {name = 'labia', options = ['ring', 'stud'], requirement = 'lewdness, pussy', id = 9},
-penis = {name = 'penis', options = ['ring', 'stud'], requirement = 'lewdness, penis', id = 10},
+	earlobes = {name = 'earlobes', options = ['earrings', 'stud'], requirement = null, id = 1},
+	eyebrow = {name = 'eyebrow', options = ['stud'], requirement = null, id = 2},
+	nose = {name = 'nose', options = ['stud', 'ring'], requirement = null, id = 3},
+	lips = {name = 'lips', options = ['stud', 'ring'], requirement = null, id = 4},
+	tongue = {name = 'tongue', options = ['stud'], requirement = null, id = 5},
+	navel = {name = 'navel', options = ['stud'], requirement = null, id = 6},
+	nipples = {name = 'nipples', options = ['ring', 'stud', 'chain'], requirement = 'lewdness', id = 7},
+	clit = {name = 'clit', options = ['ring', 'stud'], requirement = 'lewdness, pussy', id = 8},
+	labia = {name = 'labia', options = ['ring', 'stud'], requirement = 'lewdness, pussy', id = 9},
+	penis = {name = 'penis', options = ['ring', 'stud'], requirement = 'lewdness, penis', id = 10},
 }
 
 func _on_piercing_pressed():
@@ -920,11 +910,14 @@ func updatestats():
 		person.imageportait = null
 		$stats/statspanel/TextureRect/portrait.set_texture(null)
 	$stats/statspanel/spec.set_texture(specimages[str(person.spec)])
-	if person.xp >= 100 && person.levelupreqs.empty():
-		$stats/basics/levelupreqs.set_bbcode(person.dictionary("You don't know what might unlock $name's potential further, yet. "))
-	elif person.xp >= 100:
-		$stats/basics/levelupreqs.set_bbcode(person.levelupreqs.descript)
+	if person.xp >= 100:
+		get_node("stats/statspanel/xp").tint_progress = Color(2.167,1.176,1.167,1)
+		if person.levelupreqs.empty():
+			$stats/basics/levelupreqs.set_bbcode(person.dictionary("You don't know what might unlock $name's potential further, yet. "))
+		else:
+			$stats/basics/levelupreqs.set_bbcode(person.levelupreqs.descript)
 	else:
+		get_node("stats/statspanel/xp").tint_progress = ColorN("white")
 		$stats/basics/levelupreqs.set_bbcode('')
 
 var gradeimages = globals.gradeimages

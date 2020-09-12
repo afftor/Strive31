@@ -121,7 +121,7 @@ text = "Text2"
 editor/display_folded = true
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 481.0
+margin_left = 511.0
 margin_top = 16.0
 margin_right = -439.0
 margin_bottom = -412.0
@@ -364,9 +364,9 @@ expand = true
 
 [node name="HBoxContainer" type="VBoxContainer" parent="Panel"]
 editor/display_folded = true
-margin_left = 439.0
+margin_left = 469.0
 margin_top = 15.0
-margin_right = 479.0
+margin_right = 509.0
 margin_bottom = 231.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -500,32 +500,37 @@ toggle_mode = true
 text = "Only watch"
 
 [node name="givetakepanel" type="Panel" parent="Panel"]
-margin_left = 924.0
-margin_right = 1336.0
+margin_left = 918.0
+margin_right = 1330.0
 margin_bottom = 397.0
 
-[node name="givercontainer" type="VBoxContainer" parent="Panel/givetakepanel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/givetakepanel"]
 margin_left = 16.0
 margin_top = 39.0
-margin_right = 196.0
-margin_bottom = 218.0
+margin_right = 386.0
+margin_bottom = 379.0
+scroll_horizontal_enabled = false
 
-[node name="Button" type="Button" parent="Panel/givetakepanel/givercontainer"]
+[node name="VList" type="VBoxContainer" parent="Panel/givetakepanel/ScrollContainer"]
+margin_right = 380.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 380, 39 )
+
+[node name="ControlLine" type="Control" parent="Panel/givetakepanel/ScrollContainer/VList"]
 visible = false
+margin_right = 380.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 380, 39 )
+
+[node name="ButtonGiver" type="Button" parent="Panel/givetakepanel/ScrollContainer/VList/ControlLine"]
 margin_right = 180.0
 margin_bottom = 39.0
 toggle_mode = true
 text = "Name"
 
-[node name="receivercontainer" type="VBoxContainer" parent="Panel/givetakepanel"]
-margin_left = 216.0
-margin_top = 39.0
-margin_right = 396.0
-margin_bottom = 218.0
-
-[node name="Button" type="Button" parent="Panel/givetakepanel/receivercontainer"]
-visible = false
-margin_right = 180.0
+[node name="ButtonReceiver" type="Button" parent="Panel/givetakepanel/ScrollContainer/VList/ControlLine"]
+margin_left = 200.0
+margin_right = 380.0
 margin_bottom = 39.0
 toggle_mode = true
 text = "Name"

@@ -24,7 +24,7 @@ func getongoingdescription(givers, takers):
 	
 func requirements():
 	var valid = true
-	if globals.state.getCountStackableItem('rope') <= 0:
+	if globals.state.getCountStackableItem('rope') < takers.size():
 		valid = false
 	if takers.size() < 1 || givers.size() < 1:
 		valid = false

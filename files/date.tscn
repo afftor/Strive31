@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://files/theme.tres" type="Theme" id=1]
 [ext_resource path="res://files/scripts/dating.gd" type="Script" id=2]
@@ -442,7 +442,7 @@ text = "Confirm"
 margin_left = 93.0
 margin_top = 67.0
 margin_right = 540.0
-margin_bottom = 361.0
+margin_bottom = 411.0
 bbcode_enabled = true
 
 [node name="sexswitch" type="Panel" parent="."]
@@ -476,7 +476,7 @@ text = "Cancel"
 margin_left = 93.0
 margin_top = 67.0
 margin_right = 540.0
-margin_bottom = 361.0
+margin_bottom = 411.0
 bbcode_enabled = true
 [connection signal="pressed" from="panel/categories/Actions" to="." method="selectcategory" binds= [ "Actions" ]]
 [connection signal="pressed" from="panel/categories/P&P" to="." method="selectcategory" binds= [ "P&P" ]]

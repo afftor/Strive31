@@ -4,11 +4,11 @@ var selectedcategory
 var selectedupgrade
 
 var categories = {
-mansion = {upgrades = ['mansioncommunal','mansionpersonal','mansionbed', 'mansionluxury']},
-facilities = {upgrades = ['mansionalchemy', 'mansionlibrary', 'mansionparlor', 'mansionkennels', 'mansionnursery', 'mansionlab']},
-jail = {upgrades = ['jailcapacity','jailtreatment','jailincenses']},
-storage = {upgrades = ['foodcapacity', 'foodpreservation']},
-farm = {upgrades = ['farmcapacity', 'farmhatchery', 'farmtreatment','farmmana']},
+	mansion = {upgrades = ['mansioncommunal','mansionpersonal','mansionbed', 'mansionluxury']},
+	facilities = {upgrades = ['mansionalchemy', 'mansionlibrary', 'mansionparlor', 'mansionkennels', 'mansionnursery', 'mansionlab']},
+	jail = {upgrades = ['jailcapacity','jailtreatment','jailincenses']},
+	storage = {upgrades = ['foodcapacity', 'foodpreservation']},
+	farm = {upgrades = ['farmcapacity', 'farmhatchery', 'farmtreatment','farmmana']},
 }
 
 var purchaseupgrade

@@ -4,14 +4,11 @@ var mode = 'portrait' setget mode_set
 var person
 
 var portaitsbuilt = false
-#warning-ignore:unused_class_variable
-var bodybuilt = false
 var portraitspath = globals.setfolders.portraits
 var bodypath = globals.setfolders.fullbody
-var thumbnailpath = "user://thumbnails/"
+var thumbnailpath = globals.appDataDir + "thumbnails/"
 
 func _ready():
-#warning-ignore:return_value_discarded
 	get_node("ScrollContainer/_v_scroll").connect("value_changed", self, "_on_scroll")
 
 func mode_set(value):
@@ -39,8 +36,6 @@ var currentpath
 
 func buildimagelist(type = mode):
 	var dir = Directory.new()
-#warning-ignore:unused_variable
-	var array = []
 	var filecheck = File.new()
 	if type == 'portrait':
 		currentpath = portraitspath
@@ -50,23 +45,22 @@ func buildimagelist(type = mode):
 		if i.get_name() != "Button":
 			i.visible = false
 			i.free()
-	if dir.dir_exists(currentpath) == false:
-		dir.make_dir(currentpath)
-	if dir.dir_exists(thumbnailpath) == false:
-		dir.make_dir(thumbnailpath)
-	if dir.dir_exists(thumbnailpath + type) == false:
-		dir.make_dir(thumbnailpath + type)
+	if !dir.dir_exists(currentpath):
+		dir.make_dir_recursive(currentpath)
+	if !dir.dir_exists(thumbnailpath + type):
+		dir.make_dir_recursive(thumbnailpath + type)
+	var extensions = globals.imageExtensions
 	for i in globals.dir_contents(currentpath):
-		if filecheck.file_exists(i) && (i.find('.png') >= 0 || i.find('.jpg') >= 0):
+		if filecheck.file_exists(i) && i.get_extension() in extensions:
 			var node = get_node("ScrollContainer/GridContainer/Button").duplicate()
-			var iconpath = i.replace(currentpath, thumbnailpath + type)
+			var iconpath = i.get_basename().replace(currentpath, thumbnailpath + type + '/') + ".png"
 			node.set_meta('thumbnail', iconpath)
 			if !filecheck.file_exists(iconpath) && globals.rules.thumbnails == true:
 				createimagethumbnail(i, iconpath)
 			get_node("ScrollContainer/GridContainer").add_child(node)
 			#node.get_node("pic").set_texture(globals.loadimage(iconpath))
 			node.connect('pressed', self, 'setslaveimage', [i])
-			node.get_node("Label").set_text(i.replacen(currentpath + '/','').replacen('.jpg','').replacen('.png',''))
+			node.get_node("Label").set_text(i.get_file())
 			node.set_meta("type", i)
 			node.set_meta("loaded", false)
 	$ScrollContainer/GridContainer.move_child($ScrollContainer/GridContainer/Button, $ScrollContainer/GridContainer.get_children().size())
@@ -76,19 +70,10 @@ func createimagethumbnail(originpath, newpath):
 	var image = Image.new()
 	image.load(originpath)
 	image.resize(100, 100)
-	var filepath = originpath.replace(bodypath, '').replace(portraitspath, '')
-	filepath = Array(filepath.split('/'))
-	for i in filepath:
-		if i.findn('.jpg') != -1 || i.findn('.png') != -1:
-			filepath.erase(i)
-	var workingpath = thumbnailpath + mode
-	for i in filepath:
-		if !workingpath.ends_with('/'):
-			workingpath += '/'
-		workingpath += i
-		var dir = Directory.new()
-		if dir.dir_exists(workingpath) == false:
-			dir.make_dir(workingpath)
+	var filepath = newpath.get_base_dir()
+	var dir = Directory.new()
+	if !dir.dir_exists(filepath):
+		dir.make_dir_recursive(filepath)
 		
 	image.save_png(newpath)
 
@@ -100,9 +85,6 @@ func resort():
 	if gender == 'futanari':
 		gender = 'female'
 	race = race.replace("Beastkin ", "").replace("Halfkin ", "")
-
-	
-	
 	
 	for i in get_node("ScrollContainer/GridContainer").get_children():
 		i.hide()
@@ -123,12 +105,14 @@ func resort():
 func setslaveimage(path):
 	if mode == 'portrait':
 		person.imageportait = path
-		if $assignboth.pressed && globals.loadimage(path.replace("portraits", 'bodies')) != null:
-			person.imagefull = path.replace("portraits",'bodies')
+		path = path.replace(globals.setfolders.portraits, globals.setfolders.fullbody)
+		if $assignboth.pressed && globals.loadimage(path) != null:
+			person.imagefull = path
 	elif mode == 'body':
 		person.imagefull = path
-		if $assignboth.pressed && globals.loadimage(path.replace("bodies","portraits")) != null:
-			person.imageportait = path.replace('bodies',"portraits")
+		path = path.replace(globals.setfolders.fullbody, globals.setfolders.portraits)
+		if $assignboth.pressed && globals.loadimage(path) != null:
+			person.imageportait = path
 	self.visible = false
 	updatepage()
 
@@ -143,7 +127,6 @@ func _on_racelock_pressed():
 	resort()
 
 
-#warning-ignore:unused_argument
 func _on_search_text_changed( text ):
 	resort()
 
@@ -186,13 +169,11 @@ func _on_addcustom_pressed():
 
 func _on_FileDialog_file_selected( path ):
 	var dir = Directory.new()
-	var path2 = path.substr(path.find_last('/'), path.length()-path.find_last('/'))
-	dir.copy(path, portraitspath + path2)
+	dir.copy(path, path.replace(path.get_base_dir() + "/", portraitspath))
 	buildimagelist()
 
 func _on_openfolder_pressed():
-#warning-ignore:return_value_discarded
-	OS.shell_open(OS.get_user_data_dir())
+	globals.shellOpenFolder(globals.appDataDir)
 
 func updatepage():
 	if person == globals.player:
@@ -210,32 +191,28 @@ func _on_selectfolder_pressed():
 
 func _on_chooseportraitolder_pressed():
 	get_node("folderdialogue").set_meta('meta', "portrait")
+	get_node("folderdialogue").set_current_path( ProjectSettings.globalize_path(portraitspath))
 	get_node("folderdialogue").popup()
-	if portraitspath.find('user://') >= 0:
-		get_node("folderdialogue").set_current_path(OS.get_user_data_dir() + '/' +portraitspath.replace("user://", ''))
-	else:
-		get_node("folderdialogue").set_current_path(portraitspath)
 	
 
 func _on_choosebodyfolder_pressed():
 	get_node("folderdialogue").set_meta('meta', "body")
+	get_node("folderdialogue").set_current_path( ProjectSettings.globalize_path(bodypath))
 	get_node("folderdialogue").popup()
-	if bodypath.find('user://') >= 0:
-		get_node("folderdialogue").set_current_path(OS.get_user_data_dir() + '/' +bodypath.replace("user://", ''))
-	else:
-		get_node("folderdialogue").set_current_path(bodypath)
+	
 
-func _on_folderdialogue_dir_selected( dir ):
+func _on_folderdialogue_dir_selected( path ):
+	path = path.replace(OS.get_user_data_dir(), "user:/")
+	if !path.ends_with("/"):
+		path += "/"
 	if get_node("folderdialogue").get_meta("meta") == 'portrait':
-		globals.setfolders.portraits = dir
-		portraitspath = dir
-		buildimagelist()
-		_on_selectfolder_pressed()
+		globals.setfolders.portraits = path
+		portraitspath = path
 	elif get_node("folderdialogue").get_meta("meta") == 'body':
-		globals.setfolders.fullbody = dir
-		bodypath = dir
-		buildimagelist()
-		_on_selectfolder_pressed()
+		globals.setfolders.fullbody = path
+		bodypath = path
+	buildimagelist()
+	_on_selectfolder_pressed()
 
 
 func _on_closefolderselect_pressed():
