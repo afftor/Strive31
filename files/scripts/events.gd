@@ -1991,7 +1991,14 @@ func caliproposal(stage = 0):
 		return
 	if cali.vagvirgin == false || cali.loyal <= 50 || (stage == 0 && globals.state.decisions.has('caliproposalseen')):
 		return
-	if cali.away.duration != 0:
+	if cali.away.duration == -1:
+		for event in globals.state.upcomingevents:
+			if event.code == 'calireturn':
+				globals.state.upcomingevents.append({code = 'caliproposal', duration = event.duration + 2})
+				return
+		globals.state.upcomingevents.append({code = 'caliproposal', duration = 3})
+		return
+	elif cali.away.duration != 0:
 		globals.state.upcomingevents.append({code = 'caliproposal', duration = cali.away.duration + 2})
 		return
 	

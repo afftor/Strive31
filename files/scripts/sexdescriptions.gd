@@ -1660,7 +1660,7 @@ func describeTitsBodyType(group):
 	if areAllAttrib_E_val(group, C_BODYSHAPE, 'jelly'):
 		return getRandStr(descTitsBodyType[0])
 	if areAllAttrib_E_val(group, C_SKINCOV, C_FULL_BODY_FUR):
-		return getRandStr(descTitsBodyType[3])
+		return getRandStr(descTitsBodyType[1])
 	return null
 
 

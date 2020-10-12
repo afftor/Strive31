@@ -919,12 +919,13 @@ func enemydefeated():
 					globals.items.unequipitemraw(enemygear[i],unit.capture)
 					if randf() * 100 <= variables.geardropchance:
 						enemyloot.unstackables.append(enemygear[i])
-		
+		var rewards = unit.rewardpool
 		if int(globals.state.sidequests.ayda) == 14 && currentzone.code == 'gornoutskirts' && questitem == false && globals.itemdict.aydajewel.amount == 0:
-			unit.rewardpool.aydajewel = 5
+			rewards = rewards.duplicate(true)
+			rewards.aydajewel = 5
 			questitem = true
-		for i in unit.rewardpool:
-			var chance = unit.rewardpool[i]
+		for i in rewards:
+			var chance = rewards[i]
 			var bonus = 1
 			if ranger == true:
 				bonus += 0.4

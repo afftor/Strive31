@@ -748,7 +748,7 @@ func _on_end_pressed():
 			######## Counting food
 			for i in person.effects.values():
 				if i.has('duration') && i.code != 'captured':
-					if person.race != 'Tribal Elf' || (!i.code in ['bandaged','sedated', 'drunk'] && randf() > 0.5):
+					if person.race != 'Tribal Elf' || i.code in ['bandaged','sedated', 'drunk'] || randf() > 0.5:
 						i.duration -= 1
 					if i.duration <= 0:
 						person.add_effect(i, true)
@@ -1091,7 +1091,7 @@ func _on_end_pressed():
 					person.away.at = ''
 				for i in person.effects.values():
 					if i.has('duration') && i.code != 'captured':
-						if person.race != 'Tribal Elf' || (!i.code in ['bandaged','sedated'] && randf() > 0.5):
+						if person.race != 'Tribal Elf' || i.code in ['bandaged','sedated', 'drunk'] || randf() > 0.5:
 							i.duration -= 1
 						if i.duration <= 0:
 							person.add_effect(i, true)
@@ -2445,7 +2445,7 @@ var mainquestdict = {
 	'7' : "Visit Melissa for your next task.",
 	'8' : "Set up a Laboratory through Mansion Upgrades tab. Then return to Melissa.",
 	'9' : "Return to Melissa.",
-	'10': "Bring Melissa a Taurus girl with huge lactating tits and at least three additional pairs of tits.\n\nSize and lactation can be altered with certain potions, while the laboratory lets you add and develop extra tits. ",
+	'10': "Bring Melissa a Taurus girl with giant lactating tits and at least three additional pairs of tits.\nSize and lactation can be altered with certain potions.\nThe laboratory lets you add extra nipples and develop the rudimentary nipples into tits. ",
 	'11': "Visit Melissa for your next mission. ",
 	'12': "Melissa told you to travel to Gorn and find the Orc named Garthor. ",
 	'13': "Garthor from Gorn ordered you to capture and bring Tribal Elf Ivran who you can find at Gorn's outskirts.",

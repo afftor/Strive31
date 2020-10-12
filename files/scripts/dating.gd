@@ -1101,6 +1101,8 @@ func _on_finishbutton_pressed():
 
 func _on_cancelsex_pressed():
 	$sexswitch.visible = false
+	if turns == 0:
+		endencounter()
 
 func _on_confirmsex_pressed():
 	if $sexswitch/cancelsex.visible == true:
