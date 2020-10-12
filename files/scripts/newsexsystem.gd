@@ -401,6 +401,19 @@ class member:
 				else:
 					person.stress += rand_range(2,4)
 		
+		if self in scenedict.takers:
+			if scenedict.scene.giverpart == 'mouth':
+				for giver in scenedict.givers:
+					if giver.person.mods.has("augmenttongue"):
+						values.sens *= 1.3
+						break
+		else:
+			if scenedict.scene.takerpart == 'mouth' || (scenedict.scene.get('takerpart2') != null && scenedict.scene.takerpart2 == 'mouth' && scenedict.givers.size == 2 && self == scenedict.givers[1]):
+				for taker in scenedict.takers:
+					if taker.person.mods.has("augmenttongue"):
+						values.sens *= 1.3
+						break
+
 		if values.has('tags'):
 			if values.tags.has('punish'):
 				if (effects.has('resist') || effects.has('forced')) && (!person.traits.has('Masochist') && !person.traits.has('Likes it rough') && !person.traits.has('Sex-crazed') && person.spec != 'nympho'):

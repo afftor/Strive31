@@ -4,7 +4,7 @@ extends Node
 
 var effectdict = {}
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
-var gameversion = '1.0a'
+var gameversion = '1.0b'
 var state = progress.new()
 var developmode = false
 var gameloaded = false
@@ -1393,7 +1393,7 @@ func dir_contents(target = saveDir):
 			file_name = dir.get_next()
 		return array
 	else:
-		printErrorCode("ERROR: could not access path: "+ str(target), retCode)
+		printErrorCode("could not access path: "+ str(target), retCode)
 
 var currentslave
 var currentsexslave

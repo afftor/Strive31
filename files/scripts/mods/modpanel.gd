@@ -244,9 +244,7 @@ func apply_mod_dictionary():
 	temp_mod_scripts.clear()
 
 func patchFile(sourcePath, destPath):
-	if destPath.ends_with(".gd"):
-		temp_mod_scripts.erase(destPath)
-	elif destPath == "res://modList":
+	if destPath == detailsFile:
 		handleError("Patching '" + destPath + "' has been blocked for safety.", ERR_FILE_NO_PERMISSION)
 		return
 	if logPatches.has(destPath):
@@ -254,6 +252,11 @@ func patchFile(sourcePath, destPath):
 	else:
 		logPatches[destPath] = curMod
 	if dir.file_exists(destPath):
+		if destPath.ends_with(".gd"):
+			temp_mod_scripts.erase(destPath)
+			if scriptEdits.has(destPath):
+				scriptEdits.erase(destPath)
+				logOverlaps.append("Patched over changes: " + destPath + ", " + curMod)
 		if !destPath.get_extension() in backupExtensions && !destPath in newFiles:
 			retCode = dir.copy(destPath, destPath.replacen(gameDir, backupdir))
 			handleError("Copying backup file " + str(destPath), retCode)
@@ -265,10 +268,13 @@ func patchFile(sourcePath, destPath):
 func apply_mod_to_dictionary(modPath):
 	var file = File.new()
 	var patchSource = modPath + "patch/"
+	if dir.dir_exists(patchSource):
+		for path in globals.dir_contents(patchSource):
+			patchFile(path, path.replacen(patchSource, gameDir))
 	for path in globals.dir_contents(modPath):
 		if path.begins_with(patchSource):
-			patchFile(path, path.replacen(patchSource, gameDir))
-		elif path.ends_with(".gd"):
+			continue
+		if path.ends_with(".gd"):
 			var curFileTag = null
 			var modText = ''
 			retCode = file.open(path, File.READ)
@@ -329,13 +335,15 @@ func replaceOnce(strFile, matchTarget, newText):
 	strFile.erase(matchTarget.get_start(), matchTarget.get_string().length())
 	return strFile.insert(matchTarget.get_start(), newText)
 
-func changeToText(change):
+func changeToText(modName, startLine, change):
+	var text = "\n     " + curMod + ": "
 	if change == 0:
-		return "Replace all"
+		return text + "Replace all"
+	text += "line " + str(startLine - 1) + ", "
 	if change > 0:
-		return "Add " + str(change)
+		return text + "Add " + str(change)
 	else:
-		return "Remove " + str(-change)
+		return text + "Remove " + str(-change)
 
 #var scriptEdits = {}  # {'file' : {'header' : [ [startLine, endLine, change, 'mod'] ]} } #zero change is replace
 func addEditRecord(file, header, startLine, endLine, change):
@@ -346,7 +354,9 @@ func addEditRecord(file, header, startLine, endLine, change):
 	var ref = scriptEdits[file][header]
 	for entry in ref:
 		if endLine >= entry[0] && startLine <= entry[1] && curMod != entry[3]:
-			logOverlaps.append(file + ": " + header + "\n     " + curMod + ": line " + str(startLine - 1) + ", " + changeToText(change) + "\n     " + entry[3] + ": line "+ str(entry[0] - 1) + ", " + changeToText(entry[2]))
+			logOverlaps.append(file + ": " + header + changeToText(entry[3], entry[0], entry[2]) + changeToText(curMod, startLine, change))
+	if change == 0:
+		ref.clear()
 	ref.append([startLine, endLine, change, curMod])
 
 func adjustForEdit(file, header, startLine):
@@ -389,7 +399,7 @@ func apply_next_element_to_dictionary(path, modText, offset):
 		var found_match = false
 		for nested_match in op_regex_dict[which_operation].search_all(temp_mod_scripts[path]):
 			if(current_match.get_string("header") == nested_match.get_string("header")):
-				addEditRecord(path, nested_match.get_string("header"), 0, getLinePos(current_match.get_string(), current_match.get_string().length()), 0)
+				addEditRecord(path, nested_match.get_string("header"), 0, getLinePos(current_match.get_string(), current_match.get_string().length())[0], 0)
 				temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, current_match.get_string())
 				found_match = true
 		if !found_match:
@@ -406,39 +416,33 @@ func apply_next_element_to_dictionary(path, modText, offset):
 				var pool_string = nested_match.get_string().split('\n')
 				var startSize = pool_string.size()
 				var startLine = param
+				var match_stripped = current_match.get_string("body")
+				var endIdx = startSize
+
 				if which_operation in ["FUNC",'CLASS']:
-					if param > 0:
-						param = adjustForEdit(path, nested_match.get_string("header"), param)
-					if param < 0 || param >= pool_string.size():
-						startLine = pool_string.size() - 1
-						for i in customSplit(current_match.get_string("body")):
-							pool_string.append(i)
-					else:
-						for i in customSplit(current_match.get_string("body")):
-							pool_string.insert(param, i)
-							param += 1
-					addEditRecord(path, nested_match.get_string("header"), startLine, startLine, pool_string.size() - startSize)
-					temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, pool_string.join("\n"))
+					match_stripped = customSplit(match_stripped)
 				elif which_operation == "VAR":
-					var match_stripped = current_match.get_string("body")
 					var pos = match_stripped.find('\n')
 					if pos != -1 && pos < match_stripped.length() - 1:
 						match_stripped = current_match.get_string("inner")
+					match_stripped = customSplit(match_stripped, true)
+					endIdx -= 2 if (startSize > 2) else 1
+				else: # operation not supported
+					break
 
-					if param > 0:
-						param = adjustForEdit(path, nested_match.get_string("header"), param)
-					if pool_string.size() > 2:
-						if param == -1 || param > pool_string.size() - 2:
-							param = pool_string.size() - 2
-					elif param == -1 || param > pool_string.size() - 1:
-						param = pool_string.size() - 1
-
-					for i in customSplit(match_stripped, true):
-						pool_string.insert(param, i)
-						param += 1
-					addEditRecord(path, nested_match.get_string("header"), startLine, startLine, pool_string.size() - startSize)
-					temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, pool_string.join("\n"))
-				#else: operation not supported
+				if param > 0:
+					param = adjustForEdit(path, nested_match.get_string("header"), param)
+					if param >= endIdx:
+						param = endIdx
+						startLine = param
+				else:
+					param = endIdx
+					startLine = param
+				for i in match_stripped:
+					pool_string.insert(param, i)
+					param += 1
+				addEditRecord(path, nested_match.get_string("header"), startLine, startLine, pool_string.size() - startSize)
+				temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, pool_string.join("\n"))
 				break
 		elif next_tag.get_string(1) == tag_remove_from:
 			var param = max(1, next_tag.get_string(2).to_int() + 1)

@@ -656,6 +656,14 @@ func _on_quickstart_pressed():
 	startSlave = globals.newslave(slaveDefaults.race, slaveDefaults.age, slaveDefaults.sex, 'poor')	
 	player.imageportait = playerPortraits[randi()%playerPortraits.size()]
 	startSlave.cleartraits()
+
+	var traitpool = []
+	for i in globals.origins.traitlist.values():
+		if i.tags.has("secondary") || forbiddentraits.has(i):
+			continue
+		traitpool.append(i.name)
+	slaveTrait = globals.randomfromarray(traitpool)
+	startSlaveHobby = globals.randomfromarray(slaveHobbies)
 	_on_slaveconfirm_pressed()
 
 	
