@@ -228,7 +228,7 @@ func play(stage = 0):
 		person.lewdness += rand_range(3,5)
 		person.lastsexday = globals.resources.day
 		globals.resources.mana += rand_range(2,3)
-		if person.race == "Drow":
+		if person.race == "Dark Elf":
 			globals.resources.mana += 1
 	elif stage == 4:
 		person.loyal += -rand_range(5,10)
@@ -257,7 +257,7 @@ func spendtime(stage = 0):
 		person.lastsexday = globals.resources.day
 		person.lust = -rand_range(15,25)
 		globals.resources.mana += rand_range(3,5)
-		if person.race == "Drow":
+		if person.race == "Dark Elf":
 			globals.resources.mana += 1
 	elif stage == 4:
 		person.loyal += -rand_range(5,10)
@@ -278,7 +278,7 @@ func horny(stage = 0):
 		person.loyal += rand_range(5,10)
 		person.stress += -rand_range(15,25)
 		globals.resources.mana += rand_range(3,5)
-		if person.race == "Drow":
+		if person.race == "Dark Elf":
 			globals.resources.mana += 1
 	elif stage == 2:
 		person.obed += rand_range(20,35)
@@ -520,7 +520,7 @@ func gift(stage = 0):
 			person.sexuals.affection += round(rand_range(1,3))
 			globals.resources.gold -= 50
 			globals.resources.mana += rand_range(3,6)
-			if person.race == "Drow":
+			if person.race == "Dark Elf":
 				globals.resources.mana += 1
 			globals.player.energy -= 25
 	buttons = tempbuttons
@@ -586,7 +586,7 @@ func teenagersflirt(stage = 0):
 		person.lastsexday = globals.resources.day
 		if (person.metrics.vag > 0 || person.metrics.anal > 0) && person.traits.has("Monogamous") == false:
 			globals.resources.mana += rand_range(5,10)
-			if person.race == "Drow":
+			if person.race == "Dark Elf":
 				globals.resources.mana += 2
 			person.loyal += -rand_range(5,10)
 			showntext += "Getting caught up in the action, $name gets on all fours and lets one of the boys take $him from behind. "
@@ -602,7 +602,7 @@ func teenagersflirt(stage = 0):
 			person.obed += -rand_range(30,50)
 		showntext += "After short time the boys shower the $child in semen. Satisfied with your hospitality, they leave happy. "
 		globals.resources.mana += rand_range(3,6)
-		if person.race == "Drow":
+		if person.race == "Dark Elf":
 			globals.resources.mana += 1
 	elif stage == 3:
 		pass
@@ -697,7 +697,7 @@ func fickleevent(stage = 0):
 		globals.player.energy -= 25
 		globals.resources.mana += rand_range(4,10)
 		person.lastsexday = globals.resources.day
-		if person.race == "Drow":
+		if person.race == "Dark Elf":
 			globals.resources.mana += 2
 	elif stage == 3:
 		person.lastsexday = globals.resources.day
@@ -726,7 +726,7 @@ func pervertevent(stage = 0):
 		slave2.lust = -rand_range(10,15)
 		globals.player.energy -= 25
 		globals.resources.mana += rand_range(5,10)
-		if person.race == "Drow":
+		if person.race == "Dark Elf":
 			globals.resources.mana += 2
 	buttons = tempbuttons
 	showntext = eventstext[currentevent][stage]

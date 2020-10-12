@@ -4,7 +4,7 @@ extends Node
 
 var effectdict = {}
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
-var gameversion = '0.5.26'
+var gameversion = '1.0a'
 var state = progress.new()
 var developmode = false
 var gameloaded = false
@@ -19,7 +19,7 @@ var backupDir = "res://backup/"
 var appDataDir = "user://"
 var saveDirDefault = appDataDir + "saves/"
 # saveDir is the current path which is created by modpanel.gd using saveDirDefault and saveID
-var saveDir = null
+var saveDir = saveDirDefault
 var settingsFile = appDataDir + "settings.ini"
 var progressFile = appDataDir + "progressdata"
 
@@ -763,7 +763,7 @@ func impregnation(mother, father = null, anyfather = false):
 	else: 
 		age = 'teen'
 	if (mother.race.find('Beastkin') >= 0 && father.race.find('Beastkin') < 0)|| (father.race.find('Beastkin') >= 0 && mother.race.find('Beastkin') < 0):
-		if father.race.find('Beastkin') >= 0 && mother.race in ['Human','Elf','Dark Elf','Drow','Demon','Seraph']:
+		if father.race.find('Beastkin') >= 0 && mother.race in ['Human','Elf','Dark Elf','Tribal Elf','Demon','Seraph']:
 			babyrace = father.race.replace('Beastkin', 'Halfkin')
 		else:
 			babyrace = mother.race.replace('Beastkin', 'Halfkin')

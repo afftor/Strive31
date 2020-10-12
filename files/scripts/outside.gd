@@ -343,7 +343,7 @@ func newslaveinguild(number, town = 'wimborn'):
 		var origin
 		var originpool 
 		if town == 'wimborn':
-			racearray = [[globals.getracebygroup("wimborn"),1],['Drow', 1],['Dark Elf', 1.5],['Elf', 2],['Human', 6]]
+			racearray = [[globals.getracebygroup("wimborn"),1],['Dark Elf', 1],['Tribal Elf', 1.5],['Elf', 2],['Human', 6]]
 		elif town == 'gorn':
 			racearray = [[globals.getracebygroup("gorn"),1],['Centaur', 1],['Human', 2],['Goblin', 2],['Orc', 5]]
 		elif town == 'frostford':
@@ -704,7 +704,7 @@ func _on_slavesellbutton_pressed():
 		globals.resources.upgradepoints += globals.originsarray.find(selectedslave.origins)+1
 		if selectedslave.fromguild == false && (selectedslave.obed < 80 || selectedslave.effects.has('captured') == true):
 			var reputationloss = [['wimborn',1],['gorn',1],['frostford',1],['amberguard',1]]
-			if selectedslave.race in ['Elf','Dark Elf','Drow']:
+			if selectedslave.race in ['Elf','Dark Elf','Tribal Elf']:
 				reputationloss[3][1] += 12
 			elif selectedslave.race.find('Beastkin') >= 0 ||  selectedslave.race.find('Halfkin') >= 0:
 				reputationloss[2][1] += 8
@@ -2161,7 +2161,7 @@ func brothel(person = null):
 		if person == null:
 			array.insert(0,{name = 'Offer slave for quest', function = 'selectslavebrothelquest'})
 		else:
-			if person.race in ['Elf','Dark Elf','Drow'] && person.sex != 'male':
+			if person.race in ['Elf','Tribal Elf','Dark Elf'] && person.sex != 'male':
 				mansion.maintext = "— An elf, indeed. So, do you wanna trade?"
 				array = [{name = 'Give away ' + person.name,function = 'brothelquest'}, {name = 'Choose another person', function = 'selectslavebrothelquest'}, {name = 'Leave', function = 'backstreets'}]
 				questgiveawayslave = person
@@ -2172,7 +2172,7 @@ func brothel(person = null):
 	buildbuttons(array)
 
 func selectslavebrothelquest():
-	main.selectslavelist(true, 'brothel', self, 'person.race in ["Elf","Dark Elf","Drow"]')
+	main.selectslavelist(true, 'brothel', self, 'person.race in ["Elf","Dark Elf","Tribal Elf"]')
 
 func brothelquest():
 	var array = []

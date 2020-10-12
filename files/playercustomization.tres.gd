@@ -88,7 +88,7 @@ func _on_PlayerConfirmButton_pressed():
 			get_node("PlayerCustomizations/PCHairLength").select(get_node("PlayerCustomizations/PCHairLength").get_item_count()-1)
 	if (slavetemp['race'] == 'Orc'): ### SkinColor
 		text = ['green']
-	elif (slavetemp['race'] == 'Dark Elf'):
+	elif (slavetemp['race'] == 'Tribal Elf'):
 		text = ['tan', 'brown', 'dark']
 	else:
 		text = [ 'pale', 'fair', 'olive', 'tan' ]

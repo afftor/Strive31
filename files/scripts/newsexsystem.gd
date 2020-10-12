@@ -1368,21 +1368,17 @@ func startscene(scenescript, cont = false, pretext = ''):
 	
 	rebuildparticipantslist()
 
+var prevailing_lines = ['mute', 'silence', 'orgasm', 'resistorgasm', 'pain', 'painlike', 'resist', 'blowjob']
+
 func characterspeech(scene, details = []):
-	var character
 	var partner
-	var text = ''
-	
-	#who speaks
-	
-	var array = []
+	var partnerside
+	var array = [] #serves as RNG pool for partners and speech
+
 	for i in scene.takers+scene.givers:
 		if i.person != globals.player:
 			array.append(i)
-	
-	var partnerside
-	
-	character = array[randi()%array.size()]
+	var character = array[randi()%array.size()] #who speaks
 	
 	if character in scene.takers:
 		partnerside = 'givers'
@@ -1392,21 +1388,17 @@ func characterspeech(scene, details = []):
 	if !scene[partnerside].empty():
 		partner = scene[partnerside][randi()%scene[partnerside].size()]
 	
-	array.clear() #array will serve as speech selector
-	var preventrest = true
 	var dict = {}
-	var prevailing_lines = ['mute', 'silence', 'orgasm', 'resistorgasm', 'pain', 'painlike', 'resist', 'blowjob']
-	
-	
-	if character.person.traits.has('Mute'):
+	var cp = character.person
+	if cp.traits.has('Mute'):
 		dict.mute = [speechdict.mute, 1]
-	if character.person.traits.has('Sex-crazed'):
+	if cp.traits.has('Sex-crazed'):
 		dict.sexcrazed = [speechdict.sexcrazed, 1]
-	if character.person.traits.has('Enjoys Anal'):
-		dict.sexcrazed = [speechdict.enjoysanal, 1]
-	if character.person.traits.has('Likes it rough'):
-		dict.sexcrazed = [speechdict.rough, 1]
-	if character.person.rules.silence == true:
+	if cp.traits.has('Enjoys Anal'):
+		dict.enjoysanal = [speechdict.enjoysanal, 1]
+	if cp.traits.has('Likes it rough'):
+		dict.rough = [speechdict.rough, 1]
+	if cp.rules.silence == true:
 		dict.silence = [speechdict.silence, 1]
 	if character.effects.has('resist'):
 		dict.resist = [speechdict.resist, 1]
@@ -1425,30 +1417,29 @@ func characterspeech(scene, details = []):
 		dict.vagina = [speechdict.vagina, 1]
 	if scene.scene.code in ['missionaryanal', 'doggyanal', 'lotusanal','revlotusanal', 'inserttaila', 'insertinturnsass'] && partnerside == 'givers':
 		dict.anal = [speechdict.anal, 1]
-	if partner != null && (!character.person.traits.has('Homosexual') && !character.person.traits.has("Bisexual")) && character.sex != 'male' && partner.sex != 'male' && partnerside == 'givers':
+	if partner != null && (!cp.traits.has('Homosexual') && !cp.traits.has("Bisexual")) && character.sex != 'male' && partner.sex != 'male' && partnerside == 'givers':
 		dict.nonlesbian = [speechdict.nonlesbian, 1]
-	if scene.scene.get("takertags") && scene.scene.takertags.has("pain") && partnerside == 'givers' && !character.person.traits.has('Likes it rough') && !character.person.traits.has("Masochist"):
-		dict.pain = [speechdict.pain, 2.5]
-	if scene.scene.get("takertags") && scene.scene.takertags.has("pain") && partnerside == 'givers' && (character.person.traits.has('Likes it rough') || character.person.traits.has("Masochist")) && !character.effects.has('resist'):
-		dict.painlike = [speechdict.painlike, 2.5]
-	
-	
+	if scene.scene.get("takertags") && scene.scene.takertags.has("pain") && partnerside == 'givers' && !cp.traits.has('Likes it rough') && !cp.traits.has("Masochist"):
+		if character.effects.has('resist'):
+			dict.pain = [speechdict.pain, 2.5]
+		else:
+			dict.painlike = [speechdict.painlike, 2.5]
 	dict.moans = [speechdict.moans, 0.25]
+
 	for i in prevailing_lines:
 		if dict.has(i):
-			var temp = dict[i].duplicate()
+			array = [dict[i]]
 			dict.clear() 
-			dict[i] = temp
 			break
-	for i in dict.values():
-		array.append(i)
-	text = globals.weightedrandom(array)
+	if !dict.empty():
+		array = dict.values()
+	var text = globals.weightedrandom(array)
 	if text != null:
 		text = text[randi()%text.size()]
 	
-	if text != null && partner != null && text.find('[name2]') >= 0:
-		if partner.person == globals.player || character.person.traits.has("Monogamous"):
-			text = text.replace('[name2]', character.person.getMasterNoun())
+	if text != null && partner != null:
+		if partner.person == globals.player || cp.traits.has("Monogamous"):
+			text = text.replace('[name2]', cp.getMasterNoun())
 		else:
 			text = text.replace('[name2]', partner.name)
 		text = '[color=lime]' + text + '[/color]'
@@ -1902,7 +1893,7 @@ func endencounter():
 			mana += i.orgasms*3 + rand_range(1,2)
 		else:
 			mana += i.sens/500
-		if i.person.race == 'Drow':
+		if i.person.race == 'Dark Elf':
 			mana *= 1.2
 		if i.person.spec == 'nympho':
 			mana += i.actionshad.samesex + i.actionshad.oppositesex

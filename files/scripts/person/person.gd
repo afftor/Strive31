@@ -310,7 +310,7 @@ func getessence():
 	var essence
 	if race in ['Demon', 'Arachna', 'Lamia']:
 		essence = 'taintedessenceing'
-	elif race in ['Fairy', 'Drow', 'Dragonkin']:
+	elif race in ['Fairy', 'Dark Elf', 'Dragonkin']:
 		essence = 'magicessenceing'
 	elif race == 'Dryad':
 		essence = 'natureessenceing'

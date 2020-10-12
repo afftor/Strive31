@@ -402,7 +402,7 @@ func sexinitiate(secondtime = false):
 		text = temptext
 	
 	managain = action.basemana + slave.stats.maf_cur
-	if slave.race == "Drow" || (partner.race == "Drow" && partner != globals.player):
+	if slave.race == "Dark Elf" || (partner.race == "Dark Elf" && partner != globals.player):
 		managain = managain*1.2
 	if slave.spec == 'nympho':
 		managain += 2
@@ -675,7 +675,7 @@ func _on_confirm_pressed():
 	var text = ''
 	var mana = 0
 	var array = []
-	var drows = 0
+	var delfs = 0
 	var sprites = []
 	if globals.state.sidequests.emily == 16 && (action == 'threesome' && slave.unique in ['Emily','Tisha'] && threesomepartner.unique in ['Emily','Tisha']):
 		emilytishascene()
@@ -698,12 +698,12 @@ func _on_confirm_pressed():
 		mana += round(slave.lust/15 + threesomepartner.lust/15 + 4)
 		slave.metrics.manaearn += round(mana/2)
 		threesomepartner.metrics.manaearn += round(mana/2)
-		if slave.race == "Drow":
-			drows += 1
-		if threesomepartner.race == "Drow":
-			drows += 1
-		if drows > 0:
-			mana += mana*(1.2*drows)
+		if slave.race == "Dark Elf":
+			delfs += 1
+		if threesomepartner.race == "Dark Elf":
+			delfs += 1
+		if delfs > 0:
+			mana += mana*(1.2*delfs)
 		if slave.spec == 'nympho':
 			mana += 2
 		if threesomepartner.spec == 'nympho':
@@ -736,7 +736,7 @@ func _on_confirm_pressed():
 			text += getessencesfromsex(i, 5)
 			globals.impregnation(i, array[rand_range(0, array.size())])
 			mana += round(slave.lust/15)+3
-			if i.race == "Drow":
+			if i.race == "Dark Elf":
 				mana += 1
 			if i.spec == 'nympho':
 				mana += 2
@@ -770,7 +770,7 @@ func getessencesfromsex(slave, mana):
 		if slave.race in ['Demon', 'Arachna', 'Lamia']:
 			text = text + '\n\nYou have acquired [color=yellow]Tainted Essence[/color].'
 			globals.itemdict.taintedessenceing.amount += 1
-		elif slave.race in ['Fairy', 'Drow', 'Dragonkin']:
+		elif slave.race in ['Fairy', 'Dark Elf', 'Dragonkin']:
 			text = text + '\n\nYou have acquired [color=yellow]Magic Essence[/color].'
 			globals.itemdict.magicessenceing.amount += 1
 		elif slave.race == 'Dryad':

@@ -347,7 +347,7 @@ var characters = {
 		traits = ['Grateful', 'Mentor']
 	},
 	Ayda = {
-		basics = ['Dark Elf', 'adult', 'female', 'rich'],
+		basics = ['Tribal Elf', 'adult', 'female', 'rich'],
 		name = 'Ayda',
 		unique = 'Ayda',
 		surname = '',

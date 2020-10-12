@@ -20,7 +20,7 @@ static func randage():
 
 static func commonrace():
 	var text
-	text = ['Human','Elf','Dark Elf','Halfkin Cat','Halfkin Fox','Halfkin Bunny','Taurus','Demon','Goblin']
+	text = ['Human','Elf','Tribal Elf','Halfkin Cat','Halfkin Fox','Halfkin Bunny','Taurus','Demon','Goblin']
 	if globals.rules.furry == true:
 		text.append('Beastkin Cat')
 		text.append('Beastkin Fox')
@@ -50,7 +50,7 @@ static func randskincolor():
 
 static func rarerace():
 	var text
-	text = ['Dragonkin','Harpy','Arachna','Lamia','Nereid','Scylla','Demon','Seraph','Drow','Slime','Fairy']
+	text = ['Dragonkin','Harpy','Arachna','Lamia','Nereid','Scylla','Demon','Seraph','Dark Elf','Slime','Fairy']
 	text = text[randi()%text.size()]
 	return text
 
@@ -73,7 +73,7 @@ func questarray():
 			description = 'A local nobleman is looking for an obedient worker for his estate, or someone who will provide one. The semi-famous house name provides some crediability to the customer. A $sex servant must present $himself meekly and have above avearge looks. Only humanoids. ',
 			reqs = [['obed','gte', 80],['conf','lte',40],['beauty','gte',50],['bodyshape','eq','humanoid']],
 			reqstemp = [['sex', 'eq', randsex()]],
-			time = round(rand_range(4,7)),
+			time = round(rand_range(7,10)),
 			reward = round(rand_range(80,110))*10,
 			location = ['any'],
 			difficulty = 'medium',
@@ -95,7 +95,7 @@ func questarray():
 			description = 'A particularly elegant letterhead bears the nuanced description of a slave desired by a famously eccentric collector. A handsome reward is offered for the delivery of a $sex $race. ',
 			reqs = [['obed','gte', 80]],
 			reqstemp = [['age','eq',randage()],['race','eq',rarerace()],['sex', 'eq', randsex()]],
-			time = round(rand_range(6,12)),
+			time = round(rand_range(8,12)),
 			reward = round(rand_range(75,90))*10,
 			location = ['any'],
 			difficulty = 'medium',
@@ -106,7 +106,7 @@ func questarray():
 			description = 'One of the Mages Order’s carefully-scribed requisition letters is posted, detailing a new position available for full-time worker. Applicants should be versed in the Magical Arts and be very dependable.',
 			reqs = [['obed','gte', 80], ['wit', 'gte', 60], ['smaf','gte',2],['conf', 'gte', 50]],
 			reqstemp = [],
-			time = round(rand_range(6,8)),
+			time = round(rand_range(8,12)),
 			reward = round(rand_range(75,95))*10,
 			location = ['wimborn'],
 			difficulty = 'medium',
@@ -117,7 +117,7 @@ func questarray():
 			description = "As the last $race girl has been bought out by one of her frequent customers, there's a dire need for a new one. ",
 			reqs = [['obed','gte', 80], ['lewdness', 'gte', 25], ['beauty','gte',40]],
 			reqstemp = [['race','eq',commonrace()]],
-			time = round(rand_range(4,6)),
+			time = round(rand_range(7,10)),
 			reward = round(rand_range(45,70))*10,
 			location = ['any'],
 			difficulty = 'easy',
@@ -128,7 +128,7 @@ func questarray():
 			description = "One of the somewhat successful merchants has decided to get a dependable assistant. Besides being pleasant to look at, they must be able to handle all sorts of people they would be interacting with.",
 			reqs = [['obed','gte', 80], ['conf', 'gte', 50],['charm','gte',40], ['beauty','gte',40]],
 			reqstemp = [],
-			time = round(rand_range(5,9)),
+			time = round(rand_range(7,10)),
 			reward = round(rand_range(75,95))*10,
 			location = ['any'],
 			difficulty = 'medium',
@@ -139,7 +139,7 @@ func questarray():
 			description = "A call to arms has been made by the Captain of the Watch, who is seeking a capable warrior to add to the ranks of the town guard. Prospective candidates must be able to follow orders, and have the courage to stand their ground against the city’s toughest criminals.",
 			reqs = [['obed','gte', 80], ['cour','gte',50], ['sstr','gte',2], ['send', 'gte', 2]],
 			reqstemp = [],
-			time = round(rand_range(5,9)),
+			time = round(rand_range(7,10)),
 			reward = round(rand_range(75,100))*10,
 			location = ['any'],
 			difficulty = 'medium',
@@ -150,7 +150,7 @@ func questarray():
 			description = "An anonymous request was made by a certain nobleman, who is looking for a girl with strong character for his eccentric lewd plays. ",
 			reqs = [['obed','gte', 80], ['sex','eq','female'], ['lewdness', 'gte', 25],['conf','gte',65], ['asser','gte',50]],
 			reqstemp = [],
-			time = round(rand_range(4,8)),
+			time = round(rand_range(6,12)),
 			reward = round(rand_range(75,110))*10,
 			location = ['wimborn','frostford'],
 			difficulty = 'medium',
@@ -162,7 +162,7 @@ func questarray():
 			description = "A small note promises a hefty reward for delivery of an obedient boy for bed duty. It also specifies that a desirable appearance is required. ",
 			reqs = [['obed','gte', 80], ['sex','eq','male'], ['age','eq','teen'], ['beauty','gte',70], ['hairlength','gte',3]],
 			reqstemp = [],
-			time = round(rand_range(4,8)),
+			time = round(rand_range(8,12)),
 			reward = round(rand_range(75,100))*10,
 			location = ['wimborn','frostford'],
 			difficulty = 'medium',
@@ -173,7 +173,7 @@ func questarray():
 			description = "You find a note of one of the more proactive mages, searching for a subject of $race race for his dangerous experiments. He would like it to be at least somewhat cooperative and preferably smart. ",
 			reqs = [['obed','gte', 40], ['wit','gte',40]],
 			reqstemp = [['race','eq',rarerace()]],
-			time = round(rand_range(6,12)),
+			time = round(rand_range(9,12)),
 			reward = round(rand_range(45,65))*10,
 			location = ['wimborn','gorn'],
 			difficulty = 'easy',
@@ -184,7 +184,7 @@ func questarray():
 			description = "The head of a noble house wants to arrange a marriage for his love-timid son. In order to preserve their aristocratic dynasty, a pure maiden of Noble descent is required. She must be knowledgeable in the management of an estate, and have an attractiveness befitting for nobility. ",
 			reqs = [['obed','gte', 80], ['sex','eq','female'],['origins','eq','noble'],['beauty','gte',80] ],
 			reqstemp = [],
-			time = round(rand_range(6,12)),
+			time = round(rand_range(8,12)),
 			reward = round(rand_range(80,120))*10,
 			location = ['wimborn','gorn'],
 			difficulty = 'medium',
@@ -195,7 +195,7 @@ func questarray():
 			description = "A lone adventurer wants to purchase a steadfast person to keep them company on a long journey. ",
 			reqs = [['obed','gte', 80], ['send','gte', 3], ['cour','gte',40]],
 			reqstemp = [],
-			time = round(rand_range(6,8)),
+			time = round(rand_range(8,10)),
 			reward = round(rand_range(45,65))*10,
 			location = ['any'],
 			difficulty = 'easy',
@@ -206,7 +206,7 @@ func questarray():
 			description = "A middle-aged man wishes to move on with his life but has been too reliant on cohabitant for past years. Having neither the confidence nor the time to look for new wife personally, he has decided to cut corners and try out a different approach. ",
 			reqs = [['obed','gte', 80], ['sex','eq', 'female'], ['haircolor','eq',randhaircolor()], ['bodyshape','eq','humanoid']],
 			reqstemp = [],
-			time = round(rand_range(6,12)),
+			time = round(rand_range(10,16)),
 			reward = round(rand_range(40,50))*10,
 			location = ['any'],
 			difficulty = 'easy',
@@ -217,7 +217,7 @@ func questarray():
 			description = "A fairly simple note from a rich and well-bred background requests a $race girl as a birthday present for their son. Hastily scribbled in one corner of the paper you can see 'MUST HAVE BIG BOOBS' in another style of handwriting. ",
 			reqs = [['obed','gte', 80], ['sex','eq', 'female'],['titssize','gte',3]],
 			reqstemp = [['race','eq',commonrace()]],
-			time = round(rand_range(6,8)),
+			time = round(rand_range(8,12)),
 			reward = round(rand_range(50,60))*10,
 			location = ['wimborn','gorn'],
 			difficulty = 'easy',
@@ -239,7 +239,7 @@ func questarray():
 			description = "A note desiring a high grade $sex slave. Taming is not needed. ",
 			reqs = [['origins','gte','rich'], ['sex', 'eq', randsex()]],
 			reqstemp = [],
-			time = round(rand_range(6,8)),
+			time = round(rand_range(7,10)),
 			reward = round(rand_range(70,90))*10,
 			location = ['any'],
 			difficulty = 'medium',
@@ -251,7 +251,7 @@ func questarray():
 			description = "An elegant note describes the search for a young male to act as squire for a newly knighted lord.\nMust be well behaved and physically able. ",
 			reqs = [['obed','gte', 80],['sex', 'eq', 'male'], ['sstr', 'gte', 2], ['age','neq','adult']],
 			reqstemp = [],
-			time = round(rand_range(7,12)),
+			time = round(rand_range(8,14)),
 			reward = round(rand_range(30,50))*10,
 			location = ['wimborn','frostford'],
 			difficulty = 'easy',
@@ -262,7 +262,7 @@ func questarray():
 			description = "A traveling circus is looking to take in a new performer. Male or female doesn't matter, just that they be young, flexible, and a quick learner. ",
 			reqs = [['obed','gte', 80], ['sagi', 'gte', 2], ['wit','gte',40], ['age','neq','adult']],
 			reqstemp = [],
-			time = round(rand_range(7,9)),
+			time = round(rand_range(8,12)),
 			reward = round(rand_range(35,55))*10,
 			location = ['wimborn','gorn'],
 			difficulty = 'easy',
@@ -274,7 +274,7 @@ func questarray():
 			description = "A sexually frustrated wife is looking for a male slave to give her the attention she desperately craves. Looks should not be very high, to avoid husband's suspicion. Must be well endowed with good stamina! ",
 			reqs = [['sex', 'eq', 'male'], ['obed','gte', 80],['send','gte',2],['beauty','lte',40],['penis','gte',1]],
 			reqstemp = [],
-			time = round(rand_range(7,12)),
+			time = round(rand_range(9,12)),
 			reward = round(rand_range(30,50))*10,
 			location = ['wimborn','frostford'],
 			difficulty = 'easy',
@@ -286,7 +286,7 @@ func questarray():
 			description = 'A rather plain and slightly crinkled notice explains how a certain quirky land owner is buying pure beastkin wolves for a "breeding project." Appearances should be decent but looks are a secondary concern at the moment.  ',
 			reqs = [['race','eq','Beastkin Wolf'],['obed','gte', 80],['beauty','gte',20]],
 			reqstemp = [['sex', 'eq', randsex()]],
-			time = round(rand_range(7,12)),
+			time = round(rand_range(8,14)),
 			reward = round(rand_range(30,40))*10,
 			location = ['wimborn','gorn'],
 			difficulty = 'easy',

@@ -63,7 +63,7 @@ var database = {
 		length = 5,
 		exits = ['amberguard','forest'],
 		tags = ['amberguard'],
-		races = [{value = 'Drow', weight = 1},{value = 'Elf', weight = 12},{value = 'Bunny', weight = 2},{value = 'Tanuki', weight = 2}],
+		races = [{value = 'Dark Elf', weight = 1},{value = 'Elf', weight = 12},{value = 'Bunny', weight = 2},{value = 'Tanuki', weight = 2}],
 		levelrange = [3,6],
 	},
 	amberguardforest = {

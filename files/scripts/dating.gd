@@ -515,11 +515,8 @@ func moveto(newloc):
 	self.showntext = 'You lead [name2] to the [color=yellow]' + locationdicts[location].name + '[/color]. '
 	if date == false && !newloc in ['bedroom','dungeon']:
 		date = true
-		self.mood += 5
-		self.turns += 5
 		self.showntext += "\n[color=green][name2] seems to be quite happy to be taken out of the usual place and ready to spend with you some additional time. [/color]"
 	
-	self.turns -= 1
 	updatelist()
 
 func actiontooltip(descript):

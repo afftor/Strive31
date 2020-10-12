@@ -748,7 +748,7 @@ func _on_end_pressed():
 			######## Counting food
 			for i in person.effects.values():
 				if i.has('duration') && i.code != 'captured':
-					if person.race != 'Dark Elf' || (!i.code in ['bandaged','sedated', 'drunk'] && randf() > 0.5):
+					if person.race != 'Tribal Elf' || (!i.code in ['bandaged','sedated', 'drunk'] && randf() > 0.5):
 						i.duration -= 1
 					if i.duration <= 0:
 						person.add_effect(i, true)
@@ -1091,7 +1091,7 @@ func _on_end_pressed():
 					person.away.at = ''
 				for i in person.effects.values():
 					if i.has('duration') && i.code != 'captured':
-						if person.race != 'Dark Elf' || (!i.code in ['bandaged','sedated'] && randf() > 0.5):
+						if person.race != 'Tribal Elf' || (!i.code in ['bandaged','sedated'] && randf() > 0.5):
 							i.duration -= 1
 						if i.duration <= 0:
 							person.add_effect(i, true)
@@ -2448,7 +2448,7 @@ var mainquestdict = {
 	'10': "Bring Melissa a Taurus girl with huge lactating tits and at least three additional pairs of tits.\n\nSize and lactation can be altered with certain potions, while the laboratory lets you add and develop extra tits. ",
 	'11': "Visit Melissa for your next mission. ",
 	'12': "Melissa told you to travel to Gorn and find the Orc named Garthor. ",
-	'13': "Garthor from Gorn ordered you to capture and bring Dark Elf Ivran who you can find at Gorn's outskirts.",
+	'13': "Garthor from Gorn ordered you to capture and bring Tribal Elf Ivran who you can find at Gorn's outskirts.",
 	'14': "Wait for next day until returning to Garthor. ",
 	'15': "Return to Garthor and decide what should be done with Ivran. ",
 	'16': "Return back to Melissa for your next task. ",
@@ -2458,7 +2458,7 @@ var mainquestdict = {
 	'20': "Purchase the information from stranger in Amberguard. ",
 	'21': "Locate Witch's Hut at the Amber Road. ",
 	'22': "Ask Shuriya in the Hut near Amber Road how to get into tunnels",
-	'23': "Bring 2 slaves to the Shuriya: an elf and a drow. ",
+	'23': "Bring 2 slaves to the Shuriya: an elf and a dark elf. ",
 	'24': "Search through Undercity ruins for any remaining documents. ",
 	'25': "Return to Melissa with your findings. ",
 	'26': "Visit Melissa for your next assignement. ",

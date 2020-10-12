@@ -952,7 +952,7 @@ func gornpalaceivran(stage):
 		globals.state.sidequests.ivran = 'changed'
 		globals.state.mainquest = 16
 		globals.state.decisions.append('ivrantaken')
-		ivran = globals.newslave('Dark Elf', 'adult', 'female', 'rich')
+		ivran = globals.newslave('Tribal Elf', 'adult', 'female', 'rich')
 		ivran.name = 'Ivran'
 		ivran.surname = ''
 		ivran.beautybase = 75

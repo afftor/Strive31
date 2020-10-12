@@ -946,7 +946,7 @@ var enemypool = {
 		icon = null,
 		special = null,
 		capture = true,
-		capturerace = [['Dark Elf',100]],
+		capturerace = [['Tribal Elf',100]],
 		captureoriginspool = [{value = 'noble', weight = 100}],
 		captureagepool = [{value = 'adult', weight = 100}],
 		capturesex = ['any'],

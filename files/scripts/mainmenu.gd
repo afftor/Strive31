@@ -23,7 +23,7 @@ var locationDict = {
 var racebonusdict = {
 	human = {descript = 'Reputation with Wimborn increased'},
 	elf = {descript = 'Start with +1 Magic Affinity'},
-	"dark elf" : {descript = 'Start with +1 Agility'},
+	"tribal elf" : {descript = 'Start with +1 Agility'},
 	orc = {descript = 'Reputation with Gorn increased'},
 	demon = {descript = 'Start with +1 unassigned Skillpoint, all starting reputation lowered slightly'},
 	beastkin = {descript = 'Reputation with Frostford increased'},
@@ -33,7 +33,7 @@ var racebonusdict = {
 
 var skindict = {
 	human = [ 'pale', 'fair', 'olive', 'tan', 'brown', 'dark' ],
-	drow = ['blue', 'purple', 'pale blue'],
+	"dark elf" : ['blue', 'purple', 'pale blue'],
 	orc = ['green'],
 	goblin = ['green'],
 	dryad = ['green'],
@@ -1399,7 +1399,7 @@ func _on_slaveconfirm_pressed():
 	#Apply player racial bonuses
 	if player.race == 'Elf':
 		player.stats.maf_base += 1
-	elif player.race == "Dark Elf":
+	elif player.race == "Tribal Elf":
 		player.stats.agi_base += 1
 	elif player.race == 'Orc':
 		globals.state.reputation.gorn += 30

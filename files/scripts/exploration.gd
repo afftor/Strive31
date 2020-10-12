@@ -295,7 +295,7 @@ var guardRaces = {
 	'wimborn' : [['Human', 12],['Demon', 2],['Taurus', 2],['Cat', 1]],
 	'frostford' : [['Halfkin Wolf', 6],['Beastkin Wolf', 6],['Human', 5],['Halfkin Cat', 2],['Beastkin Cat', 2],['Halfkin Fox', 1],['Beastkin Fox', 1]],
 	'gorn' : [['Orc', 4],['Goblin', 2],['Centaur', 1],['Taurus', 1]],
-	'amberguard' : [['Elf', 12],['Dark Elf', 1],['Drow', 1]]
+	'amberguard' : [['Elf', 12],['Tribal Elf', 1],['Dark Elf', 1]]
 }
 
 func buildslave(i):
@@ -1670,7 +1670,7 @@ func shuriyaslaves(first = true):
 	if slave1 != null:
 		text += slave1.dictionary("\n$name will be given away as an Elf.")
 	if slave2 != null:
-		text += slave2.dictionary("\n$name will be given away as a Drow.")
+		text += slave2.dictionary("\n$name will be given away as a Dark Elf.")
 	
 	if cancontinue == true:
 		buttons.append({text = "Confirm", function = 'shuriyaslavesgive', args = null})
@@ -1678,14 +1678,14 @@ func shuriyaslaves(first = true):
 		if slave1 == null:
 			buttons.append({text = 'Select an Elf', function = 'shuriyaslaveselect', args = 1})
 		if slave2 == null:
-			buttons.append({text = 'Select a Drow', function = 'shuriyaslaveselect', args = 2})
+			buttons.append({text = 'Select a Dark Elf', function = 'shuriyaslaveselect', args = 2})
 	main.dialogue(state, self, text, buttons)
 
 func shuriyaslaveselect(stage):
 	if stage == 1:
 		main.selectslavelist(true, 'shuriyaelfselect', self, 'person.race == "Elf"')
 	else:
-		main.selectslavelist(true, 'shuriyadrowselect', self, 'person.race == "Drow"')
+		main.selectslavelist(true, 'shuriyadrowselect', self, 'person.race == "Dark Elf"')
 
 func shuriyaslavesgive(none):
 	globals.state.mainquest = 24

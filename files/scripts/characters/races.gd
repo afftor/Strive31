@@ -50,9 +50,9 @@ var races = {
 			end_max = 3,
 		},
 	},
-	'Dark Elf' : {
+	'Tribal Elf' : {
 		surname = names.elfsurname,
-		description = "Elves are famous among the various races for the legends and stories of ancient times, when elves held a similar status to modern humans. These tales speak of elves as arrogant, and in command of powerful nature magic, but ultimately spelling their own downfall in some great act of folly.\n\nDark elves belong to less known tribes, rumored to be separated from main groups and living in warmer regions.",
+		description = "Elves are famous among the various races for the legends and stories of ancient times, when elves held a similar status to modern humans. These tales speak of elves as arrogant, and in command of powerful nature magic, but ultimately spelling their own downfall in some great act of folly.\n\nTribal elves belong to less known tribes, rumored to be separated from main groups and living in warmer regions.",
 		details = "[color=aqua]Racial trait: Temporal effects from potions and spells last longer.[/color]\n\n[color=yellow]Stat potential: Strength - 4, Agility - 5, Magic - 3, Endurance - 4 [/color]",
 		pricemod = 1.5,
 		startingrace = true,
@@ -74,9 +74,9 @@ var races = {
 			end_max = 4,
 		},
 	},
-	Drow = {
+	"Dark Elf" : {
 		surname = names.elfsurname,
-		description = "Drow are a race, considered a branching species of elf. Little is known about their history and motherland, if they ever had one at all, as their underground cities are spread thin across multiple continents, and are even more difficult to enter than to locate.\n\nBeyond a preference for isolation and their general appearance, drow are quite different from their cousins in both attitude and culture. However, what sets them apart most is the unusual pigmentation of their skin; a dark colors with occasional blue tint. The unusual pigmentation is the subject of much debate and speculation, with theories ranging from natural mutation, to the byproduct of ancient beings.",
+		description = "Dark Elves are a race, considered a branching species of elf. Little is known about their history and motherland, if they ever had one at all, as their underground cities are spread thin across multiple continents, and are even more difficult to enter than to locate.\n\nBeyond a preference for isolation and their general appearance, Dark Elves are quite different from their cousins in both attitude and culture. However, what sets them apart most is the unusual pigmentation of their skin; a dark colors with occasional blue tint. The unusual pigmentation is the subject of much debate and speculation, with theories ranging from natural mutation, to the byproduct of ancient beings.",
 		details = "[color=aqua]Racial trait: sexual actions give 20% more mana.[/color]\n\n[color=yellow]Stat potential: Strength - 4, Agility - 5, Magic - 6, Endurance - 3 [/color]",
 		pricemod = 2.5,
 		startingrace = false,

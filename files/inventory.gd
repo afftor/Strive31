@@ -338,7 +338,7 @@ func slavegear(person):
 	var race
 	sex = person.sex.replace('futanari','female')
 	race = person.race
-	if race in ['Dark elf', 'Drow']:
+	if race in ['Dark Elf', 'Tribal Elf']:
 		race = 'Elf'
 	if globals.loadimage(person.imagefull) != null:
 		$gearpanel/charframe.texture = globals.loadimage(person.imagefull)
