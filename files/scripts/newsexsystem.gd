@@ -142,6 +142,7 @@ class member:
 			if !source.consent:
 				consent = false
 				effects.append('forced')
+				person.metrics.roughsex += 1
 			if fileref.calcResistWill(self) > 0:
 				effects.append('resist')
 			for i in person.gear.values():
@@ -601,6 +602,8 @@ func startsequence(actors, mode = null, secondactors = [], otheractors = []):
 	turns = variables.timeforinteraction
 	if actors.size() > 4:
 		turns += variables.bonustimeperslavefororgy * actors.size()
+		for person in actors:
+			person.metrics.orgy += 1
 	changecategory('caress')
 	clearstate()
 	rebuildparticipantslist()
