@@ -177,37 +177,44 @@ func _on_statistics_pressed():
 func _on_statsclose_pressed():
 	$stats/statisticpanel.visible = false
 
+# be sure to add a space before the noun
+func textForCountNoun(count, noun, plurEnd = 's', singEnd = ''):
+	if count == 1:
+		return str(count) + noun + singEnd
+	else:
+		return str(count) + noun + plurEnd
+
 func buildmetrics():
 	var text = ""
 	$stats/statisticpanel.visible = true
 	text += "[center]Personal achievments[/center]\n"
-	text += "In your possession: " + str(person.metrics.ownership) + " day"+globals.fastif(person.metrics.ownership == 1, '','s')+"\n"
-	text += "Spent in jail: " + str(person.metrics.jail) + " day"+globals.fastif(person.metrics.jail == 1, '','s')+"\n"
-	text += "Worked in brothel: " + str(person.metrics.brothel) + " day"+globals.fastif(person.metrics.brothel == 1, '','s')+"\n"
-	text += "Won battles: " + str(person.metrics.win) + " time"+globals.fastif(person.metrics.win == 1, '','s')+"\n"
-	text += "Captured enemies: " + str(person.metrics.capture) + " enem"+globals.fastif(person.metrics.capture == 1, 'y','ies')+"\n"
-	text += "Earned gold: " + str(person.metrics.goldearn) + " piece"+globals.fastif(person.metrics.goldearn == 1, '','s')+"\n"
-	text += "Earned food: " + str(person.metrics.foodearn) + " unit"+globals.fastif(person.metrics.foodearn == 1, '','s')+"\n"
-	text += "Produced mana: " + str(person.metrics.manaearn) + " mana\n"
-	text += "Used items: " + str(person.metrics.item) + " time"+globals.fastif(person.metrics.item == 1, '','s')+"\n"
-	text += "Affected by spells: " + str(person.metrics.spell) + " time"+globals.fastif(person.metrics.spell == 1, '','s')+"\n"
-	text += "Modified in lab: " + str(person.metrics.mods) + " time"+globals.fastif(person.metrics.mods == 1, '','s')+"\n"
+	text += "In your possession: " + textForCountNoun(person.metrics.ownership, " day") +"\n"
+	text += "Spent in jail: " + textForCountNoun(person.metrics.jail, " day")+"\n"
+	text += "Worked in brothel: " + textForCountNoun(person.metrics.brothel, " day")+"\n"
+	text += "Won battles: " + textForCountNoun(person.metrics.win, " time") +"\n"
+	#text += "Captured enemies: " + textForCountNoun(person.metrics.capture, " enem","ies", "y") +"\n"
+	text += "Earned gold: " + textForCountNoun(person.metrics.goldearn, " piece") +"\n"
+	text += "Earned food: " + textForCountNoun(person.metrics.foodearn, " unit") +"\n"
+	text += "Produced mana: " + textForCountNoun(person.metrics.manaearn, "", " mana") + "\n"
+	text += "Used items: " + textForCountNoun(person.metrics.item, " time") +"\n"
+	text += "Affected by spells: " + textForCountNoun(person.metrics.spell, " time") +"\n"
+	text += "Modified in lab: " + textForCountNoun(person.metrics.mods, " time") +"\n"
 	$stats/statisticpanel/statstext.set_bbcode(text)
 	text = "[center]Sexual achievments[/center]\n"
-	text += "Had intimacy: " + str(person.metrics.sex) + " time"+globals.fastif(person.metrics.sex == 1, '','s')+"\n"
-	text += "Orgasms: " + str(person.metrics.orgasm) + " time"+globals.fastif(person.metrics.orgasm == 1, '','s')+"\n"
+	text += "Had intimacy: " + textForCountNoun(person.metrics.sex, " time") +"\n"
+	text += "Orgasms: " + textForCountNoun(person.metrics.orgasm, " time") +"\n"
 	if person.vagina != 'none':
-		text += "Vaginal penetrations: " + str(person.metrics.vag) + " time"+globals.fastif(person.metrics.vag == 1, '','s')+"\n"
-	text += "Anal penetrations: " + str(person.metrics.anal) + " time"+globals.fastif(person.metrics.anal == 1, '','s')+"\n"
-	text += "Gave oral: " + str(person.metrics.oral) + " time"+globals.fastif(person.metrics.oral == 1, '','s')+"\n"
-	text += "Was forced: " + str(person.metrics.roughsex) + " time"+globals.fastif(person.metrics.roughsex == 1, '','s')+"\n"
+		text += "Vaginal penetrations: " + textForCountNoun(person.metrics.vag, " time") +"\n"
+	text += "Anal penetrations: " + textForCountNoun(person.metrics.anal, " time") +"\n"
+	text += "Gave oral: " + textForCountNoun(person.metrics.oral, " time") +"\n"
+	text += "Was forced: " + textForCountNoun(person.metrics.roughsex, " time") +"\n"
 	#text += person.dictionary("Of those $he liked: ") + str(person.metrics.roughsexlike) + " time"+globals.fastif(person.metrics.roughsexlike == 1, '','s')+"\n"
-	text += "Had partners: " + str(person.sexexp.partners.size()) + " partner"+globals.fastif(person.sexexp.partners.size() == 1, '','s')+"\n"
+	text += "Had partners: " + textForCountNoun(person.sexexp.partners.size(), " partner") +"\n"
 	if person.preg.has_womb == true || person.metrics.preg > 0:
-		text += "Was pregnant: " + str(person.metrics.preg) + " time"+globals.fastif(person.metrics.preg == 1, '','s')+"\n"
-		text += "Gave birth: " + str(person.metrics.birth) + " time"+globals.fastif(person.metrics.birth == 1, '','s')+"\n"
+		text += "Was pregnant: " + textForCountNoun(person.metrics.preg, " time") +"\n"
+		text += "Gave birth: " + textForCountNoun(person.metrics.birth, " time") +"\n"
 	#text += "Participated in threesomes: " + str(person.metrics.threesome) + " time"+globals.fastif(person.metrics.threesome == 1, '','s')+"\n"
-	#text += "Participated in orgies: " + str(person.metrics.orgy) + " time"+globals.fastif(person.metrics.orgy == 1, '','s')+"\n"
+	text += "Participated in orgies: " + textForCountNoun(person.metrics.orgy, " time") +"\n"
 	$stats/statisticpanel/statssextext.set_bbcode(text)
 	text = ''
 	for i in person.relations:
