@@ -85,7 +85,7 @@ class member:
 	var virginitytaken = false
 	
 	var effects = []
-	
+	var isHandCuffed = false
 	var subduedby = []
 	var subduing
 	
@@ -150,7 +150,7 @@ class member:
 					continue
 				var tempitem = globals.state.unstackables.get(i)
 				if tempitem != null && tempitem.code == 'acchandcuffs':
-					effects.append('handcuffed')
+					isHandCuffed = true
 					break
 
 	func lust_set(value):
@@ -2199,7 +2199,7 @@ func resistattempt(member):
 		if member.effects.has('tied'):
 			resiststrength = 0
 			result.text += '[name1] is powerless to resist, as [his1] limbs are restricted by rope.\n'
-		elif member.effects.has('handcuffed'):
+		elif member.isHandCuffed:
 			resiststrength = ceil(resiststrength * 2.0 / 3.0) - 1
 			result.text += '[name1] has some difficulty resisting, as [his1] arms are restricted by handcuffs.\n'
 		
