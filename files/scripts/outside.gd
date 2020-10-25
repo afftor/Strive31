@@ -784,7 +784,7 @@ func clearselection(temp = ''):
 		else:
 			mansion.maintext = '[color=yellow]Your newly purchased slave has been sent to your mansion. [/color]'
 	elif temp == 'sell':
-		mansion.maintext = "[color=yellow]You receive a nice purse of gold for your freshly selled servant. [/color]"
+		mansion.maintext = "[color=yellow]You receive a nice purse of gold for your freshly sold servant. [/color]"
 	get_node("slavebuypanel/purchasebutton").set_disabled(true)
 	get_node("slavesellpanel/slavesellbutton").set_disabled(true)
 	for i in get_node("slavebuypanel/slavebuypanel/ScrollContainer/VBoxContainer").get_children():
@@ -953,7 +953,7 @@ func slaveforquestselected(person):
 				slavefits = false
 				text += '[color=#ff4949]' + globals.repeatables.reqsfuncdescript[i] + '[/color]\n'
 	if slavefits == true:
-		mansion.maintext = "There seems to be no problems with neeeded requirements.\n" + text
+		mansion.maintext = "There seems to be no problems with needed requirements.\n" + text
 		get_node("slaveguildquestpanel/questaccept").set_text("Turn in")
 		offeredslave = person
 	else:
@@ -1299,7 +1299,7 @@ func mageorder():
 	if globals.state.mainquest in [40,41]:
 		globals.events.orderfinale()
 		return
-	mansion.maintext = "This massive building takes a large part of the street. The Wimborn's Mage's Order is the centerpiece of your career achievments. Here you'll be able to buy necessary equipment and learn spells, assuming you are part of it of course."
+	mansion.maintext = "This massive building takes a large part of the street. The Wimborn's Mage's Order is the centerpiece of your career achievements. Here you'll be able to buy necessary equipment and learn spells, assuming you are part of it of course."
 	clearbuttons()
 	#Old Event hooks
 	#Main Quest
@@ -1855,9 +1855,9 @@ func exchangeitemsconfirm():
 			#newitem.enchant = 'rare'
 		globals.state.unstackables[newitem.id] = newitem
 		if numNew < 6:
-			get_parent().infotext('Recieved '+ newitem.name + ' from exchange','green')
+			get_parent().infotext('Received '+ newitem.name + ' from exchange','green')
 	if numNew >= 6:
-		get_parent().infotext('Recieved many items from exchange','green')
+		get_parent().infotext('Received many items from exchange','green')
 	exchangeRefresh()
 
 ####QUESTS
@@ -1883,7 +1883,7 @@ func caliqueststart(value = ''):
 		cali = globals.characters.create('Cali')
 	elif globals.state.sidequests.cali == 2:
 		globals.resources.gold -= 50
-		text = ("— That is... very noble of you " + globals.fastif(globals.player.sex == 'male', 'Mylord', 'Milady')+ ", but I believe thief should be punished.\n\nOn that you tell him to let you handle the girl and after a moment butcher agrees to drop his charge. You lead the girl away and after some time end up in desolated place.")
+		text = ("— That is... very noble of you " + globals.fastif(globals.player.sex == 'male', 'Milord', 'Milady')+ ", but I believe thief should be punished.\n\nOn that you tell him to let you handle the girl and after a moment butcher agrees to drop his charge. You lead the girl away and after some time end up in desolated place.")
 		buttons.append(["Talk to her", 'caliqueststart', 4])
 		buttons.append(["Take girl to jail", 'caliqueststart',5])
 		cali.loyal += 10
@@ -1954,7 +1954,7 @@ func sebastian():
 		globals.itemdict.maturingpot.unlocked = true
 	elif globals.state.mainquest >= 7 && globals.state.farm == 0:
 		globals.state.farm = 1
-		mansion.maintext = "— Hey, "+globals.player.name+"! You took care of that little errand? Great, great! So what are you up to? Me? I'm working with not-so-easy-to-get merchandise. Since you're working with Melissa, I suppose you'd be interested as well! Yes, rare black market ingredients, mythical creatures, and forbidden magical devices; I tend to deal with many of those! Of course the service won't be cheap, as the rarity and legality is the main issue.\n\n— I can offer you one rare slave every couple of days, but I'll warn you: I only deal with rare species. Their obedience and branding is entirely up to you, so don't come back complaining if they bite you in your sleep!\n\nHe gives a mirthful chuckle.\n\n— Otherwise, a plesure doing business with you. I'll let you know when I get something in that might interest you. Speaking of which, I have one proposal which may interest you, as I heard you own a nice isolated place, and tend to keep slaves around to help you."
+		mansion.maintext = "— Hey, "+globals.player.name+"! You took care of that little errand? Great, great! So what are you up to? Me? I'm working with not-so-easy-to-get merchandise. Since you're working with Melissa, I suppose you'd be interested as well! Yes, rare black market ingredients, mythical creatures, and forbidden magical devices; I tend to deal with many of those! Of course the service won't be cheap, as the rarity and legality is the main issue.\n\n— I can offer you one rare slave every couple of days, but I'll warn you: I only deal with rare species. Their obedience and branding is entirely up to you, so don't come back complaining if they bite you in your sleep!\n\nHe gives a mirthful chuckle.\n\n— Otherwise, a pleasure doing business with you. I'll let you know when I get something in that might interest you. Speaking of which, I have one proposal which may interest you, as I heard you own a nice isolated place, and tend to keep slaves around to help you."
 	elif globals.state.mainquest >= 7:
 		if globals.state.sebastianorder.taken == false:
 			mansion.maintext = "— Glad to see you well, "+globals.player.name+"! How are you doing? Got a special order?"

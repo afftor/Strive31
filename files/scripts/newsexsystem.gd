@@ -1309,7 +1309,7 @@ func startscene(scenescript, cont = false, pretext = ''):
 			i.lastaction = dict
 			request = checkrequest(i)
 			if request == true:
-				textdict.orgasms += decoder("[color=aqua]Desire fullfiled! [name1] grows lewder and more sensitive. [/color]\n", [i], [i])
+				textdict.orgasms += decoder("[color=aqua]Desire fulfilled! [name1] grows lewder and more sensitive. [/color]\n", [i], [i])
 #			if i.sens >= 1000:
 #				textdict.orgasms += triggerorgasm(i)
 #				i.orgasm = true
@@ -1917,7 +1917,7 @@ func endencounter():
 			mana /= 2
 		if i.requestsdone > 0:
 			mana += i.requestsdone*10
-			text += ", [color=aqua]Desires fullfiled: " + str(i.requestsdone) + '[/color]'
+			text += ", [color=aqua]Desires fulfilled: " + str(i.requestsdone) + '[/color]'
 		mana = round(mana)
 		manaDict[i.person] = mana
 		totalmana += mana
@@ -2185,7 +2185,7 @@ func calcResistWill(member):
 	if member.person.effects.has('drunk'):
 		resistwill /= 2
 
-	resistwill -= member.person.obed*3 + member.person.loyal*2 + member.lust/10 - member.lewd/3
+	resistwill -= member.person.obed*3 + member.person.loyal*2 + member.lust/10 + member.lewd/3
 	if member.person.traits.has("Likes it rough"):
 		resistwill -= 60
 	

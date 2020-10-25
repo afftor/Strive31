@@ -136,7 +136,7 @@ var spelllist = {
 	barrier = {
 		code = 'barrier',
 		name = 'Barrier',
-		description = "Creates a magical barrier around target, raising it's armor. ",
+		description = "Creates a magical barrier around target, raising its armor. ",
 		effect = '',
 		manacost = 12,
 		req = 1,
@@ -162,7 +162,7 @@ var spelllist = {
 	acidspit = {
 		code = 'acidspit',
 		name = 'Acid Spit',
-		description = "Turns your saliva into highly potent corrosive substance for a short time. \nDeals spell damage to single target enemy and reduces it's armor. ",
+		description = "Turns your saliva into highly potent corrosive substance for a short time. \nDeals spell damage to single target enemy and reduces its armor. ",
 		effect = '',
 		manacost = 6,
 		req = 2,
@@ -351,7 +351,7 @@ func dominationeffect():
 	var spell = globals.spelldict.domination
 	globals.resources.mana -= spellcost(spell)
 	if rand_range(0,100) < 20 && globals.player.smaf < 5:
-		text = "Your spell badly damages $name's mind as $he twiches and yells under its' effect."
+		text = "Your spell badly damages $name's mind as $he twitches and yells under its effect."
 		person.cour -= rand_range(1,25)
 		person.conf -= rand_range(1,25)
 		person.wit -= rand_range(1,25)
@@ -526,7 +526,7 @@ func mutate(power=2, silent = false):
 			else:
 				power += 1
 		elif line == "nipples":
-			text += "Additional nipples has sprouted on $name's torse. "
+			text += "Additional nipples has sprouted on $name's torso. "
 			person.titsextra = round(rand_range(1,4))
 		elif line == "pregnancy":
 			if person.preg.has_womb == true:

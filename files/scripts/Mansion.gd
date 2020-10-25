@@ -870,7 +870,7 @@ func _on_end_pressed():
 						person.add_effect(globals.effectdict.contraceptive)
 						gold_consumption += 5
 					else:
-						text0.set_bbcode(text0.get_bbcode()+person.dictionary("[color=#ff4949]You could't afford to provide $name with contraceptives.[/color]\n"))
+						text0.set_bbcode(text0.get_bbcode()+person.dictionary("[color=#ff4949]You couldn't afford to provide $name with contraceptives.[/color]\n"))
 			if person.rules.aphrodisiac == true:
 				var value
 				if person.spec != 'housekeeper':
@@ -882,7 +882,7 @@ func _on_end_pressed():
 					person.lust += rand_range(10,15)
 					gold_consumption += value
 				else:
-					text0.set_bbcode(text0.get_bbcode()+person.dictionary("[color=#ff4949]You could't supply $name's food with aphrodisiac.[/color]\n"))
+					text0.set_bbcode(text0.get_bbcode()+person.dictionary("[color=#ff4949]You couldn't supply $name's food with aphrodisiac.[/color]\n"))
 			if person.rules.silence == true:
 				if person.cour > 40:
 					person.cour += -rand_range(3,5)
@@ -3208,7 +3208,7 @@ func _on_farm_pressed(inputslave = null):
 		manager.work = 'farmmanager'
 		text = manager.dictionary('Your farm manager is ' + manager.name_long() + '.')
 	else:
-		text = "[color=yellow]You have no assigned manager. Without manager you won't be able to recieve farm income. [/color]"
+		text = "[color=yellow]You have no assigned manager. Without manager you won't be able to receive farm income. [/color]"
 	if globals.state.mansionupgrades.farmhatchery > 0:
 		text = text + '\n\nYou have ' + str(globals.state.snails) + ' snails.'
 		if globals.state.snails == 0:
@@ -3269,7 +3269,7 @@ func _on_addhen_pressed():
 	var person = selectedfarmslave
 	person.sleep = 'farm'
 	person.work = 'hen'
-	popup(person.dictionary("You put $name into specially designed pen and fixate $his body, exposing $his orificies to be fully accessible to giant snail, leaving $him shortly after in the custody of farm."))
+	popup(person.dictionary("You put $name into specially designed pen and fixate $his body, exposing $his orifices to be fully accessible to giant snail, leaving $him shortly after in the custody of farm."))
 	_on_closeslavefarm_pressed()
 	_on_farm_pressed()
 	rebuild_slave_list()
@@ -3999,7 +3999,7 @@ func _on_headgirlbehavior_item_selected( ID ):
 		text += "Headgirl will not interfere with others' business. "
 	if ID == 1:
 		globals.state.headgirlbehavior = 'kind'
-		text += 'The Headgirl will focus on a kind approach and reduce the stress of others, trying to endrose acceptance of their master. '
+		text += 'The Headgirl will focus on a kind approach and reduce the stress of others, trying to endorse acceptance of their master. '
 	if ID == 2:
 		globals.state.headgirlbehavior = 'strict'
 		text += "Headgirl will focus on putting other servants in line at the cost of their stress. "
