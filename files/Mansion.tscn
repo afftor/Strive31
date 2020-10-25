@@ -5062,8 +5062,8 @@ margin_bottom = 162.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 bbcode_enabled = true
-bbcode_text = "Application requires [color=aqua]1 Magic Esscence[/color] and 1 [color=aqua]Supply[/color]."
-text = "Application requires 1 Magic Esscence and 1 Supply."
+bbcode_text = "Application requires [color=aqua]1 Magic Essence[/color] and 1 [color=aqua]Supply[/color]."
+text = "Application requires 1 Magic Essence and 1 Supply."
 
 [node name="applybutton" type="Button" parent="MainScreen/slave_tab/stats/customization/tattoopanel"]
 margin_left = 117.0
@@ -5090,7 +5090,7 @@ margin_right = 255.0
 margin_bottom = 298.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-text = "Transperent Ink"
+text = "Transparent Ink"
 
 [node name="tattoooptions" type="OptionButton" parent="MainScreen/slave_tab/stats/customization/tattoopanel"]
 margin_left = 56.0
@@ -5200,10 +5200,10 @@ size_flags_horizontal = 2
 size_flags_vertical = 2
 custom_fonts/normal_font = ExtResource( 45 )
 bbcode_enabled = true
-bbcode_text = "Enhanced Branding will allow to issue specific rules and comands to the branded person. 
+bbcode_text = "Enhanced Branding will allow to issue specific rules and commands to the branded person. 
 [color=aqua]Servants with Enhanced Brand won't be able to steal or agitate others. [/color]
 Operation requires 15 mana and 20 energy."
-text = "Enhanced Branding will allow to issue specific rules and comands to the branded person. 
+text = "Enhanced Branding will allow to issue specific rules and commands to the branded person. 
 Servants with Enhanced Brand won't be able to steal or agitate others. 
 Operation requires 15 mana and 20 energy."
 

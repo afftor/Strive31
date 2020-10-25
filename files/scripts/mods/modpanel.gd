@@ -26,6 +26,7 @@ var logOverlaps = PoolStringArray()
 var logErrors = PoolStringArray()
 var logUnmatched = PoolStringArray()
 var logPatches = {} # {'file' : 'firstMod'}
+var logWarnSpace = PoolStringArray()
 var retCode #lazy def to avoid many def
 
 
@@ -60,6 +61,7 @@ func initRegexs():
 		"VAR" : "(#.*\\R)*(?<header>(?<!\\V)(const|enum|onready\\h+var|var)\\h*\\w+)(?<body>(\\h*:?=\\h*[\\{\\[](.*?[\\}\\]]\\h*(#.*)?|(?<inner>.*(\\R.*)+?)?\\R[\\}\\]](?!\\h*[,\\}\\]]).*)|.*)(\\R|\\Z))",
 		"SIGN" : "(#.*\\R)*(?<header>(?<!\\V)signal\\h.*(\\R|\\Z))",
 		"CLASS" : "(#.*\\R)*(?<header>(?<!\\V)class\\h+\\w+).*\\R(?<body>((\\t.*|#.*)?\\R)*(\\t+\\S.*(\\R|\\Z)))?",
+		"WARN_SPACE" : "(?<!\\V) .*(\\R|\\Z)",
 	}
 	var tag_regex_string = "(?<!\\V)<(\\w+)(\\h+\\-?\\d+)?(\\h+\\-?\\d+)?>"
 	var file_tag_regex_string = "(?<!\\V)###\\h*<(\\w+)>\\h*###(\\R|\\Z)"
@@ -200,6 +202,9 @@ func displayReport(afterMod = true):
 		logErrors = PoolStringArray()
 
 	var textAdd = ''
+	if logWarnSpace.size() > 0:
+		textAdd += "\nWarning: The following lines start with a space rather than a tab; this may interrupt definitions:\n" + logWarnSpace.join('\n')
+		logWarnSpace = PoolStringArray()
 	if logUnmatched.size() > 0:
 		textAdd += "\nScript files unique to mod (these scripts have a new relative path compared to game files):\n" + logUnmatched.join('\n')
 		logUnmatched = PoolStringArray()
@@ -227,6 +232,7 @@ func _on_applymods_pressed():
 			curMod = mod
 			apply_mod_to_dictionary(modPath)
 	scriptEdits = {}
+	logPatches = {}
 	curMod = ''
 	apply_mod_dictionary()
 	saveconfig()
@@ -283,16 +289,18 @@ func apply_mod_to_dictionary(modPath):
 				file.close()
 			else:
 				handleError("Reading mod script " + str(path), retCode)
+			if modText.strip_edges().empty():
+				continue
 
 			var tag = file_tag_regex.search(modText)
 			if tag != null:
 				if tag.get_string(1) == tag_file_new || tag.get_string(1) == tag_file_mod:
 					curFileTag = tag.get_string(1)
 				else:
-					handleError("ERROR: '" + str(tag.get_string(1)) + "' file tag not supported.", ERR_BUG)
+					handleError("'" + str(tag.get_string(1)) + "' file tag not supported.", ERR_BUG)
 
 			var destPath = path.replacen(modPath, filedir)
-			if !modText.empty() && file.file_exists(destPath):
+			if file.file_exists(destPath):
 				apply_file_to_dictionary(destPath, modText)
 				if curFileTag == tag_file_new:
 					handleError("Relative path for file '" +str(path)+ "' tagged as '"+tag_file_new+"' matches a game file", ERR_FILE_BAD_PATH)
@@ -326,7 +334,7 @@ func apply_file_to_dictionary(file_name, string):
 		var newOffset = apply_next_element_to_dictionary(file_name, string, offset)
 		if newOffset == null:
 			var pos = getLinePos(string, offset)
-			handleError("WARNING: error occurred while modding file " + str(file_name) + ", skipped rest of file. Ended on line: " + str(pos[0]) + ", Column: " + str(pos[1]), ERR_BUG)
+			handleError("script error occurred while modding file " + str(file_name) + ", skipped rest of file. Ended on line: " + str(pos[0]) + ", Column: " + str(pos[1]), ERR_BUG)
 			return
 		else:
 			offset = newOffset
@@ -394,6 +402,10 @@ func apply_next_element_to_dictionary(path, modText, offset):
 			which_operation = op
 			has_next = true
 	
+	if which_operation == "WARN_SPACE":
+		logWarnSpace.append("     Line " + str(getLinePos(modText, current_match.get_start())[0]) + " of file " + path.replace( filedir, modfolder + curMod + "/"))
+		return current_match.get_end()
+
 	var next_tag = tag_regex.search(modText, offset)
 	if has_next && (next_tag == null || new_offset <= next_tag.get_start() || next_tag.get_start() == -1):
 		var found_match = false
@@ -462,11 +474,11 @@ func apply_next_element_to_dictionary(path, modText, offset):
 				temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, new_string.join("\n"))
 				break
 		elif next_tag.get_string(1) == tag_file_new || next_tag.get_string(1) == tag_file_mod:
-			handleError("ERROR: '" + str(next_tag.get_string(1)) + "' is a file tag, not a mod operation tag", ERR_BUG)
+			handleError("'" + str(next_tag.get_string(1)) + "' is a file tag, not a mod operation tag", ERR_BUG)
 			return next_tag.get_end()
 		else:
 			# operation not supported
-			handleError("ERROR: '" + str(next_tag.get_string(1)) + "' tag not supported.", ERR_BUG)
+			handleError("'" + str(next_tag.get_string(1)) + "' tag not supported.", ERR_BUG)
 			return next_tag.get_end()
 	if has_next:
 		 return current_match.get_end()

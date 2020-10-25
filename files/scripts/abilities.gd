@@ -177,7 +177,7 @@ var abilitydict = {
 		icondisabled = load("res://files/buttons/abils/Sedation2.png"),
 		learnable = true,
 		requiredspell = 'sedation',
-		description = "Slows target's reaction, lowering it's speed. ",
+		description = "Slows target's reaction, lowering its speed. ",
 		usetext = '$name casts Sedation onto $targetname. ',
 		target = 'one',
 		targetgroup = 'enemy',
@@ -207,7 +207,7 @@ var abilitydict = {
 		icondisabled = load("res://files/buttons/abils/Barrier2.png"),
 		learnable = true,
 		requiredspell = 'barrier',
-		description = "Creates a magical barrier around target, raising it's armor. ",
+		description = "Creates a magical barrier around target, raising its armor. ",
 		usetext = '$name casts Barrier onto $targetname. ',
 		target = 'one',
 		targetgroup = 'ally',
@@ -296,7 +296,7 @@ var abilitydict = {
 		iconnorm = load("res://files/buttons/abils/Acid spit.png"),
 		iconpressed = load("res://files/buttons/abils/Acid spit3.png"),
 		icondisabled = load("res://files/buttons/abils/Acid spit2.png"),
-		description = "Deals damage to single target enemy and recudes it's armor. Effect grows with Magic Affinity. ",
+		description = "Deals damage to single target enemy and reduces its armor. Effect grows with Magic Affinity. ",
 		usetext = '$name [color=aqua]Spits Acid[/color] at $targetname. ',
 		target = 'one',
 		targetgroup = 'enemy',
@@ -847,7 +847,7 @@ func lust(combatant, value):
 var passivesdict = {
 	doubleattack15 = {code = 'doubleattack15', effect = 'doubleattack', effectvalue = 15, descript = '15% chance to attack twice'},
 	doubleattack25 = {code = 'doubleattack25', effect = 'doubleattack', effectvalue = 25, descript = '25% chance to attack twice'},
-	cultleaderpassive = {code = 'cultleaderpassive', effect = 'cultleaderpassive', effectvalue = null, descript = 'Grows stronger when alies defeated'}
+	cultleaderpassive = {code = 'cultleaderpassive', effect = 'cultleaderpassive', effectvalue = null, descript = 'Grows stronger when allies defeated'}
 }
 
 func stunchance(caster, target, basechance = 25):

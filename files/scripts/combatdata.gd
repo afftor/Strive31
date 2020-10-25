@@ -140,7 +140,7 @@ var enemygrouppools = {
 	},
 	slaversmedium = {
 		units = [['slaver',3,5]], awareness = 0, captured = ['slavervictim', 'slavervictim'], special = 'slaversenc',
-		description = "You spot a group of [color=aqua]$unitnumber slavers[/color] leading few recently [color=yellow]captured victims[/color]. You can't say much about them without getting closer.",
+		description = "You spot a group of [color=aqua]$unitnumber slavers[/color] leading a few recently [color=yellow]captured victims[/color]. You can't say much about them without getting closer.",
 	},
 	peasant = {
 		units = [['peasant',1,1]], awareness = 0, captured = null, special = null,

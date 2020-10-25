@@ -3353,7 +3353,7 @@ func ssmassage(stage = 0):
 	if stage != 0:
 		globals.state.upcomingevents.append({code = 'sspotion', duration = 3})
 	
-	globals.main.dialogue(state, self, startslave.dictionary(text), buttons, sprites)
+	globals.main.dialogue(state, self, startslave.dictionary(text).replace("$2","$"), buttons, sprites)
 
 func sspotion(stage = 0):
 	if globals.state.mansionupgrades.mansionalchemy == 0: #check every 3 days if alchemy room has been purchased

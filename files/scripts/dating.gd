@@ -711,7 +711,7 @@ func pushdown(person, counter):
 			difficulty += 100
 		if person.effects.has('drunk'):
 			difficulty /= 2
-		difficulty -= person.obed*3 + person.loyal*2 + person.lust - person.lewdness/3
+		difficulty -= person.obed*3 + person.loyal*2 + person.lust + person.lewdness/3
 		if person.traits.has("Likes it rough"):
 			difficulty -= 60
 
@@ -791,7 +791,7 @@ func showsexswitch(text, mode):
 
 func praise(person, counter):
 	var text = ''
-	text += "You praise [name2] for [his2] recent behavoir. "
+	text += "You praise [name2] for [his2] recent behavior. "
 	
 	if person.obed >= 85 && counter < 2:
 		self.mood += 3
@@ -957,7 +957,7 @@ func sweets(person, counter):
 	if person.obed >= 55:
 		self.mood += 6
 		person.loyal += 3
-		text = text + "[he2] joyfull accepts them and enjoys the sweet taste.  "
+		text = text + "[he2] joyfully accepts them and enjoys the sweet taste.  "
 		
 	else:
 		text = text + "[he2] takes your gift arrogantly, barely respecting your intention. "
@@ -971,7 +971,7 @@ func sweets(person, counter):
 
 func tea(person, counter):
 	var text = ''
-	text += "You serve tea for you and [name2]. While drinking, you both chatand get a bit closer.  "
+	text += "You serve tea for you and [name2]. While drinking, you both chat and get a bit closer.  "
 	
 	if counter <= 3 || randf() >= 0.5:
 		self.mood += 5

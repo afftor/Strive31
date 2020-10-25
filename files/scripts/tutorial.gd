@@ -46,7 +46,7 @@ var textdict = {
 		{text = "Seriously, if you didn't know that... forget it.  Let's continue with the topic."},
 		{sprite = 'happy2', text = "There are two attributes, Mental and Physical, which are deciding factors in how servants perform and react to the variety of things you put them through."},
 		{text = "The Mental stats consist of [color=aqua]Courage[/color], [color=aqua]Confidence[/color], [color=aqua]Wit[/color], and [color=aqua]Charm[/color].  The higher those are, the better servants will perform their tasks and jobs."},
-		{text = "Those stats could also play against you if you're servants are not happy or rebelling against you.  In other words, their high aptitude may push them further away from you."},
+		{text = "Those stats could also play against you if your servants are not happy or rebelling against you.  In other words, their high aptitude may push them further away from you."},
 		{text = "The Physical stats are way more important when regarding combat. They are pretty self-explanatory.  We can talk about them later if you need more explanation.", choice = 'person'}
 	],
 	slavelevel = [

@@ -187,7 +187,7 @@ func wimborn():
 	return dict
 
 func gorn():
-	var dict = {text = "Gorn has continued to grow in wealth and power being dominant force in southern regions. ", background = 'gorn', sprite = 'garthor'}
+	var dict = {text = "Gorn has continued to grow in wealth and power being a dominant force in southern regions. ", background = 'gorn', sprite = 'garthor'}
 	
 	if globals.state.reputation.wimborn >= 20:
 		dict.text += "\n\nThe Orc's lands immediately agreed to cooperate with your regime, helping to form new trading routes. "
@@ -434,7 +434,7 @@ func ayneris():
 func ayda():
 	var dict = {text = "", background = "gorn", sprite = 'aydanormal'}
 	if globals.state.decisions.has("mainquestelves"):
-		dict.text = "Ayda returned to her work in Gorn, sending you a letter of gratitude. Her assistant was exceptionally happy and continues to serve her master."
+		dict.text = "Ayda returned to her work in Gorn, sending you a letter of gratitude. Her assistant was exceptionally happy and continues to serve his master."
 	else:
 		dict.text = "Due to your actions in the caves, Ayda has died. After her funeral, her shop was closed and her servant sold to the local slaver guild. "
 		dict.spriteblack = true

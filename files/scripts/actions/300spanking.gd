@@ -67,7 +67,7 @@ func reaction(member):
 	if member.sens < 300:
 		text = "[name2] {^jerk:wince:writhe}[s/2] in pain from the {^humiliating:demeaning:embarassing} punishment."
 	elif member.sens < 600:
-		text = "[name2] cries out with each blow to [his2] buttox, though [his2] voice betrays some enjoyment."
+		text = "[name2] cries out with each blow to [his2] buttocks, though [his2] voice betrays some enjoyment."
 	elif member.sens < 950:
 		text = "[names2] moans make it {^hard:difficult} to tell if [he2] in pain or enjoying [himself2]."
 	else:

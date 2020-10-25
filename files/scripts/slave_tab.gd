@@ -187,7 +187,7 @@ func textForCountNoun(count, noun, plurEnd = 's', singEnd = ''):
 func buildmetrics():
 	var text = ""
 	$stats/statisticpanel.visible = true
-	text += "[center]Personal achievments[/center]\n"
+	text += "[center]Personal achievements[/center]\n"
 	text += "In your possession: " + textForCountNoun(person.metrics.ownership, " day") +"\n"
 	text += "Spent in jail: " + textForCountNoun(person.metrics.jail, " day")+"\n"
 	text += "Worked in brothel: " + textForCountNoun(person.metrics.brothel, " day")+"\n"
@@ -200,7 +200,7 @@ func buildmetrics():
 	text += "Affected by spells: " + textForCountNoun(person.metrics.spell, " time") +"\n"
 	text += "Modified in lab: " + textForCountNoun(person.metrics.mods, " time") +"\n"
 	$stats/statisticpanel/statstext.set_bbcode(text)
-	text = "[center]Sexual achievments[/center]\n"
+	text = "[center]Sexual achievements[/center]\n"
 	text += "Had intimacy: " + textForCountNoun(person.metrics.sex, " time") +"\n"
 	text += "Orgasms: " + textForCountNoun(person.metrics.orgasm, " time") +"\n"
 	if person.vagina != 'none':
@@ -766,7 +766,7 @@ func _on_piercing_pressed():
 	if person.consent == true || person == globals.player:
 		$stats/customization/piercingpanel/piercestate.set_text(person.dictionary('$name does not seems to mind you pierce $his private places.'))
 	else:
-		$stats/customization/piercingpanel/piercestate.set_text(person.dictionary('$name refuses to let you pierice $his private places'))
+		$stats/customization/piercingpanel/piercestate.set_text(person.dictionary('$name refuses to let you pierce $his private places'))
 	$stats/customization/piercingpanel/piercestate.visible = person != globals.player
 	for i in piercingdict:
 		if person.piercing.has(i) == false:

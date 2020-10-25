@@ -398,7 +398,7 @@ class combatant:
 		else:
 			group = 'enemy'
 			portrait = data.icon
-			if person.sex in ['female','futa'] && data.has('iconalt'):
+			if person.sex in ['female','futanari'] && data.has('iconalt'):
 				portrait = data.iconalt
 		abilities = person.ability.duplicate()
 		activeabilities = person.abilityactive

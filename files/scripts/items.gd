@@ -66,7 +66,7 @@ var itemlist = {
 		code = 'teleportseal',
 		name = 'Teleportation Seal',
 		icon = load("res://files/images/items/teleportseal.png"),
-		description = "Magical divice allowing a single person to teleport to specified personal location. \n\n[color=yellow]Allows to send captured people to your mansion without going with them.[/color]",
+		description = "Magical device allowing a single person to teleport to specified personal location. \n\n[color=yellow]Allows to send captured people to your mansion without going with them.[/color]",
 		effect = "teleportsealeffect",
 		recipe = '',
 		cost = 20,
@@ -224,7 +224,7 @@ var itemlist = {
 		code = 'youthingpot',
 		name = 'Youthing Elixir',
 		icon = load("res://files/images/items/youthingpot.png"),
-		description = "Causes a regression of users's physical growth. 'Cause the smaller, the cuter. ",
+		description = "Causes a regression of user's physical growth. 'Cause the smaller, the cuter. ",
 		effect = 'youthingpot',
 		recipe = 'recipeyouthingpot',
 		cost = 200,
@@ -740,7 +740,7 @@ var itemlist = {
 		code = 'armorrobe',
 		name = "Wizard's Robe",
 		icon = "res://files/images/items/armorrobe.png",
-		description = "Despite what might appear as a clunky piece of clothing, combat robes allow the wearer to hold and hide various items and potions for quick and unexpected use and don't restrict movement. Outer fabric is easily torn to prevent grabbing and tuckling and can be quickly repaired with magic later. ",
+		description = "Despite what might appear as a clunky piece of clothing, combat robes allow the wearer to hold and hide various items and potions for quick and unexpected use and don't restrict movement. Outer fabric is easily torn to prevent grabbing and tackling and can be quickly repaired with magic later. ",
 		effect = [{type = 'incombat', effect = 'protection', effectvalue = 35, descript = "35% Protection"},{type = 'incombat', effect = 'armor', effectvalue = 4, descript = "+4 Armor"},{type = 'onequip', id = 'armormaf', effect = 'maf', effectvalue = 1, descript = "+1 Magic Affinity"}],
 		recipe = '',
 		reqs = null,
@@ -924,7 +924,7 @@ var itemlist = {
 		code = 'weaponnaturestaff',
 		name = 'Staff of Nature',
 		icon = "res://files/images/items/naturestaff.png",
-		description = "A twisted branch infused with Nature's power. Strengthens weilder but is not a very effective weapon.\n[color=yellow]Requirements: 1 Magic Affinity[/color]",
+		description = "A twisted branch infused with Nature's power. Strengthens wielder but is not a very effective weapon.\n[color=yellow]Requirements: 1 Magic Affinity[/color]",
 		effect = [{type = 'incombat', effect = 'damage', effectvalue = 4, descript = "+4 Damage"},{type = 'onequip', effect = 'health', effectvalue = 25, descript = "+25 Health"},{type = 'onequip', effect = 'maf', effectvalue = 1, descript = "+1 Magic Affinity"}],
 		recipe = '',
 		reqs =  [{reqstat = 'smaf', oper = 'gte', reqvalue = 1}],
@@ -968,7 +968,7 @@ var itemlist = {
 		code = 'armorrogue',
 		name = "Rogue's Armor",
 		icon = "res://files/images/items/roguearmor.png",
-		description = "An unearthy semi-living object which can be weared. Feeds on the fluids of wearer which periodically stimulates in private places. ",
+		description = "An unearthly semi-living object which can be worn. Feeds on the fluids of wearer which periodically stimulates in private places. ",
 		effect = [{type = 'incombat', effect = 'protection', effectvalue = 45, descript = "45% Protection"},{type = 'incombat', effect = 'armor', effectvalue = 8, descript = "+8 Armor"},{type = 'onequip', effect = 'energy', effectvalue = 20, descript = "+20 Energy"}],
 		recipe = '',
 		reqs = null,
@@ -1425,7 +1425,7 @@ func hairgrowtheffect():
 		person.hairlength = list[list.find(person.hairlength)+1]
 		text = "Applying the elixir to $his hair, $name shows almost instant growth as $his hair gains new length."
 	else:
-		text = "The Hairgrowth Elixir isn't effective as $name applies it, as $his hair is already overly long."
+		text = "The Hair Growth Elixir isn't effective as $name applies it, as $his hair is already overly long."
 	if person == globals.player:
 		text = text.replace("$name's", 'your')
 		text = text.replace("$name", 'you')
