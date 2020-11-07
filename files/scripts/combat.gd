@@ -977,8 +977,8 @@ func makebuff(code, target, caster):
 				var temp2 = temp[ii].split('.')
 				temp[ii] = target[temp2[1]]
 		var temp2 = ''
-		for i in temp:
-			temp2 += str(i)
+		for j in temp:
+			temp2 += str(j)
 		buff.stats[i[0]] = globals.evaluate(temp2)
 	return buff
 
