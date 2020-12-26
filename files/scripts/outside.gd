@@ -1873,6 +1873,7 @@ func exchangeRefresh():
 			newbutton.connect("mouse_exited", globals, 'itemtooltiphide')
 			newbutton.connect("pressed", self, 'calculateexchange')
 			newbutton.set_meta("item", i)
+	calculateexchange()
 
 func exchangeitems():
 	if $shoppanel/exchange.visible:
@@ -1881,7 +1882,6 @@ func exchangeitems():
 	else:
 		$shoppanel/exchange.visible = true
 	exchangeRefresh()
-	calculateexchange()
 
 var ItemsForExchange = []
 
@@ -1889,7 +1889,7 @@ func calculateexchange():
 	var itemarray = []
 	ItemsForExchange.clear()
 	for i in $shoppanel/exchange/ScrollContainer/GridContainer.get_children():
-		if i.pressed == true:
+		if i.visible && i.pressed:
 			itemarray.append(i.get_meta('item'))
 	ItemsForExchange = itemarray.duplicate()
 	$shoppanel/exchange/TradeButton.disabled = itemarray.size() == 0 || itemarray.size() % 3 != 0
