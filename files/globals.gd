@@ -2,7 +2,6 @@
 
 extends Node
 
-var effectdict = {}
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
 var gameversion = '1.0b'
 var state = progress.new()
@@ -23,43 +22,83 @@ var saveDir = saveDirDefault
 var settingsFile = appDataDir + "settings.ini"
 var progressFile = appDataDir + "progressdata"
 
+var backupExtensions = ['gd','tscn','scn']
 var imageExtensions = ["png","jpg","webp"]
+
+var rules = {
+	futa = true,
+	futaballs = false,
+	furry = true,
+	furrynipples = true,
+	male_chance = 15,
+	futa_chance = 10,
+	children = false,
+	noadults = false,
+	slaverguildallraces = false,
+	fontsize = 18,
+	musicvol = 24,
+	soundvol = 24,
+	receiving = true,
+	fullscreen = false,
+	oldresize = true,
+	fadinganimation = true,
+	permadeath = false,
+	autoattack = true,
+	showfullbody = true,
+	enddayalise = 1,
+	spritesindialogues = true,
+	instantcombatanimation = false,
+	randomcustomportraits = true,
+	thumbnails = false,
+}
+
+var gallery = load("res://files/scripts/gallery.gd").new()
+var characters = gallery
+var charactergallery = gallery.charactergallery setget savechars
+var savelist = {}
+var setfolders = loadsettings() setget savefolders
+var modfolder = setfolders.mods
+
+var logModErrors = PoolStringArray() # holds errors that occur when creating modDict as modpanel has not loaded yet
+var modDict = createModDict() # dyanamic pathing for mods, format = {'modRootName' : 'pathToRoot'}, also see the functions: createModDict, getPathModFile, loadModFile, loadModImage
 
 var resources = resource.new()
 var person = load("res://files/scripts/person/person.gd")
-var questtext = load("res://files/scripts/questtext.gd").new()
-var slavegen = load("res://files/scripts/slavegen.gd").new()
 var assets = load("res://files/scripts/assets.gd").new()
 var constructor = load("res://files/scripts/characters/constructor.gd").new()
 var origins = load("res://files/scripts/origins.gd").new()
 var description = load("res://files/scripts/characters/description.gd").new()
 var dictionary = load("res://files/scripts/dictionary.gd").new()
+var racefile = load("res://files/scripts/characters/races.gd").new()
+var races = racefile.races
+var names = racefile.names
+var questtext = load("res://files/scripts/questtext.gd").new()
 var sexscenes = load("res://files/scripts/sexscenes.gd").new()
 var glossary = load("res://files/scripts/glossary.gd").new()
 var repeatables = load("res://files/scripts/repeatable_quests.gd").new()
 var abilities = load("res://files/scripts/abilities.gd").new()
 var effects = load("res://files/scripts/effects.gd").new()
-var events = load("res://files/scripts/events.gd").new()
+var effectdict = effects.effectlist
+onready var events = load("res://files/scripts/events.gd").new()
 var items = load("res://files/scripts/items.gd").new()
-var spells = load("res://files/scripts/spells.gd").new()
-var spelldict = spells.spelllist
 var itemdict = items.itemlist
-var racefile = load("res://files/scripts/characters/races.gd").new()
-var races = racefile.races
-var names = racefile.names
+onready var spells = load("res://files/scripts/spells.gd").new()
+onready var spelldict = spells.spelllist
 var dailyevents = load("res://files/scripts/dailyevents.gd").new()
 var jobs = load("res://files/scripts/jobs&specs.gd").new()
 var mansionupgrades = load("res://files/scripts/mansionupgrades.gd").new()
-var gallery = load("res://files/scripts/gallery.gd").new()
-var slavedialogues = load("res://files/scripts/slavedialogues.gd").new()
-var characters = gallery
+var mansionupgradesdict = mansionupgrades.dict
+
 var patronlist = load("res://files/scripts/patronlists.gd").new()
 var areas = load('res://files/scripts/explorationregions.gd').new()
 var combatdata = load("res://files/scripts/combatdata.gd").new()
 
+#var slavegen = load("res://files/scripts/slavegen.gd").new()
+#var slavedialogues = load("res://files/scripts/slavedialogues.gd").new()
+
 #QMod - Variables
-var mainQuestTexts = events.mainquestTexts
-var sideQuestTexts = events.sidequestTexts
+#var mainQuestTexts = events.mainquestTexts
+#var sideQuestTexts = events.sidequestTexts
 var places = {
 	anywhere = {region = 'any', area = 'any', location = 'any'},
 	nowhere = {region = 'none', area = 'none', location = 'none'},
@@ -76,6 +115,8 @@ var player
 var partner
 
 var spritedict = gallery.sprites
+var backgrounds = gallery.backgrounds
+var scenes = gallery.scenes
 var musicdict = {
 	combat1 = load("res://files/music/battle1.ogg"),
 	combat2 = load("res://files/music/battle2.ogg"),
@@ -102,9 +143,6 @@ var sounddict = {
 	page = load("res://files/sounds/page.wav"),
 	attack = load("res://files/sounds/normalattack.wav"),
 }
-var backgrounds = gallery.backgrounds
-var scenes = gallery.scenes
-var mansionupgradesdict = mansionupgrades.dict
 var gradeimages = {
 	"slave" : load("res://files/buttons/mainscreen/40.png"),
 	poor = load("res://files/buttons/mainscreen/41.png"),
@@ -149,17 +187,8 @@ func _init():
 	if OS.get_executable_path() == 'C:\\Users\\1\\Desktop\\godot\\Godot_v3.0.4-stable_win64.exe':
 		developmode = true
 	randomize()
-	loadsettings()
 	if rules.fullscreen == true:
 		OS.set_window_fullscreen(true)
-	effectdict = effects.effectlist 
-#	var tempvars = load("res://mods/variables.gd").duplicate()
-#	var tempnode = Node.new()
-#	tempnode.set_script(tempvars)
-#	for i in variables.list:
-#		if tempnode.get(i) != null:
-#			variables[i] = tempnode[i]
-#	tempnode.queue_free()
 	
 	for i in races:
 		allracesarray.append(i)
@@ -172,73 +201,187 @@ func _init():
 #		characters.characters.Emily.imageportait = "res://files/images/emily/oldemilyportrait.png"
 
 
-func savevars():
+func _ready():
+	var temp
+
+
+# makes a dictionary of all modRootNames and their paths in the modfolder, then removes the duplicate mods, and ensures that all root mod folders have info.txt
+func createModDict():
+	var dir = Directory.new()
+	var retCode
+	var arrayDir = scanModFolder()
+	var tempModDict = {}
+	var idx = 0
+	while idx < arrayDir.size():
+		var path = arrayDir[idx]
+		var arraySubDir = []
+		retCode = dir.open(path)
+		if retCode != OK:
+			printErrorCode("Opening mod directory " + str(modfolder), retCode)
+			continue
+		retCode = dir.list_dir_begin(true)
+		if retCode != OK:
+			handleModError("Scanning mod directory " + str(modfolder), retCode)
+			continue
+		var file_name = dir.get_next()
+		while file_name != '':
+			var isMod = false
+			if file_name == null:
+				continue
+			if dir.current_is_dir():
+				if file_name in ['scripts','patch']:
+					isMod = true
+				else:
+					arraySubDir.append( path.plus_file(file_name) )
+			elif file_name == 'info.txt' || file_name.get_extension() in backupExtensions:
+				isMod = true
+			if isMod:
+				arraySubDir.clear()
+				var temp = path.right(path.find_last('/')+1)
+				if tempModDict.has(temp):
+					tempModDict[temp].append(path)
+				else:
+					tempModDict[temp] = [path]
+				break
+			file_name = dir.get_next()
+		for childPath in arraySubDir:
+			arrayDir.append(childPath)
+		idx += 1
+	removeDupMods(tempModDict)
+	createModInfo(tempModDict)
+	return tempModDict
+
+# makes an array of all folders in modfolder
+func scanModFolder():
+	var dir = Directory.new()
+	var retCode
+	var array = []
+	if !dir.dir_exists(modfolder):
+		retCode = dir.make_dir(modfolder)
+		handleModError("Making mod directory " + str(modfolder), retCode)
+		return array
+	retCode = dir.open(modfolder)
+	if retCode != OK:
+		handleModError("Opening mod directory " + str(modfolder), retCode)
+		return array
+	retCode = dir.list_dir_begin(true)
+	if retCode != OK:
+		handleModError("Scanning mod directory " + str(modfolder), retCode)
+		return array
+	var file_name = dir.get_next()
+	while file_name != "":
+		if dir.current_is_dir() && file_name != null:
+			array.append(modfolder + file_name)
+		file_name = dir.get_next()
+	return array
+
+func removeDupMods(refModDict):
+	for rootName in refModDict:
+		if refModDict[rootName].size() > 1:
+			var minLevels = 999
+			var pathMin
+			var text = "Warning: Found more than one mod with the same root name: "
+			for path in refModDict[rootName]:
+				var temp = path.split('/', false).size()
+				if temp < minLevels || (temp == minLevels && path < pathMin):
+					minLevels = temp
+					pathMin = path
+				text += "\n     " + path
+			refModDict[rootName] = pathMin
+			print(text)
+			traceFile(text)
+		else:
+			refModDict[rootName] = refModDict[rootName][0]
+
+# create default info.txt if mods don't have one
+func createModInfo(refModDict):
 	var file = File.new()
-	var text = 'extends Node\n'
-	for i in variables.list:
-		text += 'var ' + i + " = " + str(variables[i]) + "\n" 
-	file.open("res://mods/variables.gd", File.WRITE)
-	file.store_line(text)
-	file.close()
+	var retCode
+	for path in refModDict.values():
+		if !file.file_exists(path +'/info.txt'):
+			retCode = file.open(path +'/info.txt', File.WRITE)
+			if retCode == OK:
+				file.store_line("There's no information on this mod.")
+				file.close()
+			else:
+				handleModError("Creating default info.txt for " + path, retCode)
+
+func handleModError(msg, code):
+	if code != OK:
+		logModErrors.append("ERROR: " + msg + " (" + errorText[code] + ")")
+		printErrorCode(msg, code)
+
 
 func loadsettings():
-	var settings = File.new()
+	var file = File.new()
 	var dir = Directory.new()
-	for i in setfolders.values():
+	var retCode
+
+	var baseFolders = {portraits = appDataDir +'portraits/', fullbody = appDataDir + 'bodies/', mods = appDataDir + 'mods/'}
+	for i in baseFolders.values():
 		if !dir.dir_exists(i):
-			dir.make_dir_recursive(i)
+			retCode = dir.make_dir_recursive(i)
+			printErrorCode("Creating folder " + i, retCode)
 		
-	if settings.file_exists(settingsFile) == false:
-		settings.open(settingsFile, File.WRITE)
-		settings.store_line(var2str(rules))
-		settings.close()
-	settings.open(settingsFile, File.READ)
-	var temp = str2var(settings.get_as_text())
-	for i in rules:
-		if temp.has(i):
-			rules[i] = temp[i]
-	settings.close()
-	var data = {chars = charactergallery, folders = setfolders}
-	
-	if settings.file_exists(progressFile) == false:
-		overwritesettings()
-	
-	settings.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
-	var storedsettings = settings.get_var()
-	temp = storedsettings.chars
-	
-	for character in charactergallery:
-		if temp.has(character):
-			for part in charactergallery[character]:
-				if part in ['unlocked', 'nakedunlocked'] && temp[character].has(part):
-					charactergallery[character][part] = temp[character][part]
-				elif part == 'scenes':
-					for scene in range(temp[character][part].size()):
-						charactergallery[character][part][scene].unlocked = temp[character][part][scene].unlocked
-	if storedsettings.has('folders') == false:
-		overwritesettings()
-		settings.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
-		storedsettings = settings.get_var()
-	temp = storedsettings.folders
-	for i in temp:
-		if !temp[i].ends_with('/'):
-			temp[i] += '/'
-		setfolders[i] = temp[i]
-	modfolder = setfolders.mods
-	if storedsettings.has('savelist') == false:
-		overwritesettings()
-		settings.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
-		storedsettings = settings.get_var()
-	temp = storedsettings.savelist
-	for i in temp:
-		savelist[i] = temp[i]
-	settings.close()
+	if file.file_exists(settingsFile):
+		retCode = file.open(settingsFile, File.READ)
+		if retCode == OK:
+			var temp = str2var(file.get_as_text())
+			for i in rules:
+				if temp.has(i):
+					rules[i] = temp[i]
+			file.close()
+		else:
+			printErrorCode("Reading file " + settingsFile, retCode)
+	else:
+		retCode = file.open(settingsFile, File.WRITE)
+		if retCode == OK:
+			file.store_line(var2str(rules))
+			file.close()
+		else:
+			printErrorCode("Writing file " + settingsFile, retCode)
 
-var charactergallery = gallery.charactergallery setget savechars
-var setfolders = {portraits = appDataDir +'portraits/', fullbody = appDataDir + 'bodies/', mods = appDataDir + 'mods/'} setget savefolders
-var savelist = {}
-var modfolder = setfolders.mods
+	if file.file_exists(progressFile):
+		retCode = file.open_encrypted_with_pass(progressFile, File.READ, 'tehpass')
+		if retCode == OK:
+			var storedsettings = file.get_var()
+			var temp = storedsettings.get('chars')
+			if temp:
+				for character in charactergallery:
+					if !temp.has(character):
+						continue
+					for part in charactergallery[character]:
+						if part in ['unlocked', 'nakedunlocked'] && temp[character].has(part):
+							charactergallery[character][part] = temp[character][part]
+						elif part == 'scenes':
+							for scene in range(temp[character][part].size()):
+								charactergallery[character][part][scene].unlocked = temp[character][part][scene].unlocked
 
+			temp = storedsettings.get('folders')
+			if temp:
+				for i in temp:
+					if temp[i].ends_with('/'):
+						baseFolders[i] = temp[i]
+					else:
+						baseFolders[i] = temp[i] + '/'
+
+			temp = storedsettings.get('savelist')
+			if temp:
+				for i in temp:
+					savelist[i] = temp[i]
+
+			file.close()
+		else:
+			printErrorCode("Reading file " + progressFile, retCode)
+	else:
+		retCode = file.open_encrypted_with_pass(progressFile, File.WRITE, 'tehpass')
+		if retCode == OK:
+			var data = {chars = charactergallery, folders = baseFolders, savelist = {}}
+			file.store_var(data)
+			file.close()
+		else:
+			printErrorCode("Writing file " + progressFile, retCode)
+	return baseFolders
 
 func savechars(value):
 	gallery.charactergallery = value
@@ -247,14 +390,20 @@ func savefolders(value):
 	overwritesettings()
 
 func overwritesettings():
-	var settings = File.new()
-	settings.open(settingsFile, File.WRITE)
-	settings.store_line(var2str(rules))
-	settings.close()
-	settings.open_encrypted_with_pass(progressFile, File.WRITE, 'tehpass')
-	var data = {chars = charactergallery, folders = setfolders, savelist = savelist}
-	settings.store_var(data)
-	settings.close()
+	var file = File.new()
+	var retCode = file.open(settingsFile, File.WRITE)
+	if retCode == OK:
+		file.store_line(var2str(rules))
+		file.close()
+	else:
+		printErrorCode("Writing file " + settingsFile, retCode)
+	retCode = file.open_encrypted_with_pass(progressFile, File.WRITE, 'tehpass')
+	if retCode == OK:
+		var data = {chars = charactergallery, folders = setfolders, savelist = savelist}
+		file.store_var(data)
+		file.close()
+	else:
+		printErrorCode("Writing file " + progressFile, retCode)
 
 func clearstate():
 	state = progress.new()
@@ -283,6 +432,18 @@ func slaves_set(person):
 	if globals.get_tree().get_current_scene().has_node("infotext"):
 		globals.get_tree().get_current_scene().infotext("New Character acquired: " + person.name_long(),'green')
 
+func canloadimage(path):
+	if path == null || typeof(path) == TYPE_OBJECT:
+		return path != null
+	if ResourceLoader.exists(path):
+		return load(path) != null
+	if !File.new().file_exists(path):
+		return false
+	if Image.new().load(path) != OK:
+		return false
+	return true
+
+var showLoadImageNotFound = true  # change to false to hide errors when image files are not found
 func loadimage(path):
 	#var file = File.new()
 	if path == null || typeof(path) == TYPE_OBJECT:
@@ -290,6 +451,8 @@ func loadimage(path):
 	if ResourceLoader.exists(path):
 		return load(path)
 	if !File.new().file_exists(path):
+		if showLoadImageNotFound:
+			printErrorCode("loadimage("+str(path)+")", ERR_FILE_NOT_FOUND)
 		return null
 	var image = Image.new()
 	var retVal = image.load(path)
@@ -300,6 +463,36 @@ func loadimage(path):
 	temptexture.create_from_image(image)
 	return temptexture
 
+
+# convenience function for getting the path for single mod files using the dynamic path system
+# modRootName is the name of the folder containing info.txt
+# subpath is the path from the folder named modRootName to 
+func getPathModFile(modRootName, subpath):
+	if modDict.has(modRootName):
+		return modDict[modRootName].plus_file(subpath)
+	else:
+		printErrorCode("getPathModFile("+str(modRootName)+", "+str(subpath)+")", ERR_INVALID_PARAMETER)
+		return null
+
+# convenience function for loading single mod files using the dynamic path system, see getPathModFile for args.
+# only loads script, scene, or import files
+func loadModFile(modRootName, subpath):
+	if modDict.has(modRootName):
+		return load( modDict[modRootName].plus_file(subpath) )
+	else:
+		printErrorCode("loadModFile("+str(modRootName)+", "+str(subpath)+")", ERR_INVALID_PARAMETER)
+		return null
+
+# convenience function for loading single mod files using the dynamic path system, see getPathModFile for args.
+# only intended for image files
+func loadModImage(modRootName, subpath):
+	if modDict.has(modRootName):
+		return loadimage( modDict[modRootName].plus_file(subpath) )
+	else:
+		printErrorCode("loadModImage("+str(modRootName)+", "+str(subpath)+")", ERR_INVALID_PARAMETER)
+		return null
+
+
 func slavecount():
 	var number = 0
 	for i in slaves:
@@ -307,33 +500,6 @@ func slavecount():
 			number += 1
 	return number
 
-
-
-var rules = {
-	futa = true,
-	futaballs = false,
-	furry = true,
-	furrynipples = true,
-	male_chance = 15,
-	futa_chance = 10,
-	children = false,
-	noadults = false,
-	slaverguildallraces = false,
-	fontsize = 18,
-	musicvol = 24,
-	soundvol = 24,
-	receiving = true,
-	fullscreen = false,
-	oldresize = true,
-	fadinganimation = true,
-	permadeath = false,
-	autoattack = true,
-	enddayalise = 1,
-	spritesindialogues = true,
-	instantcombatanimation = false,
-	randomcustomportraits = true,
-	thumbnails = false,
-}
 
 var scenedict = {
 	#Mansion = 'res://files/Mansion.scn',
@@ -1122,6 +1288,11 @@ var penistypearray = ['human','canine','feline','equine']
 var alltails = ['cat','fox','wolf','bunny','bird','demon','dragon','scruffy','snake tail','racoon']
 var allwings = ['feathered_black', 'feathered_white', 'feathered_brown', 'leather_black','leather_red','insect']
 var allears = ['human','feathery','pointy','short_furry','long_pointy_furry','fins','long_round_furry', 'long_droopy_furry']
+var allhorns = ['short', 'long_straight', 'curved']
+var alleyecolors = ['blue', 'green', 'brown', 'hazel', 'black', 'gray', 'purple', 'blue', 'blond', 'red', 'auburn']
+var allfurcolors = ['white', 'gray', 'orange_white','black_white','black_gray','black','orange','brown']
+var allhaircolors = ['red', 'auburn', 'brown', 'black', 'white', 'green', 'purple', 'blue', 'blond', 'red']
+var allskincolors = ['pale', 'fair', 'olive', 'tan', 'brown', 'dark', 'blue', 'purple', 'pale blue', 'green','jelly','teal']
 var statsdict = {sstr = 'Strength', sagi = 'Agility', smaf = "Magic Affinity", send = "Endurance", cour = 'Courage', conf = 'Confidence', wit = 'Wit', charm = 'Charm'}
 var maxstatdict = {sstr = 'str_max', sagi = 'agi_max', smaf = 'maf_max', send = 'end_max', cour = 'cour_max', conf = 'conf_max', wit = 'wit_max', charm = 'charm_max'}
 var basestatdict = {sstr = 'str_base', sagi = 'agi_base', smaf = 'maf_base', send = 'end_base', cour = 'cour_base', conf = 'conf_base', wit = 'wit_base', charm = 'charm_base'}
@@ -1354,7 +1525,14 @@ func load_game(text):
 
 func repairsave():
 	state.currentversion = gameversion
-	for person in [player] + slaves + state.babylist:
+	var personList = slaves + state.babylist
+	personList.append(player)
+	for guild in globals.guildslaves.values():
+		for person in guild:
+			personList.append(person)
+	if state.sebastianorder.taken:
+		personList.append(state.sebastianslave)
+	for person in personList:
 		person.id = str(person.id)
 		if person.sexexp.has('partners') == false:
 			person.sexexp = {partners = {}, watchers = {}, actions = {}, seenactions = {}, orgasms = {}, orgasmpartners = {}}
@@ -1373,6 +1551,7 @@ func repairsave():
 						e.type = 'passive'
 						e.effect = 'armorbreaker'
 						e.erase('effectvalue')
+	globals.rules.showfullbody = globals.rules.get('showfullbody', true)
 
 var showalisegreet = false
 
@@ -1486,7 +1665,7 @@ func checkfurryrace(text):
 			text = 'Halfkin ' + text
 	return text
 
-var errorText = [
+const errorText = [
 	"OK",
 	"Generic",
 	"Unavailable",
@@ -1539,7 +1718,7 @@ var errorText = [
 
 func printErrorCode(msg, code=ERR_BUG, showOK = false):
 	if code != OK:
-		globals.traceFile("ERROR: " +str(msg)+ "  Error code("+ str(code)+ "): "+ str(errorText[code]))
+		traceFile("ERROR: " +str(msg)+ "  Error code("+ str(code)+ "): "+ str(errorText[code]))
 		print("ERROR: ", msg, "  Error code(", code, "): ", errorText[code])
 	elif showOK: 
 		print("OK: ", msg)
@@ -1554,11 +1733,13 @@ func traceFile(string):
 	if firstTrace:
 		type = File.WRITE
 		firstTrace = false
+		var dir = Directory.new() #Create log directory if it doesn't exist
+		if !dir.dir_exists("user://logs/"):
+			dir.make_dir_recursive("user://logs/")
 	else:
 		type = File.READ_WRITE
-	if file.open("res://DEBUG_TRACE.txt", type) == OK:
-		if !firstTrace:
-			file.seek_end()
+	if file.open("user://logs/DEBUG_TRACE.txt", type) == OK:
+		file.seek_end()
 		file.store_string(string)
 		file.close()
 

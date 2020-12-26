@@ -214,7 +214,7 @@ func randomportrait(person):
 			var path = portraits_by_race[raceWord][count]
 			person.imageportait = path
 			path = path.replace(globals.setfolders.portraits, globals.setfolders.fullbody)
-			if globals.loadimage(path) != null:
+			if globals.canloadimage(path):
 				person.imagefull = path
 			return
 		else:

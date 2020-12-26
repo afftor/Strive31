@@ -1,10 +1,10 @@
 extends Node
 
 ####Resources
-var textnode = load('res://files/scripts/questtext.gd').new() #Old quest system text
-var EventBuilder = preload("res://files/scripts/event/event_builder.gd").new()
-const EventResult = preload("res://files/scripts/event/event_result.gd")
-const Quest = preload("res://files/scripts/event/quest.gd")
+var textnode = globals.questtext #Old quest system text
+#var EventBuilder = preload("res://files/scripts/event/event_builder.gd").new()
+#const EventResult = preload("res://files/scripts/event/event_result.gd")
+#const Quest = preload("res://files/scripts/event/quest.gd")
 
 
 #Old Variables
@@ -21,8 +21,8 @@ var lastEventPlace = {region = 'none', location = 'none'}
 var mainquest
 var sidequests = {}
 
-var mainquestTexts
-var sidequestTexts
+#var mainquestTexts
+#var sidequestTexts
 
 
 ###Init & Ready
@@ -353,6 +353,9 @@ func tishaappearance():
 			emily = i
 	if emily == null:
 		return
+	if emily.away.duration > 0:
+		globals.state.upcomingevents.append({code = 'tishaappearance', duration = emily.away.duration + 2})
+		return
 	var text = textnode.TishaEncounter
 	sprite = [['emily2normal','pos2','opac2'],['tishaangry','pos1','opac']]
 	globals.charactergallery.tisha.unlocked = true
@@ -516,6 +519,9 @@ func tishadisappear(stage = 0):
 		if i.unique == 'Emily':
 			emily = i
 	if emily == null:
+		return
+	if emily.away.duration > 0:
+		globals.state.upcomingevents.append({code = 'tishadisappear', duration = emily.away.duration + 2})
 		return
 	if stage == 0:
 		sprite = [['emily2worried','pos1','opac']]
@@ -766,7 +772,7 @@ func emilytishasex(stage = 0):
 	var image
 	if stage == 0:
 		image = 'tishaemily'
-		text = globals.questtext.TishaEmilySex
+		text = textnode.TishaEmilySex
 		sprite = [['tishanakedhappy', 'pos1'], ['emilynakedhappy','pos2']]
 		for i in globals.slaves:
 			if i.unique == 'Emily':
@@ -792,7 +798,7 @@ func emilytishasex(stage = 0):
 	elif stage == 1:
 		globals.main.closescene()
 		sprite = [['tishahappy', 'pos1'], ['emily2happy','pos2']]
-		text = globals.questtext.TishaEmilySex2
+		text = textnode.TishaEmilySex2
 		state = true
 		globals.main.dialogue(state,self,text,buttons, sprite)
 
@@ -811,7 +817,7 @@ func sexscene(value):
 		image = 'emilyshowerrape'
 		text = textnode.EmilyShowerRape
 	elif value == 'tishaemilysex':
-		text = globals.questtext.TishaEmilySex
+		text = textnode.TishaEmilySex
 		image = 'tishaemily'
 	elif value == 'tishablackmail':
 		image = 'tishatable'
@@ -1206,111 +1212,6 @@ func gornivranwin():
 func gornwaitday():
 	globals.state.mainquest = 15
 
-func gornayda():
-	var text = ''
-	var state = true
-	var sprite = null
-	var buttons = []
-	if globals.state.mainquest < 37 || globals.state.mainquestcomplete && globals.state.decisions.has("mainquestelves"):
-		outside.setcharacter('aydanormal')
-		if globals.state.mainquest == 15 && !globals.state.sidequests.ivran in ['tobealtered','potionreceived']:
-			text = textnode.MainQuestGornAydaIvran
-			state = false
-			buttons = [{name = 'Accept', function = 'gornaydaivran', args = 1}, {name = 'Reject',function = 'gornaydaivran', args = 2}]
-		elif globals.state.mainquest == 15 && globals.state.sidequests.ivran == 'tobealtered':
-			text = "Ayda asked you to provide her with someone of high magic affinity. "
-			buttons = [{name = 'Select', function = 'gornaydaselect'}]
-		else:
-			if globals.state.sidequests.ayda == 0:
-				text = textnode.MainQuestGornAydaFirstMeet
-				globals.state.sidequests.ayda = 1
-			else:
-				text = textnode.GornAydaReturn
-			if globals.state.sidequests.ayda == 1:
-				buttons.append({name = 'Ask Ayda about herself', function = 'gornaydatalk', args = 1})
-			elif globals.state.sidequests.ayda == 2:
-				buttons.append({name = 'Ask Ayda about monster races',function = 'gornaydatalk', args = 2})
-	
-			elif globals.state.sidequests.ayda >= 3:
-				buttons.append({name = "See Ayda's assortments", function = 'aydashop'})
-		if globals.state.sidequests.yris == 4:
-			buttons.append({name = "Ask about the found ointment", function = "gornaydatalk", args = 3})
-		if state == true:
-			buttons.append({name = "Leave", function = 'leaveayda'})
-		outside.get_node("charactersprite").visible = true
-		globals.main.maintext = globals.player.dictionary(text)
-		outside.buildbuttons(buttons, self)
-	elif globals.state.mainquest == 38:
-		text = textnode.MainQuestFinaleAydaShop
-		globals.state.mainquest = 39
-		globals.main.dialogue(true, self, text, buttons, sprite)
-	else:
-		text = "You try to enter Ayda's shop but she does not appear to be around. "
-		globals.main.dialogue(true, self, text, buttons, sprite)
-
-func leaveayda():
-	outside.togorn()
-	globals.main.exploration.zoneenter('gorn')
-
-func aydashop():
-	outside.shopinitiate("aydashop")
-
-func gornaydatalk(stage = 0):
-	var text = ''
-	var buttons = []
-	outside.setcharacter('aydanormal2')
-	if stage == 1:
-		text = textnode.GornAydaTalk
-		globals.state.sidequests.ayda = 2
-	elif stage == 2:
-		text = textnode.GornAydaTalkMonsters
-		globals.state.sidequests.ayda = 3
-	elif stage == 3:
-		text = textnode.GornYrisAydaReport
-		globals.state.sidequests.yris += 1
-	
-	buttons.append({name = "Continue", function = "gornayda"})
-	
-	globals.main.maintext = globals.player.dictionary(text)
-	outside.buildbuttons(buttons, self)
-
-func gornaydaselect(person = null):
-	var text
-	var state = true
-	var sprite
-	var buttons = []
-	if person == null:
-		globals.main.selectslavelist(true, 'gornaydaselect', self, 'globals.currentslave.smaf >= 4')
-	else:
-		text = textnode.MainQuestGornAydaIvranReturn
-		globals.state.sidequests.ayda = 1
-		person.away.duration = 15
-		person.away.at = 'away'
-		globals.state.sidequests.ivran = 'potionreceived'
-		buttons.append({name = "Continue", function = "gornayda"})
-		globals.main.maintext = globals.player.dictionary(text)
-		outside.buildbuttons(buttons, self)
-		#globals.main.dialogue(state, self, text, buttons, sprite)
-
-func gornaydaivran(stage = 0):
-	var text
-	var sprite
-	var buttons = []
-	var state = true
-	if stage == 0:
-		text = textnode.MainQuestGornAydaIvran
-		state = false
-		buttons = [['Accept','gornaydaivran',1], ['Reject','gornaydainvran',2]]
-	elif stage == 1:
-		text = textnode.MainQuestGornAydaIvranAccept
-		globals.state.sidequests.ivran = 'tobealtered'
-	elif stage == 2:
-		text = textnode.MainQuestGornAydaIvranReject
-	
-	buttons.append({name = "Continue", function = "gornayda"})
-	globals.main.maintext = globals.player.dictionary(text)
-	outside.buildbuttons(buttons, self)
-	#globals.main.dialogue(state, self, text, buttons, sprite)
 
 func undercitybosswin():
 	var reward
@@ -1657,7 +1558,7 @@ func mountainwin(stage = 0):
 			text += "I remember you brainwashed that village girl into joining you, as well. "
 			counter += 1
 		if globals.state.decisions.has("ivrantaken"):
-			text += "You went so far as to take possession of a dark elf leader. "
+			text += "You went so far as to take possession of a tribal elf leader. "
 			counter += 1
 		if globals.state.decisions.has("calisexforced"):
 			text += "You even forced that wolf girl to sleep with a stranger just to save you some cash. "
@@ -2415,9 +2316,9 @@ func calistraybandit():
 
 func calistraybanditwin():
 	var sprite = [['calineutral','pos1','opac']]
+	globals.state.sidequests.cali = 26
 	globals.main.exploration.zoneenter('wimbornoutskirts')
 	globals.main.dialogue(true,self,textnode.CaliStrayBanditWin, null, sprite)
-	globals.state.sidequests.cali = 26
 	if globals.state.sidequests.calibarsex in ['none','sebastianfinish']:
 		globals.state.upcomingevents.append({code = 'caliproposal', duration = 1})
 
@@ -2503,6 +2404,7 @@ func calibadend(choice):
 		globals.state.decisions.append('calibadleft')
 	globals.resources.upgradepoints += 10
 	cali.add_trait("Grateful")
+	cali.consent = true
 	globals.main.exploration.zoneenter('grove')
 	globals.main.dialogue(true,self,text,null,sprite)
 	globals.state.sidequests.cali = 102
@@ -2539,6 +2441,7 @@ func caligoodend(choice):
 		globals.main.exploration.zoneenter('grove')
 	globals.resources.upgradepoints += 15
 	cali.add_trait("Grateful")
+	cali.consent = true
 	globals.main.dialogue(true,self,text,null,sprite)
 	globals.state.sidequests.cali = 103
 
@@ -3746,6 +3649,7 @@ func finalbosswin():
 	var buttons = []
 	globals.state.decisions.append('darknessdefeated')
 	globals.main.dialogue(state, self, text, buttons)
+	globals.main.exploration.winscreenclear()
 	globals.main.exploration.generaterandomloot([], {number = 0}, rand_range(2,5), [2,5])
 	globals.main.exploration.generateloot([globals.weightedrandom(bossloot), 1], '')
 	globals.main.exploration.generateloot([globals.weightedrandom(bossloot), 1], '')

@@ -16,8 +16,8 @@ enum StageName {
 #QMod - Dictionaries
 var locationDict = {
 	wimborn = {code = 'wimborn', name = 'Wimborn', descript = "Wimborn is the biggest local human city, its rich infrastructure and dense population allows even beginners to make out their living, as long as they are diligent.\n\n[color=aqua][center]Default Start — Recommended.[/center][/color]"},
-	gorn = {code = 'gorn', name = 'Gorn', descript = "Gorn is the central Orcish city with hot climate and strict ruleship. There's no Mage's Order, but local slave market is never empty."},
-	frostford = {code = 'frostford', name = 'Frostford', descript = "Frostford, located in cold, northern regions, mostly populated by Beastkin. Despite serene attitude of locals, it's covered in snow most of the time and limiting food sources makes it difficult to survive without reasonable preparations and trustworthy people."},
+	gorn = {code = 'gorn', name = 'Gorn', descript = "Gorn is the central Orcish city with hot climate and strict ruleship. There's no Mage's Order, but local slave market is never empty.\n\n\n[color=yellow][center]Not recommended for inexperienced players.[/center][/color]"},
+	frostford = {code = 'frostford', name = 'Frostford', descript = "Frostford, located in cold, northern regions, mostly populated by Beastkin. Despite serene attitude of locals, it's covered in snow most of the time and limiting food sources makes it difficult to survive without reasonable preparations and trustworthy people.\n[color=yellow][center]Not recommended for inexperienced players.[/center][/color]"},
 }
 
 var racebonusdict = {
@@ -370,7 +370,7 @@ func _display_savegame_info(node):
 			
 	var text
 	if globals.savelist.has(filesname): #Load savegame info box - portrait, player name, gold, current day, slave count
-		if globals.savelist[filesname].has('portrait') && globals.loadimage(globals.savelist[filesname].portrait):
+		if globals.savelist[filesname].has('portrait') && globals.canloadimage(globals.savelist[filesname].portrait):
 			$TextureFrame/SavePanel/loadimage.set_texture(globals.loadimage(globals.savelist[filesname].portrait))
 		else:
 			$TextureFrame/SavePanel/loadimage.set_texture(null)

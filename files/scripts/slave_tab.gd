@@ -4,7 +4,6 @@ extends Control
 var person
 var tab
 var jobdict = globals.jobs.jobdict
-var showfullbody = true
 
 func _ready():
 	for i in $stats/customization/tattoopanel/VBoxContainer.get_children():
@@ -28,6 +27,7 @@ func _ready():
 	for i in ['cour','conf','wit','charm']:
 		get_node("stats/trainingabilspanel/" +i + '/Button').connect("pressed", self, 'mentalup',[i])
 		get_node("stats/trainingabilspanel/" +i + '/Button2').connect("pressed", self, 'mentalup5',[i])
+	$stats/basics/fullbodycheck.pressed = globals.rules.showfullbody
 
 func _input(event):
 	if (globals.main != null && globals.main.get_node("screenchange").visible) || $stats/customization/nicknamepanel.is_visible():
@@ -86,7 +86,7 @@ func slavetabopen():
 	$stats/basics/slavedescript.set_bbcode(text)
 	text = person.status()
 	$stats/statustext.set_bbcode(text)
-	if showfullbody == true:
+	if globals.rules.showfullbody:
 		$stats/basics/bodypanel/fullbody.set_texture(null)
 		if person.imagefull != null && globals.loadimage(person.imagefull) != null:
 			$stats/basics/bodypanel/fullbody.set_texture(globals.loadimage(person.imagefull))
@@ -154,8 +154,6 @@ func slavetabopen():
 	if globals.state.tutorial.has('person') && globals.state.tutorial.person == false:
 		globals.state.tutorial.person = true
 		get_tree().get_current_scene().get_node("tutorialnode").slaveinitiate()
-	
-	$stats/basics/fullbodycheck.pressed = showfullbody
 	
 	if person.work == 'jailer':
 		get_node("stats/workbutton").set_text('Jailer')
@@ -543,6 +541,7 @@ func _on_relativesclose_pressed():
 
 func _on_nickname_pressed():
 	$stats/customization/nicknamepanel.popup()
+	$stats/customization/nicknamepanel/nickline.set_text(person.nickname)
 
 func _on_nickaccept_pressed():
 	$stats/customization/nicknamepanel.visible = false
@@ -975,6 +974,7 @@ func _on_customize_pressed():
 
 
 func _on_fullbodycheck_pressed():
-	showfullbody = $stats/basics/fullbodycheck.pressed
+	globals.rules.showfullbody = $stats/basics/fullbodycheck.pressed
+	globals.overwritesettings()
 	slavetabopen()
 

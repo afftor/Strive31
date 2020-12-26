@@ -1236,15 +1236,19 @@ func end(value):
 
 func cour(value):
 	person.stats.cour_base += value
+	return ''
 
 func conf(value):
 	person.stats.conf_base += value
+	return ''
 
 func wit(value):
 	person.stats.wit_base += value
+	return ''
 
 func charm(value):
 	person.stats.charm_base += value
+	return ''
 
 func health(value):
 	person.stats.health_bonus += value
@@ -1253,30 +1257,36 @@ func health(value):
 func energy(value):
 	person.stats.energy_max += value
 
+func energy_cur(value):
+	person.energy += value
+	return ''
+
+func toxicity(value):
+	person.energy -= value
+	return ''
+
 func beauty(value):
 	person.beautytemp += value
 
 func lust(value):
 	person.lust += value
+	return ''
 
 func luxury(value):
 	person.luxury += value
 
 
 func fear(value):
-	var text = ''
 	person.fear_raw(value)
-	return text 
+	return ''
 
 func stress(value):
-	var text = ''
 	person.stress -= value
-	return text
+	return ''
 
 func obedmod(value):
-	var text = ''
 	person.stats.obed_mod += value
-	return text
+	return ''
 
 #caution: abilities gained from items should not be acquirable by other means
 func abil(value):
@@ -1320,7 +1330,7 @@ func kimonoeffect(person):
 	pass
 
 func livingsuiteffect(person):
-	person.lust += 4
+	person.lust += 10
 	return "$name is being stimulated by wearing a [color=yellow]Living suit[/color] and $his lust grows.\n"
 
 func peteffect(person):
@@ -1397,7 +1407,7 @@ func createunstackable(itemcode):
 func aphrodisiaceffect():
 	if person == globals.player:
 		return('You decide this potion is not going to benefit you at all.')
-	person.lust += 35
+	person.lust += 70
 	var text = person.dictionary("After ingesting an aphrodisiac, $name begins showing signs of growing excitement.")
 	return text
 

@@ -35,14 +35,10 @@ static func randhaircolor():
 	return text
 
 static func randanyhaircolor():
-	var text
-	text = ['red', 'auburn', 'brown', 'black', 'white', 'green', 'purple', 'blue', 'blond', 'red']
-	text = text[randi()%text.size()]
-	return text
+	return globals.randomfromarray(globals.allhaircolors)
 
 static func randanyeyecolor():
-	var text = ['blue', 'green', 'brown', 'hazel', 'black', 'gray', 'purple', 'blue', 'blond', 'red', 'auburn']
-	return text[randi()%text.size()]
+	return globals.randomfromarray(globals.alleyecolors)
 
 static func randskincolor():
 	var text = ['pale', 'fair', 'olive', 'tan', 'brown', 'dark', 'blue', 'purple', 'pale blue', 'green','teal']
@@ -115,7 +111,7 @@ func questarray():
 			code = '005',
 			shortdescription = 'Brothel owner looking for a new resident.',
 			description = "As the last $race girl has been bought out by one of her frequent customers, there's a dire need for a new one. ",
-			reqs = [['obed','gte', 80], ['lewdness', 'gte', 25], ['beauty','gte',40]],
+			reqs = [['sex','neq','male'], ['obed','gte', 80], ['lewdness', 'gte', 25], ['beauty','gte',40]],
 			reqstemp = [['race','eq',commonrace()]],
 			time = round(rand_range(7,10)),
 			reward = round(rand_range(45,70))*10,

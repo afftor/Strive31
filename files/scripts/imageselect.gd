@@ -103,12 +103,12 @@ func setslaveimage(path):
 	if mode == 'portrait':
 		person.imageportait = path
 		path = path.replace(globals.setfolders.portraits, globals.setfolders.fullbody)
-		if $assignboth.pressed && globals.loadimage(path) != null:
+		if $assignboth.pressed && globals.canloadimage(path):
 			person.imagefull = path
 	elif mode == 'body':
 		person.imagefull = path
 		path = path.replace(globals.setfolders.fullbody, globals.setfolders.portraits)
-		if $assignboth.pressed && globals.loadimage(path) != null:
+		if $assignboth.pressed && globals.canloadimage(path):
 			person.imageportait = path
 	self.visible = false
 	updatepage()

@@ -1733,6 +1733,7 @@ margin_left = 59.0
 margin_top = 8.0
 margin_right = 173.0
 margin_bottom = 30.0
+mouse_filter = 1
 size_flags_horizontal = 2
 size_flags_vertical = 0
 custom_fonts/font = ExtResource( 6 )
@@ -1879,6 +1880,20 @@ custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 text = "1"
 align = 1
 
+[node name="questbrowse" type="Button" parent="slaveguildquestpanel"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -332.0
+margin_top = 37.0
+margin_right = -179.0
+margin_bottom = 91.0
+size_flags_horizontal = 2
+size_flags_vertical = 2
+custom_fonts/font = ExtResource( 6 )
+text = "Browse slaves"
+
 [node name="questaccept" type="Button" parent="slaveguildquestpanel"]
 anchor_left = 1.0
 anchor_top = 1.0
@@ -1912,9 +1927,9 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 232.0
+margin_left = 226.0
 margin_top = 37.0
-margin_right = 385.0
+margin_right = 379.0
 margin_bottom = 91.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
@@ -3085,6 +3100,7 @@ texture_hover = ExtResource( 32 )
 [connection signal="pressed" from="slavebuypanel/slavelistcancel" to="." method="_on_slavelistcancel_pressed"]
 [connection signal="pressed" from="slavesellpanel/slavesellbutton" to="." method="_on_slavesellbutton_pressed"]
 [connection signal="pressed" from="slavesellpanel/slavesellcancel" to="." method="_on_slavesellcancel_pressed"]
+[connection signal="pressed" from="slaveguildquestpanel/questbrowse" to="." method="_on_questbrowse_pressed"]
 [connection signal="pressed" from="slaveguildquestpanel/questaccept" to="." method="_on_questaccept_pressed"]
 [connection signal="pressed" from="slaveguildquestpanel/questcancel" to="." method="_on_questcancel_pressed"]
 [connection signal="pressed" from="slaveguildquestpanel/questhide" to="." method="_on_questhide_pressed"]

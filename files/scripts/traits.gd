@@ -189,7 +189,7 @@ var traits = {
 	},
 	"Fickle": {
 		"name": "Fickle",
-		"description": "$name prefers having as many sexual partners as possible, unable to stay confined to only one person for long. \n\n[color=aqua]Prostituion job bonus, multiple partners are unlocked by default. [/color]",
+		"description": "$name prefers having as many sexual partners as possible, unable to stay confined to only one person for long. \n\n[color=aqua]Prostitution job bonus, multiple partners are unlocked by default. [/color]",
 		"effect": {
 			
 		},
@@ -485,7 +485,7 @@ var traits = {
 	},
 	"Infertile": {
 		"name": "Infertile",
-		"description": "$name appear to have a rare condition making $him much less likely to have children. \n\n[color=aqua]Imregnation chance greatly reduced. [/color]",
+		"description": "$name appear to have a rare condition making $him much less likely to have children. \n\n[color=aqua]Impregnation chance greatly reduced. [/color]",
 		"effect": {
 		},
 		"tags": [
@@ -716,7 +716,7 @@ var traits = {
 	},
 	"Authority": {
 		"name": "Authority",
-		"description": "[color=aqua]If obedience above 95 , all other slaves gain +5 obedience per day. [/color]",
+		"description": "[color=aqua]If obedience above 95, all other slaves gain +5 obedience per day. [/color]",
 		"effect": {
 			
 		},

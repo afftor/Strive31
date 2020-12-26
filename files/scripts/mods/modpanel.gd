@@ -8,8 +8,6 @@ var backupdir = globals.backupDir
 var detailsFile = gameDir + "details.ini"
 var saveID = ''
 
-var backupExtensions = ['gd','tscn','scn']
-
 var op_regex_dict = {}
 var tag_regex
 var file_tag_regex
@@ -40,16 +38,6 @@ var dir = Directory.new()
 func _ready():
 #	if globals.developmode == true:
 #		return
-	var file = File.new()
-	for mod in scanfolder():
-		if !file.file_exists(mod +"/info.txt"): #makes info.txt to store mod description
-			retCode = file.open(mod +'/info.txt', File.WRITE)
-			if retCode == OK:
-				file.store_line("There's no information on this mod.")
-				file.close()
-			else:
-				handleError("Creating default info.txt for " + mod, retCode)
-
 	loadfromconfig()
 	if !dir.dir_exists(backupdir) || str(globals.gameversion) != backupVersion || globals.dir_contents(backupdir).size() <= 0:
 		storebackup()
@@ -82,28 +70,6 @@ func initRegexs():
 	handleError("Compiling file tag regex", retCode)
 
 
-func scanfolder(): #makes an array of all folders in modfolder
-	var array = []
-	if dir.dir_exists(modfolder) == false:
-		retCode = dir.make_dir(modfolder)
-		handleError("Making mod directory " + str(modfolder), retCode)
-	retCode = dir.open(modfolder)
-	if retCode == OK:
-		retCode = dir.list_dir_begin(true)
-		if retCode == OK:
-			var file_name = dir.get_next()
-			while file_name != "":
-				if dir.current_is_dir() && !file_name in ['.','..',null]:
-					array.append(modfolder + file_name)
-				file_name = dir.get_next()
-		else:
-			handleError("Scanning mod directory " + str(modfolder), retCode)
-	else:
-		handleError("Opening mod directory " + str(modfolder), retCode)
-	return array
-
-
-
 func loadfromconfig():
 	if !dir.file_exists(detailsFile):
 		return
@@ -123,7 +89,7 @@ func loadfromconfig():
 		handleError("Opening config file " + str(detailsFile), retCode)
 	var record = [] #record of unique entries
 	for i in loadorder.duplicate():
-		if !dir.dir_exists(modfolder + str(i)):
+		if !globals.modDict.has(i) || !dir.dir_exists(globals.modDict[i]):
 			loadorder.erase(i)
 		if i in record:
 			loadorder.erase(i)
@@ -147,7 +113,7 @@ func storebackup(): #clears and creates backups
 			retCode = dir.remove(path)
 			handleError("Deleting file " + str(path), retCode)
 	for path in globals.dir_contents(filedir):
-		if !path.get_extension() in backupExtensions:
+		if !path.get_extension() in globals.backupExtensions:
 			continue
 		var destPath = path.replacen(gameDir, backupdir)
 		if !dir.dir_exists( destPath.get_base_dir()):
@@ -195,11 +161,16 @@ func displayReport(afterMod = true):
 		text = "Mod list has been changed. Game must close for changes to take effect."
 	else:
 		text = "Errors in the mod system have been detected."
-	if logErrors.size() == 0:
+	if globals.logModErrors.size() == 0 && logErrors.size() == 0:
 		text += "\n\n[color=green]No errors recorded.[/color]"
 	else:
-		text += "\n\n[color=red]The following errors were recorded:[/color]\n" + logErrors.join('\n')
-		logErrors = PoolStringArray()
+		text += "\n\n[color=red]The following errors were recorded:[/color]"
+		if globals.logModErrors.size() > 0:
+			text += "\n" + globals.logModErrors.join('\n')
+			globals.logModErrors = PoolStringArray()
+		if logErrors.size() > 0:
+			text += "\n" + logErrors.join('\n')
+			logErrors = PoolStringArray()
 
 	var textAdd = ''
 	if logWarnSpace.size() > 0:
@@ -226,7 +197,7 @@ func _on_applymods_pressed():
 			displayReport(false)
 			return
 	for mod in loadorder:
-		var modPath = modfolder + mod + "/"
+		var modPath = globals.modDict[mod] + "/"
 		if dir.dir_exists(modPath):
 			activemods.append(mod)
 			curMod = mod
@@ -263,7 +234,7 @@ func patchFile(sourcePath, destPath):
 			if scriptEdits.has(destPath):
 				scriptEdits.erase(destPath)
 				logOverlaps.append("Patched over changes: " + destPath + ", " + curMod)
-		if !destPath.get_extension() in backupExtensions && !destPath in newFiles:
+		if !destPath.get_extension() in globals.backupExtensions && !destPath in newFiles:
 			retCode = dir.copy(destPath, destPath.replacen(gameDir, backupdir))
 			handleError("Copying backup file " + str(destPath), retCode)
 	else:
@@ -403,7 +374,7 @@ func apply_next_element_to_dictionary(path, modText, offset):
 			has_next = true
 	
 	if which_operation == "WARN_SPACE":
-		logWarnSpace.append("     Line " + str(getLinePos(modText, current_match.get_start())[0]) + " of file " + path.replace( filedir, modfolder + curMod + "/"))
+		logWarnSpace.append("     Line " + str(getLinePos(modText, current_match.get_start())[0]) + " of file " + path.replace( filedir, globals.modDict[curMod] + "/"))
 		return current_match.get_end()
 
 	var next_tag = tag_regex.search(modText, offset)
@@ -427,7 +398,6 @@ func apply_next_element_to_dictionary(path, modText, offset):
 					continue
 				var pool_string = nested_match.get_string().split('\n')
 				var startSize = pool_string.size()
-				var startLine = param
 				var match_stripped = current_match.get_string("body")
 				var endIdx = startSize
 
@@ -446,10 +416,9 @@ func apply_next_element_to_dictionary(path, modText, offset):
 					param = adjustForEdit(path, nested_match.get_string("header"), param)
 					if param >= endIdx:
 						param = endIdx
-						startLine = param
 				else:
 					param = endIdx
-					startLine = param
+				var startLine = param
 				for i in match_stripped:
 					pool_string.insert(param, i)
 					param += 1
@@ -459,17 +428,18 @@ func apply_next_element_to_dictionary(path, modText, offset):
 		elif next_tag.get_string(1) == tag_remove_from:
 			var param = max(1, next_tag.get_string(2).to_int() + 1)
 			var param_2 = max(1, next_tag.get_string(3).to_int() + 1)
-			var startLine = param
 			for nested_match in op_regex_dict[which_operation].search_all(temp_mod_scripts[path]):
 				if current_match.get_string("header") != nested_match.get_string("header"):
 					continue
 				param = adjustForEdit(path, nested_match.get_string("header"), param)
 				param_2 = adjustForEdit(path, nested_match.get_string("header"), param_2)
 				var new_string = nested_match.get_string().split('\n')
+				var startLine = param
 				var startSize = new_string.size()
 				for i in range(0, param_2 - param + 1):
-					if param < new_string.size():
-						new_string.remove(param)
+					if param >= new_string.size():
+						break
+					new_string.remove(param)
 				addEditRecord(path, nested_match.get_string("header"), startLine, startLine + startSize - new_string.size() - 1, new_string.size() - startSize)
 				temp_mod_scripts[path] = replaceOnce(temp_mod_scripts[path], nested_match, new_string.join("\n"))
 				break
@@ -508,9 +478,7 @@ func show():
 		if i.name != 'Button':
 			i.hide()
 			i.queue_free()
-	var array = []
-	for i in scanfolder():
-		array.append(i.replacen(modfolder,""))
+	var array = globals.modDict.keys()
 	array.sort_custom(self, 'sortmods')
 	for i in array:
 		var modactive = loadorder.has(i)
@@ -518,6 +486,7 @@ func show():
 		$allmodscontainer/VBoxContainer.add_child(newbutton)
 		newbutton.visible = true
 		newbutton.text = i
+		newbutton.hint_tooltip = globals.modDict[i].replace(modfolder,".../")
 		if modactive == true:
 			newbutton.pressed = true
 			newbutton.get_node("order").text = str(loadorder.find(i))
@@ -528,7 +497,7 @@ func show():
 			newbutton.get_node("down").connect("pressed",self,'moddown',[i])
 		newbutton.connect("mouse_entered", self, 'moddescript',[i])
 		newbutton.connect("pressed",self, 'togglemod', [i])
-	if logErrors.size() > 0:
+	if globals.logModErrors.size() > 0 || logErrors.size() > 0:
 		displayReport(false)
 
 func sortmods(first,second):
@@ -543,12 +512,12 @@ func sortmods(first,second):
 func moddescript(mod):
 	var text = ''
 	var file = File.new()
-	retCode = file.open(modfolder + mod + '/info.txt', File.READ)
+	retCode = file.open(globals.modDict[mod] + '/info.txt', File.READ)
 	if retCode == OK:
 		text = file.get_as_text()
 		file.close()
 	else:
-		handleError("Reading file " + str(modfolder + mod + '/info.txt'), retCode)
+		handleError("Reading file " + globals.modDict[mod] + '/info.txt', retCode)
 	if text == '':
 		text = "There's no information on this mod."
 	text = '[center][color=aqua]' + mod + '[/color][/center]\n' + text

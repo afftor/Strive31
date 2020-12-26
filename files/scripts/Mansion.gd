@@ -94,6 +94,7 @@ func _ready():
 		alisegreet()
 	elif globals.gameloaded == true:
 		infotext("Game Loaded.",'green')
+		globals.gameloaded = false
 	
 	for i in ['sstr','sagi','smaf','send']:
 		get(i).get_node('Control').connect('mouse_entered', self, 'stattooltip',[i])
@@ -460,6 +461,8 @@ func getridof():
 
 var listinstance = load("res://files/listline.tscn")
 var awayText = {
+	'travel back': 'will return back in ',
+	'transported back': 'will be transported back in ',
 	'in labor': 'will be resting after labor for ',
 	'training': 'will be undergoing training for ',
 	'nurture': 'will be undergoing nurturing for ',
@@ -479,11 +482,19 @@ func createSlaveListNode(personlist, person, nodeIndex, visible):
 	nameNode.connect("mouse_entered", globals, 'slavetooltip', [person])
 	nameNode.connect("mouse_exited", globals, 'slavetooltiphide')
 	nameNode.connect('pressed', self, 'openslavetab', [person])
+	node.find_node('levelup').connect('pressed', self, 'openslavetab', [person, true])
 	updateSlaveListNode(node, person, visible)
 
 func updateSlaveListNode(node, person, visible):
 	node.visible = visible #fix permanent details vs updated
-	node.find_node('name').set_text( person.name_long() + ("(+)" if (person.xp >= 100) else ""))
+	node.find_node('name').set_text( person.name_long() )
+	if person.xp >= 100:
+		node.find_node('name').rect_min_size.x = 208 # manual resize since auto glitched
+		node.find_node('levelup').visible = true
+		node.find_node('levelup').hint_tooltip = person.dictionary("Talk to $him to investigate unlocking $his potential." if person.levelupreqs.empty() else "Check requirements for unlocking $his potential.")
+	else:
+		node.find_node('levelup').visible = false
+		node.find_node('name').rect_min_size.x = 235 # manual resize since auto glitched
 	node.find_node('health').set_normal_texture( person.health_icon())
 	node.find_node('healthvalue').set_text( str(round(person.health)))
 	node.find_node('obedience').set_normal_texture( person.obed_icon())
@@ -566,7 +577,7 @@ func rebuild_slave_list():
 	get_node("ResourcePanel/population").set_text(str(globals.slavecount()))
 	_on_orderbutton_pressed()
 
-func openslavetab(person):
+func openslavetab(person, islevelup = false):
 	if person.sleep == 'farm':
 		_on_farm_pressed()
 		farminspect(person)
@@ -574,6 +585,10 @@ func openslavetab(person):
 		currentslave = globals.slaves.find(person)
 		get_tree().get_current_scene().hide_everything()
 		$MainScreen/slave_tab.slavetabopen()
+		if islevelup:
+			$MainScreen/slave_tab._on_inspect_pressed()
+			if person.levelupreqs.empty():
+				get_node("MainScreen/slave_tab/stats")._on_talk_pressed()
 
 func _on_category_pressed():
 	rebuild_slave_list()
@@ -927,7 +942,7 @@ func _on_end_pressed():
 					text2.set_bbcode(text2.get_bbcode() + person.dictionary("$name suffers from magical toxicity.\n"))
 				if person.toxicity > 60 && randf() > 0.75:
 					globals.spells.person = person
-					text0.set_bbcode(text0.get_bbcode()+globals.spells.mutate(person.toxicity/30, true) + "\n\n")
+					text0.set_bbcode(text0.get_bbcode()+globals.spells.mutate(person.toxicity/30) + "\n\n")
 				person.toxicity -= rand_range(1,5)
 			
 			
@@ -1071,23 +1086,32 @@ func _on_end_pressed():
 				person.energy += rand_range(20,30) + person.send*6
 
 				if person.away.duration == 0:
-					text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name returned to the mansion and went back to $his duty. \n"))
-					var sleepChange = false
-					if person.sleep != 'communal':
-						match person.sleep:
-							'personal':
-								sleepChange = globals.count_sleepers().personal > globals.state.mansionupgrades.mansionpersonal
-							'your':
-								sleepChange = globals.count_sleepers().your_bed > globals.state.mansionupgrades.mansionbed
-							'jail':
-								sleepChange = globals.count_sleepers().jail > globals.state.mansionupgrades.jailcapacity
-							'farm':
-								if globals.count_sleepers().farm > variables.resident_farm_limit[globals.state.mansionupgrades.farmcapacity]:
-									sleepChange = true
-									person.job = 'rest'
-					if sleepChange:
-						person.sleep = 'communal'
-						text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name's sleeping place is no longer available so $he has moved to the communal area. \n"))
+					if person.away.at == 'transported back':
+						globals.itemdict['rope'].amount += globals.state.calcRecoverRope(1)
+						if globals.count_sleepers().jail < globals.state.mansionupgrades.jailcapacity:
+							person.sleep = 'jail'
+							text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name has been transported to the mansion and placed in the jail. \n"))
+						else:
+							person.sleep = 'communal'
+							text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name has been transported to the mansion. You are out of free jail cells and $he was assigned to the communal area. \n"))
+					else:
+						text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name returned to the mansion and went back to $his duty. \n"))
+						var sleepChange = false
+						if person.sleep != 'communal':
+							match person.sleep:
+								'personal':
+									sleepChange = globals.count_sleepers().personal > globals.state.mansionupgrades.mansionpersonal
+								'your':
+									sleepChange = globals.count_sleepers().your_bed > globals.state.mansionupgrades.mansionbed
+								'jail':
+									sleepChange = globals.count_sleepers().jail > globals.state.mansionupgrades.jailcapacity
+								'farm':
+									if globals.count_sleepers().farm > variables.resident_farm_limit[globals.state.mansionupgrades.farmcapacity]:
+										sleepChange = true
+										person.job = 'rest'
+						if sleepChange:
+							person.sleep = 'communal'
+							text0.set_bbcode(text0.get_bbcode() + person.dictionary("$name's sleeping place is no longer available so $he has moved to the communal area. \n"))
 					person.away.at = ''
 				for i in person.effects.values():
 					if i.has('duration') && i.code != 'captured':
@@ -1184,21 +1208,28 @@ func _on_end_pressed():
 					globals.resources.mana += round(rand_range(1,3))
 					text1.bbcode_text += person.dictionary("A small amount of mana has been gathered from $name.\n")
 		farmmanager.xp += count * 5
+	else:
+		for person in globals.slaves:
+			if person.sleep == 'farm' && person.away.duration == 0:
+				text1.set_bbcode(text1.get_bbcode()+person.dictionary('$name idled in the farm with no farm manager present.\n '))
+				if globals.state.mansionupgrades.farmtreatment == 0:
+					person.stress += 15
 	#####          Dirtiness
 	if globals.state.condition <= 40:
 		for person in globals.slaves:
 			if person.away.duration != 0:
 				continue
-			if globals.state.condition >= 30 && randf() >= 0.7:
-				person.stress += rand_range(5,15)
-				person.obed += -rand_range(15,20)
-				text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=yellow]$name was distressed by mansion's poor condition. [/color]\n"))
-			elif globals.state.condition >= 15 && randf() >= 0.5:
-				person.stress += rand_range(10,20)
-				person.obed += -rand_range(15,35)
-				text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=yellow]$name was distressed by mansion's poor condition. [/color]\n"))
-
-			elif globals.state.condition < 15 && randf() >= 0.4:
+			if globals.state.condition >= 30:
+				if randf() >= 0.7:
+					person.stress += rand_range(5,15)
+					person.obed += -rand_range(15,20)
+					text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=yellow]$name was distressed by mansion's poor condition. [/color]\n"))
+			elif globals.state.condition >= 15:
+				if randf() >= 0.5:
+					person.stress += rand_range(10,20)
+					person.obed += -rand_range(15,35)
+					text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=yellow]$name was distressed by mansion's poor condition. [/color]\n"))
+			elif randf() >= 0.4:
 				person.stress += rand_range(15,25)
 				person.health -= rand_range(5,10)
 				text0.set_bbcode(text0.get_bbcode() + person.dictionary("[color=#ff4949]Mansion's terrible condition causes $name a lot of stress and impacted $his health. [/color]\n"))
@@ -1807,7 +1838,7 @@ func loadchosen(node):
 		i.pressed = (i== node)
 	get_node("menucontrol/menupanel/SavePanel/saveline").set_text(savefilename.replace(globals.saveDir,''))
 	if globals.savelist.has(savename):
-		if globals.savelist[savename].has('portrait') && globals.loadimage(globals.savelist[savename].portrait):
+		if globals.savelist[savename].has('portrait') && globals.canloadimage(globals.savelist[savename].portrait):
 			$menucontrol/menupanel/SavePanel/saveimage.set_texture(globals.loadimage(globals.savelist[savename].portrait))
 		else:
 			$menucontrol/menupanel/SavePanel/saveimage.set_texture(null)
@@ -1955,6 +1986,7 @@ func _on_music_finished():
 		get_node("music").set_meta("currentsong", 'over')
 		music_set("mansion")
 	elif get_node("music").get_meta("currentsong") == 'combat':
+		return
 		get_node("music").set_meta("currentsong", 'over')
 		music_set("combat")
 	else:
@@ -1987,14 +2019,11 @@ func _on_mansion_pressed():
 	get_node("ResourcePanel/menu").disabled = false
 	get_node("ResourcePanel/helpglossary").disabled = false
 	get_node("MainScreen/mansion/sexbutton").set_disabled(globals.state.sexactions < 1 && globals.state.nonsexactions < 1)
-	if globals.player.imageportait != null && globals.loadimage(globals.player.imageportait):
+	if globals.player.imageportait != null && globals.canloadimage(globals.player.imageportait):
 		$Navigation/personal/TextureRect.texture = globals.loadimage(globals.player.imageportait)
 	else:
 		$Navigation/personal/TextureRect.texture = selftexture
 	$ResourcePanel/clean.set_text(str(round(globals.state.condition)) + '%')
-	
-	build_mansion_info()
-	
 	
 	if globals.state.farm >= 3:
 		get_node("Navigation/farm").set_disabled(false)
@@ -2021,8 +2050,9 @@ func _on_mansion_pressed():
 			else:
 				nojailcells = true
 		globals.itemdict['rope'].amount += globals.state.calcRecoverRope(array.size())
-		text = "You have assigned your captives to the mansion. " + globals.fastif(nojailcells, '[color=yellow]You are out of free jail cells and some captives were assigned to the living room.[/color]', '')
+		text = "You have assigned your captives to the mansion. " + globals.fastif(nojailcells, '[color=yellow]You are out of free jail cells and some captives were assigned to the communal area.[/color]', '')
 		popup(text)
+	build_mansion_info()
 	rebuild_slave_list()
 
 var colordict = {high = '[color=green]', med = '[color=yellow]', low = '[color=#ff4949]'}
@@ -2435,7 +2465,7 @@ func _on_questsclosebutton_pressed():
 
 var mainquestdict = {
 	'0' : "You should try joining Mage Order in town to get access to better stuff and start your career.",
-	'1' : "Old chancellor at Mage Order wants me to bring him a girl before I can join. She must be: \nFemale;\nHuman; \nAverage look (40) or better; \nHigh obedience; \n\nI can probably take a look at Slavers's Guild or explore outsides. ",
+	'1' : "Old chancellor at Mage Order wants me to bring him a girl before I can join. She must be: \nFemale\nHuman \nAverage look (40) or better \nHigh obedience \n\nI can probably take a look at Slavers's Guild or explore outsides. ",
 	'2' : "Visit Mage Order again and seek for further promotions.",
 	'3' : "Melissa from Mage Order wants you to bring them captured Fairy. ",
 	'3.1' : "Melissa from Mage Order wants you to bring them captured Fairy, I should be able to find them in far forests around Wimborn. ",
@@ -2513,7 +2543,7 @@ var emilyquestdict = {
 }
 var yrisquestdict = {
 	"1":"Accept Yris's challenge at Gorn's bar",
-	"2":"Find a way to win Yris's challenge at Gorn's bar. Perhaps, some potion might provide an option",
+	"2":"Find a way to win Yris's challenge at Gorn's bar. Perhaps, you could bring some potion to help with the challenge.",
 	"3":"Talk to Yris at Gorn's Bar",
 	"4":"Find a way to secure your bet with Yris. Perhaps, some alchemist might shine some light upon your findings. You'll also need 1000 gold and 1 Deterrent potion.",
 	"5":"Beat Yris at her challenge at Gorn's Bar. You'll also need to bring 1000 gold and Deterrent potion. ",
@@ -3337,12 +3367,6 @@ var functiontocall
 
 func selectslavelist(prisoners = false, calledfunction = 'popup', targetnode = self, reqs = 'true', player = false, onlyparty = false):
 	var array = []
-	nodetocall = targetnode
-	functiontocall = calledfunction
-	for i in $chooseslavepanel/ScrollContainer/chooseslavelist.get_children():
-		if i.name != 'Button':
-			i.hide()
-			i.free()
 	if player == true:
 		array.append(globals.player)
 	for person in globals.slaves:
@@ -3356,7 +3380,16 @@ func selectslavelist(prisoners = false, calledfunction = 'popup', targetnode = s
 		if prisoners == false && person.sleep == 'jail' :
 			continue
 		array.append(person)
-	for person in array:
+	showChoosePerson(array, calledfunction, targetnode)
+
+func showChoosePerson(arrayPersons, calledfunction = 'popup', targetnode = self):
+	nodetocall = targetnode
+	functiontocall = calledfunction
+	for i in $chooseslavepanel/ScrollContainer/chooseslavelist.get_children():
+		if i.name != 'Button':
+			i.hide()
+			i.free()
+	for person in arrayPersons:
 		var button = $chooseslavepanel/ScrollContainer/chooseslavelist/Button.duplicate()
 		button.show()
 		button.get_node('Label').text = person.name_long()
@@ -3368,7 +3401,7 @@ func selectslavelist(prisoners = false, calledfunction = 'popup', targetnode = s
 		button.set_meta("slave", person)
 		button.get_node("portrait").set_texture(globals.loadimage(person.imageportait))
 		$chooseslavepanel/ScrollContainer/chooseslavelist/.add_child(button)
-	if array.size() == 0:
+	if arrayPersons.empty():
 		$chooseslavepanel/Label.text = "No characters fit the condition"
 	else:
 		$chooseslavepanel/Label.text = "Select Character"
@@ -3755,10 +3788,10 @@ func sexselect():
 			newbutton.connect("pressed",self,'selectsexslave',[newbutton, i])
 			var numInteractions = i.getRemainingInteractions()
 			if numInteractions > 0:
-				newbutton.set_tooltip(i.dictionary('You can interact with $name %s more time%s today.' % [numInteractions, 's' if numInteractions > 1 else '']))
+				newbutton.set_tooltip(i.dictionary('You can interact with %s %s more time%s today.' % [i.name_long(), numInteractions, 's' if numInteractions > 1 else '']))
 			else:
 				newbutton.set_disabled(true)
-				newbutton.set_tooltip(i.dictionary('You have already interacted with $name too many times today.'))
+				newbutton.set_tooltip(i.dictionary('You have already interacted with %s too many times today.' % i.name_long()))
 		elif sexmode == 'sex':
 			if i.away.duration != 0 || i.sleep in ['farm']:
 				continue
@@ -3776,10 +3809,10 @@ func sexselect():
 				tooltip = i.dictionary('$name gave you no consent.\n')
 			var numInteractions = i.getRemainingInteractions()
 			if numInteractions > 0:
-				tooltip += i.dictionary('You can interact with $name %s more time%s today.' % [numInteractions, 's' if numInteractions > 1 else ''])
+				tooltip += i.dictionary('You can interact with %s %s more time%s today.' % [i.name_long(), numInteractions, 's' if numInteractions > 1 else ''])
 			else:
 				newbutton.set_disabled(true)
-				tooltip += i.dictionary('You have already interacted with $name too many times today.')
+				tooltip += i.dictionary('You have already interacted with %s too many times today.' % i.name_long())
 			newbutton.set_tooltip(tooltip)
 #		elif sexmode == 'abuse':
 #			if i.away.duration != 0 || i.sleep in ['farm']:
@@ -4084,12 +4117,14 @@ func repeattweenanimate(node, name):
 		tweennode.start()
 
 func nodeunfade(node, duration = 0.4, delay = 0):
-	tween.interpolate_property(node, 'modulate', Color(1,1,1,0), Color(1,1,1,1), duration, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, delay)
-	tween.start()
+	if delay > 0 || node.get_modulate().a <= 0.1:
+		tween.interpolate_property(node, 'modulate', Color(1,1,1,0), Color(1,1,1,1), duration, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, delay)
+		tween.start()
 
 func nodefade(node, duration = 0.4, delay = 0):
-	tween.interpolate_property(node, 'modulate', Color(1,1,1,1), Color(1,1,1,0), duration, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, delay)
-	tween.start()
+	if delay > 0 || node.get_modulate().a >= 0.9:
+		tween.interpolate_property(node, 'modulate', Color(1,1,1,1), Color(1,1,1,0), duration, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT, delay)
+		tween.start()
 
 var traitaction = '' 
 

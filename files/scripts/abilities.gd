@@ -425,7 +425,7 @@ var abilitydict = {
 		can_miss = false,
 		learncost = 20,
 		power = 0,
-		cooldown = 0,
+		cooldown = 3,
 		type = 'physical',
 		price = 100,
 		costenergy = 0,
@@ -437,6 +437,7 @@ var abilitydict = {
 		aiselfcond = 'any',
 		aitargetcond = 'any',
 		aipriority = -1,
+		targetsfx = 'mindreadanimation',
 	},
 	aoeattack = {
 		name = 'Slam',
