@@ -113,20 +113,20 @@ func getrandomfromarray(array):
 
 
 func getrandomeyecolor():
-	return getrandomfromarray(['blue', 'green', 'brown', 'hazel', 'black', 'gray', 'purple', 'blue', 'blond', 'red', 'auburn'])
+	return getrandomfromarray(globals.alleyecolors)
 
 func getrandomfurcolor():
-	return getrandomfromarray(['white', 'gray', 'orange_white','black_white','black_gray','black','orange','brown'])
+	return getrandomfromarray(globals.allfurcolors)
 
 func getrandomhaircolor():
-	return getrandomfromarray(['red', 'auburn', 'brown', 'black', 'white', 'green', 'purple', 'blue', 'blond', 'red'])
+	return getrandomfromarray(globals.allhaircolors)
 
 
 func getrandomhorns():
-	return getrandomfromarray(['short', 'long_straight', 'curved'])
+	return getrandomfromarray(globals.allhorns)
 
 
 func getrandomskincolor():
-	return getrandomfromarray(['pale', 'fair', 'olive', 'tan', 'brown', 'dark', 'blue', 'purple', 'pale blue', 'green','jelly','teal'])
+	return getrandomfromarray(globals.allskincolors)
 
 

@@ -81,8 +81,12 @@ func launch():
 	if globals.state.sidequests.ayneris > 0:
 		scenearray.append("ayneris")
 	currentscene = scenearray[0]
-	show_(call(currentscene))
-	timer.set_wait_time(15)
+	showNextScene(currentscene)
+
+func showNextScene(scene):
+	var dict = call(scene)
+	show_(dict)
+	timer.set_wait_time(max( dict.text.split(' ', false).size() * 0.6, 20))
 	timer.start()
 
 func show_(dict):
@@ -119,9 +123,7 @@ func advance():
 		currentscene = scenearray[scenearray.find(currentscene)+1]
 		get_parent().animationfade(2)
 		yield(get_parent(), "animfinished")
-		show_(call(currentscene))
-		timer.set_wait_time(15)
-		timer.start()
+		showNextScene(currentscene)
 	elif stage == 'credits':
 		get_node("TextureFrame").visible = true
 		get_node("TextureFrame/RichTextLabel").visible = true

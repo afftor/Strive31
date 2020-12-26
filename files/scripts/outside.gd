@@ -9,8 +9,8 @@ onready var mansion = get_parent()
 var questgiveawayslave
 
 #QMod - Variables
-onready var mainQuestTexts = globals.mainQuestTexts
-onready var sideQuestTexts = globals.sideQuestTexts
+#onready var mainQuestTexts = globals.mainQuestTexts
+#onready var sideQuestTexts = globals.sideQuestTexts
 
 func _ready():
 	if globals.guildslaves.wimborn.size() < 2:
@@ -575,7 +575,7 @@ func slaveguildslaves(location):
 		if globals.state.reputation.has(location) && globals.state.reputation[location] <= -10 && location != 'umbra':
 			price *= (10 - globals.state.reputation[location]) / 20.0
 		if location == 'slavers':
-			price *= 0.5
+			price = price * 0.5 + 50
 		price = round(price)
 		newbutton.set_meta('person', person)
 		newbutton.get_node('price').set_text(str(price)+ ' gold')
@@ -710,7 +710,8 @@ func _on_slavesellbutton_pressed():
 				reputationloss[2][1] += 8
 			elif selectedslave.race in ['Orc','Goblin','Centaur']:
 				reputationloss[1][1] += 10
-			globals.state.reputation[globals.weightedrandom(reputationloss)] -= 4
+			reputationloss = globals.weightedrandom(reputationloss)
+			globals.state.reputation[reputationloss] -= 4
 			text += "[color=yellow]Your reputation has suffered from this deal. [/color]\n"
 	if globals.guildslaves.has(guildlocation):
 		globals.guildslaves[guildlocation].append(selectedslave)
@@ -752,7 +753,8 @@ func sellslavelist(location):
 			
 			newbutton.get_node("sex").texture = globals.sexicon[person.sex]
 			newbutton.get_node("sex").hint_tooltip = person.sex
-			newbutton.get_node('name').set_text(person.dictionary('$name, ')+ person.race + ', ' + person.age + ', ' + person.work)
+			newbutton.get_node('name').set_text(person.name_long())
+			newbutton.get_node('name').hint_tooltip = person.name_long() + ', ' + person.race + ', ' + person.age + ', ' + globals.jobs.jobdict.get(person.work, {name=person.work.capitalize()}).name
 			if location == 'sebastian':
 				newbutton.get_node('price').set_text(str(round(person.sellprice(true)*0.7))+ ' gold')
 			elif location == 'umbra':
@@ -800,6 +802,7 @@ func slaveguildquests():
 	var text
 	clearbuttons()
 	get_node("slaveguildquestpanel/questaccept").set_disabled(true)
+	get_node("slaveguildquestpanel/questbrowse").visible = false
 	get_node("slaveguildquestpanel/questcancel").visible = false
 	mansion.maintext = ''
 	text = "You walk to the Slaver Guild's request board.\n\n[color=yellow]Completing repeatable missions will earn you Mansion Upgrade points. [/color]"
@@ -869,6 +872,10 @@ func removequest():
 				globals.state.repeatables[i].remove(globals.state.repeatables[i].find(ii))
 	slaveguildquests()
 
+func _on_questbrowse_pressed():
+	if selectedquest.taken:
+		main.selectslavelist(true, 'slaveforquestselected', self)
+
 func _on_questaccept_pressed():
 	if selectedquest.taken == false:
 		selectedquest.taken = true
@@ -890,85 +897,109 @@ func _on_questaccept_pressed():
 			elif selectedquest.difficulty == 'hard':
 				globals.state.reputation[guildlocation] += 10
 				globals.resources.upgradepoints += 10
-			for i in globals.state.repeatables:
-				for ii in globals.state.repeatables[i]:
-					if ii == selectedquest:
-						globals.state.repeatables[i].remove(globals.state.repeatables[i].find(ii))
-			slaveguildquests()
+			removequest()
 		else:
-			main.selectslavelist(true, 'slaveforquestselected', self)
+			var array = []
+			for person in globals.slaves:
+				if person.away.duration != 0:
+					continue
+				if checkQuestOnPersonTextless(selectedquest, person):
+					array.append(person)
+			main.showChoosePerson(array, 'slaveforquestselected', self)
 
 func slaveforquestselected(person):
-	var quest = selectedquest
-	var slavefits = true
-	var text = ''
-	for i in quest.reqs:
-		var ref = person
-		if i[0].find('.') >= 0:
-			var temp = i[0].split('.')
-			for j in temp:
-				ref = ref[j]
-		else:
-			ref = person[i[0]]
-		var ref2 = i[2]
-		if i[0] == 'hairlength':
-			ref = globals.hairlengtharray.find(person.hairlength)
-		if i[0] == 'titssize':
-			ref = globals.sizearray.find(person.titssize)
-		if i[0] == 'penis':
-			ref = globals.genitaliaarray.find(person.penis)
-		if i[0] == 'origins':
-			ref = globals.originsarray.find(person.origins)
-			ref2 = globals.originsarray.find(ref2)
-		if i[1] == 'gte':
-			if ref < ref2:
-				slavefits = false
-				text = text + '[color=#ff4949]' + repeatablesdict[i[0]] + '[/color]\n'
-			else:
-				text = text + '[color=green]' + repeatablesdict[i[0]] + '[/color]\n'
-		elif i[1] == 'eq':
-			if ref != ref2:
-				slavefits = false
-				text = text + '[color=#ff4949]' + repeatablesdict[i[0]] + '[/color]\n'
-			else:
-				text = text + '[color=green]' + repeatablesdict[i[0]] + '[/color]\n'
-		elif i[1] == 'neq':
-			if ref == ref2:
-				slavefits = false
-				text = text + '[color=#ff4949]' + repeatablesdict[i[0]] + '[/color]\n'
-			else:
-				text = text + '[color=green]' + repeatablesdict[i[0]] + '[/color]\n'
-		elif i[1] == 'lte':
-			if ref > ref2:
-				slavefits = false
-				text = text + '[color=#ff4949]' + repeatablesdict[i[0]] + '[/color]\n'
-			else:
-				text = text + '[color=green]' + repeatablesdict[i[0]] + '[/color]\n'
-	if quest.has("reqsfunc"):
-		for i in quest.reqsfunc:
-			var checkfunc = globals.repeatables.call(i, person)
-			if checkfunc == true:
-				text += '[color=green]' + globals.repeatables.reqsfuncdescript[i] + '[/color]\n'
-			else:
-				slavefits = false
-				text += '[color=#ff4949]' + globals.repeatables.reqsfuncdescript[i] + '[/color]\n'
-	if slavefits == true:
-		mansion.maintext = "There seems to be no problems with needed requirements.\n" + text
+	var result = checkQuestOnPerson(selectedquest, person)
+	if result[0]:
+		mansion.maintext = "There seems to be no problems with needed requirements.\n\n" + result[1]
 		get_node("slaveguildquestpanel/questaccept").set_text("Turn in")
 		offeredslave = person
 	else:
-		mansion.maintext = person.dictionary("You have not completed all the requirements. \n") + text
+		mansion.maintext = person.dictionary("$name does not meet all the requirements.\n\n") + result[1]
+		get_node("slaveguildquestpanel/questaccept").set_text('Offer match')
 		offeredslave = null
 
+func checkQuestOnPerson(quest, person):
+	var slavefits = true
+	var textPool = PoolStringArray()
+	for req in quest.reqs:
+		if checkReqOnPerson(req, person):
+			textPool.append( '[color=green][Pass]  ' + slaveReqText(req) + '[/color]')
+		else:
+			slavefits = false
+			textPool.append( '[color=#ff4949][Fail]     ' + slaveReqText(req) + '[/color]')
+	for i in quest.get('reqsfunc', []):
+		if globals.repeatables.call(i, person):
+			textPool.append( '[color=green][Pass]  ' + globals.repeatables.reqsfuncdescript[i] + '[/color]')
+		else:
+			slavefits = false
+			textPool.append( '[color=#ff4949][Fail]     ' + globals.repeatables.reqsfuncdescript[i] + '[/color]')
+	return [slavefits, textPool.join('')]
+
+func checkQuestOnPersonTextless(quest, person):
+	for req in quest.reqs:
+		if !checkReqOnPerson(req, person):
+			return false
+	for i in quest.get('reqsfunc', []):
+		if !globals.repeatables.call(i, person):
+			return false
+	return true
+
+# reqs are case sensitive
+func checkReqOnPerson(req, person):
+	var ref1 = person
+	for j in req[0].split('.'):
+		ref1 = ref1[j]
+	var ref2 = req[2]
+	match req[0]:
+		'hairlength':
+			ref1 = globals.hairlengtharray.find(person.hairlength)
+		'titssize':
+			ref1 = globals.sizearray.find(person.titssize)
+		'penis':
+			ref1 = globals.genitaliaarray.find(person.penis)
+		'origins':
+			ref1 = globals.originsarray.find(person.origins)
+			ref2 = globals.originsarray.find(ref2)
+	match req[1]:
+		'gte':
+			return ref1 >= ref2
+		'eq':
+			return ref1 == ref2
+		'neq':
+			return ref1 != ref2
+		'lte':
+			return ref1 <= ref2
+		'has': # can be used for single value in arrays or partial value of strings
+			return ref1.find(ref2) != -1
+		'nhas': # can be used for single value in arrays or partial value of strings
+			return ref1.find(ref2) == -1
+		'any': # used for intersection of 2 arrays
+			return getIntersectionCount(ref1, ref2) > 0
+		'all': # used for intersection of 2 arrays
+			return getIntersectionCount(ref1, ref2) == ref2.size()
+		'none':
+			return getIntersectionCount(ref1, ref2) == 0
+	globals.printErrorCode("unrecognized req op")
+	return false
+
+func getIntersectionCount(array1, array2):
+	var count = 0
+	for i in array1:
+		if array2.has(i):
+			count += 1
+	return count
 
 
 var repeatablesdict = {
-	sex = 'Sex',obed = 'Obedience', cour = 'Courage',conf = 'Confidence',wit = 'Wit', charm = 'Charm', 
-	'beauty':'Beauty',lewdness = 'Lewdness', asser = 'Role Preference', 
-	'sexuals.unlocks' : "Unlocked Sex Categories",
-	'sstr' : 'Strength', 'sagi' : 'Agility', 'smaf' : 'Magic Affinity', 'send' : 'Endurance',
-	loyal = 'Loyalty', race = 'Race', age = 'Age', hairlength = 'Hair Length', origins = 'Grade',
-	bodyshape = 'Type', haircolor = 'Hair Color', 'titssize' : 'Breasts Size', 'penis' : "Penis Size", spec = 'Specialization', level = 'Level', eyecolor = 'Eye Color',
+	'sstr' : "Strength", 'sagi' : "Agility", 'smaf' : "Magic Affinity", 'send' : "Endurance",
+	'cour' : "Courage", 'conf' : "Confidence", 'wit' : "Wit", 'charm' : "Charm",
+	'obed' : "Obedience", 'loyal' : "Loyalty", 'asser' : "Role Preference", 'lewdness' : "Lewdness",
+	'race' : "Race", 'age' : "Age", 'sex' : "Sex", 'origins' : "Grade", 'beauty': "Beauty",
+	'level' : "Level", 'traits' : "Traits", 'spec' : "Specialization", 'ability' : "Ability",
+	'hairlength' : "Hair Length", 'haircolor' : "Hair Color", 'eyecolor' : "Eye Color",
+	'bodyshape' : "Body Type", 'titssize' : "Breast Size", 'penis' : "Penis Size",
+	'lactation' : "Lactating", 'titsextradeveloped' : "Developed Extra Nipples into Tits",
+	'titsextra' : "Additional Rows of Tits", 'vagvirgin' : "Virgin",
 }
 
 func slavequesttext(quest):
@@ -976,40 +1007,17 @@ func slavequesttext(quest):
 	var sex = ''
 	var race = ''
 	var text2 = ''
-	var operators = {eq = ' only;\n', gte = ' or higher;\n', lte = ' or lower;\n', neq = ' not;\n'}
 	get_node("slaveguildquestpanel/questaccept").set_disabled(false)
 	selectedquest = quest
 	for i in get_node("slaveguildquestpanel/ScrollContainer/VBoxContainer").get_children():
 		if i.has_meta("quest") && i.get_meta('quest') != quest:
 			i.set_pressed(false) 
-	for i in quest.reqs:
-		if i[0].find('skills') >= 0:
-			text2 = text2 + repeatablesdict[i[0]] + ' — '+ globals.player.skill_level(i[2]) + operators[i[1]]
-		elif i[0] in ['sex','bodyshape','haircolor','race']:
-			text2 = text2 + repeatablesdict[i[0]] + ' — '+ str(i[2]) + ';\n'
-		elif i[0] == 'age':
-			text2 += repeatablesdict[i[0]] + ' — ' 
-			if i[1] == 'neq':
-				text2 += 'Not '
-			text2 += str(i[2]) + ';\n'
-		elif i[0] == 'hairlength':
-			text2 = text2 + 'Hair length — ' + str(globals.hairlengtharray[i[2]]) + ';\n'
-		elif i[0] == 'titssize':
-			text2 = text2 + 'Breast size — ' + str(globals.sizearray[i[2]]) + operators[i[1]]
-		elif i[0] == 'penis':
-			text2 = text2 + 'Penis size — ' + str(globals.genitaliaarray[i[2]]) + operators[i[1]]
-		elif i[0] == 'origins':
-			text2 = text2 + 'Origins — ' + str(i[2]) + operators[i[1]]
-		elif i[0] == 'spec':
-			text2 += 'Specialization — ' + globals.jobs.specs[i[2]].name + '\n'
-		elif i[0] == 'eyecolor':
-			text2 += "Eye Color — " + i[2] + '\n'
-		else:
-			text2 = text2 + repeatablesdict[i[0]] + ' — '+ str(i[2]) + operators[i[1]]
-		if i[0] == 'sex':
-			sex = i[2]
-		elif i[0] == 'race':
-			race = i[2]
+	for req in quest.reqs:
+		text2 += slaveReqText(req)
+		if req[0] == 'sex':
+			sex = req[2]
+		elif req[0] == 'race':
+			race = req[2]
 	if quest.has('reqsfunc'):
 		for i in quest.reqsfunc:
 			text2 += globals.repeatables.reqsfuncdescript[i]
@@ -1021,17 +1029,48 @@ func slavequesttext(quest):
 	if quest.description.find('$him') >= 0:
 		quest.description = quest.description.replace("$him",him(sex))
 	if quest.taken == true:
+		get_node("slaveguildquestpanel/questbrowse").visible = true
 		get_node("slaveguildquestpanel/questcancel").visible = true
-		get_node("slaveguildquestpanel/questaccept").set_text('Offer person')
+		get_node("slaveguildquestpanel/questaccept").set_text('Offer match')
 	else:
+		get_node("slaveguildquestpanel/questbrowse").visible = false
 		get_node("slaveguildquestpanel/questcancel").visible = false
 		get_node("slaveguildquestpanel/questaccept").set_text('Accept')
 	text = quest.description
 	text = text + '\n\nRequired Slave Specifics:\n' + text2 + '\n[color=yellow]Reward: ' + str(quest.reward) + ' gold.[/color] [color=aqua]Time Limit: ' + str(quest.time) + ' days.[/color]'
-	
-	
-	
 	return text
+
+var reqTextOpStart = {'neq': 'Not ', 'has': 'Has ', 'nhas': 'Does not have ', 'any': 'Any of these: ', 'all': 'All of these: ', 'none': 'None of these: '}
+var reqTextOpEnd = {'gte' : ' or higher\n', 'lte' : ' or lower\n'}
+
+func slaveReqText(req):
+	var text = repeatablesdict[req[0]] + ' — ' + reqTextOpStart.get( req[1], '')
+	var text2
+	if typeof(req[2]) == TYPE_ARRAY:
+		text2 = PoolStringArray()
+		for val in req[2]:
+			text2.append( getReqValText(req[0], val) )
+		text2 = text2.join(', ')
+	else:
+		text2 = getReqValText(req[0], req[2])
+	return text + text2 + reqTextOpEnd.get( req[1], '\n')
+	
+func getReqValText(reqType, reqVal):
+#	if req[0].find('skills') >= 0:
+#		text = repeatablesdict[req[0]] + ' — '+ text + globals.player.skill_level(req[2])
+	match reqType:
+		'hairlength':
+			return str(globals.hairlengtharray[reqVal]).capitalize()
+		'titssize':
+			return str(globals.sizearray[reqVal]).replace('huge','giant').capitalize()
+		'penis':
+			return str(globals.genitaliaarray[reqVal]).capitalize()
+		'spec':
+			return str(globals.jobs.specs[reqVal].name)
+		'ability':
+			return str(globals.abilities.abilitydict[reqVal].name)
+		_:
+			return str(reqVal).capitalize()
 
 var slaveserviceselected
 var serviceoperation
@@ -1376,13 +1415,21 @@ func mageorderquest1(person = null):
 		if questgiveawayslave == null:
 			sprites = [['chancellor','pos1','opac']]
 			text = "— Ah, you’ve returned, how very ‘wonderful’ of you. The arrangement has not been forgotten, provide me with what I want, and I’ll provide you with what you want."
-			buttons.append(['Select slave', 'mageorderselect', 1])
+			buttons.append(['Select matching slave', 'mageorderselect', 0])
+			buttons.append(['Browse slaves', 'mageorderbrowse'])
 		else:
 			person = questgiveawayslave
 			sprites = [['chancellor','pos1']]
-			text = "— Looks about right. Ready to part with her?"
-			buttons.append(['Give away ' + person.name, 'givecompanion'])
-			buttons.append(['Select slave', 'mageorderselect', 1])
+			var result = checkQuestOnPerson(mageOrderSlaveQuests[0], person)
+			if result[0]:
+				text = "— Looks about right. Ready to part with her?"
+				buttons.append(['Give away ' + person.name, 'givecompanion'])
+				buttons.append(['Select matching slave', 'mageorderselect', 0])
+				buttons.append(['Browse slaves', 'mageorderbrowse'])
+			else:
+				text = "— Do not waste my time.\n\n" + result[1]
+				buttons.append(['Select matching slave', 'mageorderselect', 0])
+				buttons.append(['Browse slaves', 'mageorderbrowse'])
 	elif globals.state.mainquest == 2:
 		sprites = [['melissafriendly','pos1','opac']]
 		globals.charactergallery.melissa.unlocked = true
@@ -1392,13 +1439,13 @@ func mageorderquest1(person = null):
 		sprites = [['melissafriendly','pos1','opac']]
 		if questgiveawayslave == null:
 			text = '— You are back. Did you find the fairy?'
-			buttons.append(['Select person', 'mageorderselect', 2])
+			buttons.append(['Select matching slave', 'mageorderselect', 1])
 		else:
 			person = questgiveawayslave
 			sprites = [['melissafriendly','pos1']]
-			text = "— Looks about right. Ready to part with her?"
+			text = person.dictionary("— Looks about right. Ready to part with $him?")
 			buttons.append(['Give away ' + person.name, 'givecompanion'])
-			buttons.append(['Select slave', 'mageorderselect', 2])
+			buttons.append(['Select matching slave', 'mageorderselect', 1])
 	elif globals.state.mainquest == 4:
 		sprites = [['melissaworried','pos1','opac']]
 		globals.state.mainquest = 5
@@ -1437,13 +1484,21 @@ func mageorderquest1(person = null):
 		if questgiveawayslave == null:
 			sprites = [['melissafriendly','pos1','opac']]
 			text = "— You are back. Did you finish preparing the girl?"
-			buttons.append(['Select slave', 'mageorderselect', 3])
+			buttons.append(['Select matching slave', 'mageorderselect', 2])
+			buttons.append(['Browse slaves', 'mageorderbrowse'])
 		else:
 			person = questgiveawayslave
-			text = "— Great work! Can I have her?"
 			sprites = [['melissafriendly','pos1']]
-			buttons.append(['Give away ' + person.name, 'givecompanion'])
-			buttons.append(['Select slave', 'mageorderselect', 3])
+			var result = checkQuestOnPerson(mageOrderSlaveQuests[2], person)
+			if result[0]:
+				text = "— Great work! Can I have her?"
+				buttons.append(['Give away ' + person.name, 'givecompanion'])
+				buttons.append(['Select matching slave', 'mageorderselect', 2])
+				buttons.append(['Browse slaves', 'mageorderbrowse'])
+			else:
+				text = "— Not quite what I am looking for.\n\n" + result[1]
+				buttons.append(['Select matching slave', 'mageorderselect', 2])
+				buttons.append(['Browse slaves', 'mageorderbrowse'])
 	elif globals.state.mainquest == 11:
 		sprites = [['melissafriendly','pos1']]
 		text = questtext.MainQuestGornStart
@@ -1478,16 +1533,24 @@ func mageorderquest1(person = null):
 	main.dialogue(state, self, text, buttons, sprites)
 	mageorder()
 
+var mageOrderSlaveQuests = [
+	{reqs = [['sex','eq','female'],['race','eq','Human'],['beauty','gte',40],['obed','gte',80]]},
+	{reqs = [['race','eq','Fairy']]},
+	{reqs = [['race','eq','Taurus'],['sex','neq','male'],['lactation','eq',true],['titssize','eq',5],['titsextradeveloped','eq',true],['titsextra','gte',3]]},
+]
+
+func mageorderbrowse():
+	main.selectslavelist(true, 'mageorderquest1', self)
+
 func mageorderselect(stage):
-	var reqs
-	
-	if stage == 1:
-		reqs = "person.obed >= 80 && person.race == 'Human' && person.beauty >= 40 && person.sex == 'female'"
-	elif stage == 2:
-		reqs = 'person.race == "Fairy"'
-	elif stage == 3:
-		reqs = "person.race == 'Taurus' && person.titssize == 'huge' && person.lactation == true && person.titsextradeveloped && person.titsextra >= 3"
-	main.selectslavelist(true, 'mageorderquest1', self, reqs)
+	var quest = mageOrderSlaveQuests[stage]
+	var array = []
+	for person in globals.slaves:
+		if person.away.duration != 0:
+			continue
+		if checkQuestOnPersonTextless(quest, person):
+			array.append(person)
+	main.showChoosePerson(array, 'mageorderquest1', self)
 
 func orderhade():
 	var text = globals.questtext.MainQuestGornMelissaAfter
@@ -1520,7 +1583,7 @@ func givecompanion():
 		if person != null:
 			globals.state.mainquest = 4
 			sprites = [['melissafriendly','pos1']]
-			text = "— Oh, what a cutie! You are just as capable as I expected. Can't wait to play with her in private, but business first.\n\nWith that, your companion is taken away and you are then taught Refined Branding. \n\n[color=green]You have been paid 500 gold. \n\nYour main quest has been updated. [/color]\n[color=yellow]You have gained an extra level.[/color]"
+			text = person.dictionary("— Oh, what a cutie! You are just as capable as I expected. Can't wait to play with $him in private, but business first.\n\nWith that, your companion is taken away and you are then taught Refined Branding. \n\n[color=green]You have been paid 500 gold. \n\nYour main quest has been updated. [/color]\n[color=yellow]You have gained an extra level.[/color]")
 			main.currentslave = globals.slaves.find(person)
 			globals.resources.gold += 500
 			globals.state.rank = 2
@@ -1550,7 +1613,7 @@ func mageorderquest2():
 		sprites = [['melissafriendly','pos1']]
 		globals.state.mainquest = 3
 		globals.resources.gold += 250
-		text = "— Marvelous! So here's the first thing we have on our hands. You likely know of the Brands and their utility. But those are the result of crude and very old work; surely anyone would want something much more efficient. For that, we have invented an upgrade to the old brands. They are generally referred to as 'Refined Brands' and are not very well known by the masses. The idea is pretty simple; to make the brand and branded person follow complex rules instead of just submissive basics. I can't overstate how amazingly useful it is, but those old fools at the council don't seem to bother.\n\n— The main issue is the magic essence, which is pretty hard to gather in large amounts as it is produced by fairies. Yeah, those shortstacks with childish behavior. Getting your hands on one seems to be getting harder and harder by the day. I want you to find me one, and in exchange I'll promote you, and share with you the knowledge of how to place a Refined Brand on a slave.\n\n— You will likely find fairies in the Far Eerie Woods or elven grove. It's a devilish looking place beyond the elven parts of the forest. That place is likely affected by a taint or some magical phenomenon that nobody can quite figure out. All of the creatures there seem to lose  their sentience and become hostile to outsiders. Fairies are not generally like that, so I figured you may be able to tame one if you get her out of there. If not, she'd still be useful to us. Now, if you’ll excuse me, I still have some affairs to attend to today. Be careful, honey.\n\n[color=green]Your main quest has been updated. [/color]"
+		text = "— Marvelous! So here's the first thing we have on our hands. You likely know of the Brands and their utility. But those are the result of crude and very old work; surely anyone would want something much more efficient. For that, we have invented an upgrade to the old brands. They are generally referred to as 'Refined Brands' and are not very well known by the masses. The idea is pretty simple; to make the brand and branded person follow complex rules instead of just submissive basics. I can't overstate how amazingly useful it is, but those old fools at the council don't seem to bother.\n\n— The main issue is the magic essence, which is pretty hard to gather in large amounts as it is produced by fairies. Yeah, those shortstacks with childish behavior. Getting your hands on one seems to be getting harder and harder by the day. I want you to find me one, and in exchange I'll promote you, and share with you the knowledge of how to place a Refined Brand on a slave.\n\n— You will likely find fairies in the Far Eerie Woods or elven grove. It's a devilish looking place beyond the elven parts of the forest. That place is likely affected by a taint or some magical phenomenon that nobody can quite figure out. All of the creatures there seem to lose their sentience and become hostile to outsiders. Fairies are not generally like that, so I figured you may be able to tame one if you get it out of there. If not, it'd still be useful to us. Now, if you’ll excuse me, I still have some affairs to attend to today. Be careful, honey.\n\n[color=green]Your main quest has been updated. [/color]"
 	main.dialogue(true, self, text, buttons, sprites)
 
 
@@ -1829,7 +1892,7 @@ func calculateexchange():
 		if i.pressed == true:
 			itemarray.append(i.get_meta('item'))
 	ItemsForExchange = itemarray.duplicate()
-	$shoppanel/exchange/TradeButton.disabled = itemarray.size() % 3 != 0
+	$shoppanel/exchange/TradeButton.disabled = itemarray.size() == 0 || itemarray.size() % 3 != 0
 
 var treasurepool = [
 	['armorninja',5],['armorplate',1],['armorleather',20],['armorchain',11],['armorelvenchain',3],['armorrobe',4],
@@ -2322,7 +2385,13 @@ func itembackpackselect(item):
 		get_node("playergroupdetails/Panel/usebutton").set_disabled(true)
 	var text ='[center]' + item.name + '[/center]\n' + item.description + '\n\nWeight: ' + str(item.weight)
 	if item.code == 'teleportseal' && partyselectedslave == globals.player:
-		text += '\n\n[color=#ff4949]Your captured slaves will be freed and your party will take time to return home on their own. [/color]'
+		if globals.state.playergroup.empty():
+			if globals.state.capturedgroup.empty():
+				text += '\n\n[color=#ff4949]If you had brought a party, they would take time to return home on their own, while transporting your captured slaves. [/color]'
+			else:
+				text += '\n\n[color=#ff4949]Your captured slaves will be freed. If you had brought a party, they would be transported by your party. [/color]'
+		else:
+			text += '\n\n[color=#ff4949]Your party will take time to return home on their own, while transporting your captured slaves. [/color]'
 	get_node("playergroupdetails/Panel/itemdescript").set_bbcode(text)
 
 func spellbackpackselect(spell):
@@ -2353,14 +2422,28 @@ func useitem(item, person):
 		globals.items.call(item.effect)
 	elif item.code == 'teleportseal':
 		if person == globals.player:
-			get_parent().popup("After activating Teleportation Seal, you appear inside of your mansion, leaving your party behind. Hopefully they will find a way back in near time. ")
-			for i in globals.state.playergroup:
-				var temp = globals.state.findslave(i)
-				temp.away.duration = round(rand_range(1,3))
-				temp.away.at = 'travel back'
+			_on_closegroup_pressed()
+			if globals.state.playergroup.empty():
+				if globals.state.capturedgroup.empty():
+					get_parent().popup("After activating Teleportation Seal, you appear inside of your mansion. ")
+				else:
+					get_parent().popup("After activating Teleportation Seal, you appear inside of your mansion, leaving your captives behind to free themselves. ")
+			else:
+				get_parent().popup("After activating Teleportation Seal, you appear inside of your mansion, leaving your party behind. Hopefully they will find a way back in the near future. ")
+				var away = round(rand_range(1,3))
+				for i in globals.state.playergroup:
+					var temp = globals.state.findslave(i)
+					temp.away.duration = away
+					temp.away.at = 'travel back'
+				for temp in globals.state.capturedgroup:
+					globals.slaves = temp
+					temp.away.duration = away
+					temp.away.at = 'transported back'
+			globals.state.capturedgroup.clear()
 			globals.main.sound("teleport")
 			main.exploration.deeperregion = false
 			mansion()
+			return
 		elif globals.slaves.find(person) >= 0:
 			get_parent().popup(person.dictionary("After activating Teleportation Seal, $name slowly dissipates in bright sparkles."))
 			globals.state.playergroup.erase(person.id)
@@ -2369,6 +2452,7 @@ func useitem(item, person):
 				person.sleep = 'jail'
 			globals.slaves = person
 			globals.state.capturedgroup.erase(person)
+			globals.state.backpack.stackables.rope = globals.state.backpack.stackables.get('rope', 0) + globals.state.calcRecoverRope(1)
 	playergrouppanel()
 	_on_details_pressed()
 

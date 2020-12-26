@@ -206,25 +206,20 @@ func get_traits():
 
 #warning-ignore:unused_argument
 func add_trait(trait, remove = false):
-	trait = globals.origins.trait(trait)
-	var conflictexists = false
-	var text = ""
-	var traitexists = false
+	var traitEntry = globals.origins.trait(trait)
+	if traitEntry == null:
+		globals.printErrorCode("adding non-existant trait " + str(trait))
+		return false
 	for i in get_traits():
-		if i.name == trait.name:
-			traitexists = true
-		for ii in i.conflict:
-			if trait.name == ii:
-				conflictexists = true
-	if traitexists || conflictexists:
-		return
-	else:
-		traits.append(trait.name)
-		if globals.get_tree().get_current_scene().has_node("infotext") && globals.slaves.find(self) >= 0 && away.at != 'hidden':
-			text += self.dictionary("$name acquired new trait: " + trait.name)
-			globals.get_tree().get_current_scene().infotext(text,'yellow')
-		if trait['effect'].empty() != true:
-			add_effect(trait['effect'])
+		if i.name == traitEntry.name || traitEntry.name in i.conflict:
+			return false
+	traits.append(traitEntry.name)
+	if globals.get_tree().get_current_scene().has_node("infotext") && globals.slaves.has(self) && away.at != 'hidden':
+		var text = self.dictionary("$name acquired new trait: " + traitEntry.name)
+		globals.get_tree().get_current_scene().infotext(text, 'yellow')
+	if !traitEntry.effect.empty():
+		add_effect(traitEntry.effect)
+	return true
 
 func trait_remove(trait):
 	var text = ''

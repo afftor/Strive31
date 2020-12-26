@@ -418,130 +418,174 @@ func sortspells(first, second):
 	else:
 		return true
 
+func randNewFromArray(array, old):
+	array = array.duplicate()
+	array.erase(old)
+	return globals.randomfromarray(array)
+
+func randNewPartFromArray(targetPerson, part, array):
+	array = array.duplicate()
+	array.erase(targetPerson[part])
+	targetPerson[part] = globals.randomfromarray(array)
+
 func mutateeffect():
 	globals.resources.mana -= spellcost(spelllist.mutate)
 	var text = mutate(2)
 	globals.main.rebuild_slave_list()
 	return text
 
-func mutate(power=2, silent = false):
-	var array = ['traitadd','height','tits','ass','penis','balls','penistype','skin','skincov','eyecolor','eyeshape','haircolor','hairlength','ears','tail','wings','horns','beauty','lactation','nipples','lust','amnesia','pregnancy']
-	var line
+var dictChangeParts = {
+	15 : ['height', globals.heightarray, "height"],
+	16 : ['titssize', globals.sizearray, "chest size"],
+	17 : ['asssize', globals.sizearray, "butt size"],
+	18 : ['skin', globals.allskincolors, "skin color"],
+	19 : ['eyecolor', globals.alleyecolors, "eye color"],
+	20 : ['eyeshape', ['normal','slit'], "pupil shape"],
+	21 : ['haircolor', globals.allhaircolors, "hair color"],
+	22 : ['ears', globals.allears, "ear shape"],
+}
+func mutate(power=2):
 	var text = "Raw magic in $name's body causes $him to uncontrollably mutate. \n\n"
 	var temp
 	while power >= 1:
-		person.stress += rand_range(5,15)
-		line = globals.randomfromarray(array)
-		if line == 'height':
-			text += "$name's height has changed. "
-			person.height = globals.randomfromarray(globals.heightarray)
-		elif line == 'tits':
-			text += "$name's chest size has changed. "
-			person.titssize = globals.randomfromarray(globals.sizearray)
-		elif line == 'traitadd':
-			text += "$name has received a new trait. "
-			person.add_trait(globals.origins.traits('any').name)
-		elif line == 'ass':
-			text += "$name's butt size has changed. "
-			person.asssize = globals.randomfromarray(globals.sizearray)
-		elif line == 'penis':
-			if (globals.rules.futa == false && person.sex != 'male'):
-				power += 1
-				continue
-			if person.penis == 'none':
-				person.penis = 'small'
-				text += "$name has grown a dick. "
-			else:
-				text += "$name's dick size has changed. "
-				person.penis = globals.randomfromarray(globals.genitaliaarray)
-		elif line == 'penistype':
-			if person.penis == 'none':
-				power += 1
-			else:
-				text += "$name's dick shape has changed. "
-				person.penistype = globals.randomfromarray(globals.penistypearray)
-		elif line == "balls":
-			if (globals.rules.futaballs == false && person.sex != 'male'):
-				power += 1
-				continue
-			if person.balls == 'none':
-				person.balls = 'small'
-				text += "$name has grown a scrotum. "
-			else:
-				person.balls = globals.randomfromarray(globals.genitaliaarray)
-				text += "$name's scrotum size has changed. "
-		elif line == 'skin':
-			text += "$name's skin color has changed. "
-			person.skin = globals.assets.getrandomskincolor()
-		elif line == 'skincov':
-			text += "$name's skin coverage has changed. "
-			person.skincov = globals.randomfromarray(globals.skincovarray)
-			person.furcolor = globals.assets.getrandomfurcolor()
-		elif line == 'eyecolor':
-			text += "$name's eye color has changed. "
-			person.eyecolor = globals.assets.getrandomeyecolor()
-		elif line == "eyeshape":
-			text += "$name's pupil shape has changed. "
-			if person.eyeshape == 'normal':
-				person.eyeshape = 'slit'
-			else:
-				person.eyeshape = 'normal'
-		elif line == "haircolor":
-			text += "$name's hair color has changed. "
-			person.haircolor = globals.assets.getrandomhaircolor()
-		elif line == "hairlength":
-			if globals.hairlengtharray.find(person.hairlength) < 4:
-				person.hairlength = globals.hairlengtharray[globals.hairlengtharray.find(person.hairlength) + 1]
-				text += "$name's hair has grown. "
-			else:
-				power += 1 
-		elif line == "horn":
-			if person.horns == 'none':
-				text += "$name has grown a pair of horns. "
-			else:
-				text += "$name's horns have changed in shape. " 
-			person.horns = globals.assets.getrandomhorns()
-		elif line == "tail":
-			if person.tail == 'none':
-				text += "$name has grown a tail. "
-			else:
-				text += "$name's tail has changed in shape. " 
-			person.tail = globals.randomfromarray(globals.alltails)
-		elif line == "wings":
-			if person.wings == 'none':
-				text += "$name has grown a pair of wings. "
-			else:
-				text += "$name's wings has changed in shape. " 
-			person.wings = globals.randomfromarray(globals.allwings)
-		elif line == "ears":
-			text += "$name's ears shape has changed. "
-			person.ears = globals.randomfromarray(globals.allears)
-		elif line == "beauty":
-			text += "$name's face has drastically changed. "
-			person.beautybase = round(rand_range(10, 90))
-		elif line == "lactation":
-			if person.lactation == false:
-				text += "$name's breasts started secreting milk. "
-				person.lactation = true
-			else:
-				power += 1
-		elif line == "nipples":
-			text += "Additional nipples has sprouted on $name's torso. "
-			person.titsextra = round(rand_range(1,4))
-		elif line == "pregnancy":
-			if person.preg.has_womb == true:
-				text += "It seems some new life has began in $name. "
-				person.preg.fertility = 100
-				globals.impregnation(person)
-			else:
-				power += 1
-		elif line == "amnesia":
-			text += "$name's cognitive abilities have worsened. "
-			person.wit -= rand_range(10,25)
-		elif line == "lust":
-			text += "$name's lust has greatly increased. "
-			person.lust += rand_range(40,80)
-		power -= 1
+		var didChange = true
+		match randi() % 23:
+			0:
+				if person.add_trait(globals.origins.traits('any').name):
+					text += "$name has received a new trait. "
+				else:
+					didChange = false
+			1:
+				if person.penis == 'none':
+					person.penis = 'small'
+					if (globals.rules.futa && randi() % 3 != 0) || person.vagina == 'none':
+						text += "$name has grown a dick. "
+					else:
+						person.vagina = 'none'
+						person.preg.has_womb = false
+						text += "$name's vagina has transformed into a dick. "
+				elif person.vagina == 'none':
+					person.vagina = 'normal'
+					person.preg.has_womb = true
+					if (globals.rules.futa && randi() % 3 != 0) || person.penis == 'none':
+						text += "$name has grown a vagina. "
+					else:
+						person.penis = 'none'
+						text += "$name's dick has transformed into a vagina. "
+				elif randi() % 2 == 0:
+					person.vagina = 'none'
+					person.preg.has_womb = false
+					text += "$name's vagina has shrunk to nothing. "
+				else:
+					person.penis = 'none'
+					text += "$name's dick has shrunk to nothing. "
+			2:
+				if person.penis == 'none':
+					didChange = false
+				elif randi() % 2 == 0:
+					text += "$name's dick size has changed. "
+					randNewPartFromArray(person, 'penis', globals.genitaliaarray)
+				else:
+					text += "$name's dick shape has changed. "
+					randNewPartFromArray(person, 'penistype', globals.penistypearray)		
+			3:
+				if !globals.rules.futaballs && person.sex != 'male':
+					if person.balls != 'none':
+						person.balls = 'none'
+						text += "$name's scrotum has shrunk to nothing. "
+					else:
+						didChange = false
+				elif person.balls == 'none':
+					person.balls = 'small'
+					text += "$name has grown a scrotum. "
+				else:
+					randNewPartFromArray(person, 'balls', globals.genitaliaarray + ['none'])
+					if person.balls == 'none':
+						text += "$name's scrotum has shrunk to nothing. "
+					else:
+						text += "$name's scrotum size has changed. "
+			4:
+				text += "$name's skin coverage has changed. "
+				if globals.rules.furry:
+					randNewPartFromArray(person, 'skincov', globals.skincovarray)
+					randNewPartFromArray(person, 'furcolor', globals.allfurcolors)
+				else:
+					temp = globals.skincovarray
+					temp.erase('full_body_fur')
+					randNewPartFromArray(person, 'skincov', temp)
+			5:
+				if globals.hairlengtharray.find(person.hairlength) < globals.hairlengtharray.size() - 1:
+					person.hairlength = globals.hairlengtharray[globals.hairlengtharray.find(person.hairlength) + 1]
+					text += "$name's hair has grown. "
+				else:
+					didChange = false 
+			6:
+				text += "$name's general appeal has drastically changed. "
+				temp = person.beautybase
+				while abs(temp - person.beautybase) < 15:
+					temp = round(rand_range(10, 90))
+				person.beautybase = temp
+			7:
+				if person.lactation == false:
+					text += "$name's breasts started secreting milk. "
+					person.lactation = true
+				else:
+					text += "$name's breasts stopped secreting milk. "
+					person.lactation = false
+			8:
+				temp = randNewFromArray(range(6), int(person.titsextra))
+				text += "Additional %s have %s on $name's torso. " % ["tits" if person.titsextradeveloped else "nipples", "sprouted" if (temp > person.titsextra) else "shrunk to nothing"]
+				person.titsextra = temp
+			9:
+				if person.preg.has_womb && person.preg.duration == 0 && !person.effects.has("contraceptive"):
+					text += "It seems some new life has began in $name. "
+					person.preg.fertility = 100
+					globals.impregnation(person)
+				else:
+					didChange = false
+			10:
+				text += "$name's cognitive abilities have worsened. "
+				person.wit -= rand_range(10,25)
+			11:
+				text += "$name's lust has greatly increased. "
+				person.lust += rand_range(40,80)
+			12:
+				temp = randNewFromArray(globals.allhorns + ['none'], person.horns)
+				if person.horns == 'none':
+					text += "$name has grown a pair of horns. "
+				elif temp == 'none':
+					text += "$name's horns have shrunk to nothing. "
+				else:
+					text += "$name's horns have changed in shape. " 
+				person.horns = temp
+			13:
+				temp = randNewFromArray(globals.alltails + ['none'], person.tail)
+				if person.tail == 'none':
+					text += "$name has grown a tail. "
+				elif temp == 'none':
+					text += "$name's tail has shrunk to nothing. "
+				else:
+					text += "$name's tail has changed in shape. " 
+				person.tail = temp
+			14:
+				temp = randNewFromArray(globals.allwings + ['none'], person.wings)
+				if person.wings == 'none':
+					text += "$name has grown a pair of wings. "
+				elif temp == 'none':
+					text += "$name's wings have shrunk to nothing. " 
+				else:
+					text += "$name's wings have changed in shape. " 
+				person.wings = temp
+			var val:
+				var ref = dictChangeParts.get(val)
+				if ref == null:
+					didChange = false
+				else:
+					randNewPartFromArray(person, ref[0], ref[1])
+					text += "$name's %s has changed. " % ref[2]
+		if didChange:
+			person.stress += rand_range(5,15)
+			power -= 1
 	person.checksex()
 	person.toxicity -= rand_range(20,30)
 	text = person.dictionary(text)

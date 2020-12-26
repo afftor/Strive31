@@ -994,7 +994,7 @@ func slavedescription(member):
 var nakedspritesdict = globals.gallery.nakedsprites
 
 func showbody(i):
-	if globals.loadimage(i.person.imagefull) != null:
+	if globals.canloadimage(i.person.imagefull):
 		$Panel/bodyimage.visible = true
 		$Panel/bodyimage.texture = globals.loadimage(i.person.imagefull)
 	elif nakedspritesdict.has(i.person.unique):
@@ -1933,6 +1933,8 @@ func endencounter():
 	text += "\nEarned mana: " + str(totalmana)
 	globals.resources.mana += totalmana 
 	
+	for action in ongoingactions:
+		stopongoingaction(action)
 	ongoingactions.clear()
 	
 	get_node("Control").show()

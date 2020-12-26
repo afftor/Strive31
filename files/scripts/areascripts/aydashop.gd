@@ -8,7 +8,10 @@ func gornayda():
 	var state = true
 	var sprite = [['aydanormal', 'pos1','opac']]
 	var buttons = []
-	if globals.state.mainquest < 37 || globals.state.sandbox == true:
+
+	if globals.state.sidequests.ayda == 5 || (globals.state.sandbox == true && globals.state.sidequests.ayda == 3 && globals.state.sidequests.yris >= 6):
+		aydafinalereturn()
+	elif globals.state.mainquest < 37 || (globals.state.sandbox == true && globals.state.sidequests.ayda < 6):
 		globals.main.get_node("outside").setcharacter('aydanormal')
 		if globals.state.mainquest == 15 && !globals.state.sidequests.ivran in ['tobealtered','potionreceived','notaltered']:
 			text = textnode.MainQuestGornAydaIvran
@@ -43,8 +46,6 @@ func gornayda():
 		globals.state.sidequests.ayda = 4
 		globals.state.mainquest = 39
 		globals.main.dialogue(true, self, text, buttons, sprite)
-	elif globals.state.sidequests.ayda == 5 || (globals.state.sandbox == true && globals.state.sidequests.yris >= 6):
-		aydafinalereturn()
 	elif globals.state.sidequests.ayda >= 6:
 		text = "The bunny boy greets you as you enter."
 		globals.main.maintext = globals.player.dictionary(text)
@@ -90,7 +91,6 @@ func aydaquest():
 
 func leaveayda():
 	globals.main.get_node("outside").togorn()
-	globals.main.exploration.zoneenter('gorn')
 
 func aydashop():
 	if globals.state.sidequests.ayda >= 6:
@@ -135,12 +135,12 @@ func aydafinalereturn(stage = 0):
 		state = true
 		var person = globals.characters.create("Ayda")
 		globals.slaves = person
-		globals.main.exploration.zoneenter('gorn')
+		leaveayda()
 	elif stage == 2:
 		text = textnode.aydareturnrefuse
 		globals.state.sidequests.ayda = 101
 		sprite = [['aydanormal', 'pos1']]
-		globals.main.exploration.zoneenter('gorn')
+		leaveayda()
 		state = true
 	
 	

@@ -45,6 +45,7 @@ var playerpaneltextures = {
 
 func _ready():
 	$grouppanel/skilline/skill.set_meta('skill', {})
+	$autoattack.pressed = globals.rules.autoattack
 
 	if debug == true:
 		var scene = load("res://files/scripts/exploration.gd")
@@ -147,6 +148,7 @@ func start_battle(nosound = false):
 		newcombatant.node = newbutton
 		newcombatant.scene = self
 		newcombatant.createfromslave(i)
+		newbutton.get_node("portrait").texture = globals.loadimage(newcombatant.portrait)
 		newbutton.connect('pressed', newcombatant, 'selectcombatant')
 		newbutton.connect('mouse_entered', newcombatant, 'combatanttooltip')
 		newbutton.connect("mouse_exited", newcombatant, 'hidecombatanttooltip')
@@ -177,6 +179,7 @@ func start_battle(nosound = false):
 			newcombatant.createfromslave(i.capture, i)
 		else:
 			newcombatant.createfromdata(i)
+		newbutton.get_node("portrait").texture = globals.loadimage(newcombatant.portrait)
 		newcombatant.name = i.name
 		enemygroup.append(newcombatant)
 		combatantnodes.append(newbutton)
@@ -225,7 +228,6 @@ func _process(delta):
 		if ongoinganimation:
 			break
 		
-		i.get_node("portrait").texture = globals.loadimage(combatant.portrait)
 		i.get_node("name").text = combatant.name
 		var hpPercent = (combatant.hp/combatant.hpmax)*100
 		if !i.get_node("hp").has_meta('hp') || i.get_node("hp").get_meta('hp') != hpPercent:
@@ -576,7 +578,7 @@ class combatant:
 		scene.combatlog += scene.combatantdictionary(self, self, "\n[color=aqua][name1] has been defeated.[/color]")
 		if group == 'enemy':
 			for i in scene.enemygroup:
-				if i.passives.has("cultleaderpassive") && i != self:
+				if i.passives.has("cultleaderpassive") && i.state != 'defeated':
 					i.hpmax += 150
 					i.hp += 300
 					i.attack += 50
@@ -695,8 +697,9 @@ func bufftooltip(buff):
 	var text = '[center][color=yellow]' + buff.name + "[/color][/center]"
 	if buff.description != null:
 		text += '\n'+buff.description
-	if str(buff.stats).replace('(','').replace(')','') != '':
-		text += "\n" + str(buff.stats).replace('(','').replace(')','')
+	var stattext = str(buff.stats).replace('(','').replace(')','').replace('{','').replace('}','')
+	if !stattext.empty():
+		text += "\n" + stattext
 	if buff.duration >= 0:
 		text += '\nDuration: ' + str(buff.duration)+ ' turns'
 	globals.showtooltip(text)
@@ -835,6 +838,7 @@ func useskills(skill, caster = null, target = null, retarget = false):
 		caster.energy -= skill.costenergy
 	else:
 		group = 'enemy'
+
 	var skillcounter = 1
 	if caster.passives.has('doubleattack') && rand_range(0,100) < caster.passives.doubleattack.effectvalue && skill.type == 'physical':
 		skillcounter += 1
@@ -864,8 +868,6 @@ func useskills(skill, caster = null, target = null, retarget = false):
 				elif skill.type == 'spell':
 					damage = spelldamage(caster, target, skill)
 					text += '[targetname1] takes [color=#f05337]' + str(damage) + '[/color] spell damage.' 
-				
-				
 				
 				if skill.type == 'physical' && hit == 'miss':
 					target.dodge()
@@ -902,9 +904,6 @@ func useskills(skill, caster = null, target = null, retarget = false):
 						sendbuff(caster, i, skill.effect)
 					counter += 1
 			
-			
-			
-			
 		elif skill.target == 'self':
 			if skill.code == 'escape' && globals.main.get_node("explorationnode").launchonwin != null && caster.group == 'player':
 				globals.main.popup("You can't escape from this fight")
@@ -913,6 +912,8 @@ func useskills(skill, caster = null, target = null, retarget = false):
 				period = 'base'
 				caster.cooldowns.erase('escape')
 				return
+			if skill.code == 'mindread':
+				caster.actionpoints += 1
 		#buffs and effects
 		if skill.attributes.has('noescape') && target.effects.has('escapeeffect'):
 			text += "[targetname1] being held in place! "
@@ -932,11 +933,10 @@ func useskills(skill, caster = null, target = null, retarget = false):
 		globals.abilities.restorehealth(caster,target)
 	elif skill.code == "masshealcouncil":
 		for i in targetarray:
-				if i != caster:
-					globals.abilities.restorehealth(caster,i)
+			if i != caster:
+				globals.abilities.restorehealth(caster,i)
 	elif skill.code == 'escape':
 		text += "[name1] prepares to escape! "
-	
 	
 	
 	if skill.target == 'all':
@@ -1172,6 +1172,9 @@ func enemyturn():
 		
 		period = 'nextturn'
 	else:
+		if $autoattack.pressed != globals.rules.autoattack:
+			globals.rules.autoattack = $autoattack.pressed
+			globals.overwritesettings()
 		if period == 'escape':
 			playerescape()
 		elif period == 'win':
@@ -1453,6 +1456,13 @@ func barrieranimation(combatant):
 	var tween = $Tween
 	
 	tween.interpolate_property(node, "modulate", Color(0.25,0.25,1,1), Color(1,1,1,1), 1.3, Tween.TRANS_SINE, Tween.EASE_IN)
+	tween.start()
+
+func mindreadanimation(combatant):
+	var node = combatant.node
+	var tween = $Tween
+	
+	tween.interpolate_property(node, "modulate", Color(0.08,0.33,1,1), Color(1,1,1,1), 0.8, Tween.TRANS_SINE, Tween.EASE_IN)
 	tween.start()
 
 func findcombatantfromslave(person):

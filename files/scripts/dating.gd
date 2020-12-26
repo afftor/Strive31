@@ -401,9 +401,8 @@ func initiate(tempperson):
 		$textfield/masterportrait/TextureRect.visible = false
 	else:
 		$textfield/masterportrait/TextureRect.visible = true
-	
-	
-	
+
+
 	if jail == true:
 		get_parent().background = 'jail'
 		location = 'dungeon'
@@ -421,11 +420,10 @@ func initiate(tempperson):
 			self.mood += 4
 			text += "[he2] obediently agrees to your order and tries [his2] best to please you. "
 		else:
-			
 			text += "Without great joy [he2] obeys your order and reluctantly joins you. "
 		if person.lust >= 30:
 			mood += 6
-		elif person.traits.has("Devoted"):
+		if person.traits.has("Devoted"):
 			mood += 10
 	
 	$panel/consent.visible = person.consent
@@ -515,7 +513,7 @@ func moveto(newloc):
 	self.showntext = 'You lead [name2] to the [color=yellow]' + locationdicts[location].name + '[/color]. '
 	if date == false && !newloc in ['bedroom','dungeon']:
 		date = true
-		self.showntext += "\n[color=green][name2] seems to be quite happy to be taken out of the usual place and ready to spend with you some additional time. [/color]"
+		self.showntext += "\n[color=green][name2] seems to be quite happy to be taken out of the usual place and ready to spend some time with you. [/color]"
 	
 	updatelist()
 

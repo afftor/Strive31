@@ -20,7 +20,11 @@ var enchantmentdict = {
 	enchstress = {name = "-&v Stress per day", id = 'costumestress', effect = "stress", mineffect = 5, maxeffect = 8, itemtypes = ['costume'], type = 'onendday'},
 	enchobedmod = {name = "+&100v% Obedience", id = 'costumeobed', effect = "obedmod", mineffect = 0.15, maxeffect = 0.30, itemtypes = ['costume'], type = 'onequip'},
 	enchaccobedmod = {name = "+&100v% Obedience", id = 'accessobed', effect = "obedmod", mineffect = 0.05, maxeffect = 0.15, itemtypes = ['accessory'], type = 'onequip'},
-
+	enchlux = {name = "+&v Luxury", id = 'underluxury', effect = "luxury", mineffect = 5, maxeffect = 5, itemtypes = ['underwear'], type = 'onequip'},
+	enchlust = {name = "+&v Lust per day", id = 'underlust', effect = "lust", mineffect = 3, maxeffect = 7, itemtypes = ['underwear'], type = 'onendday'},
+	enchunderstress = {name = "-&v Stress per day", id = 'understress', effect = "stress", mineffect = 4, maxeffect = 7, itemtypes = ['underwear'], type = 'onendday'},
+	enchdailyenergy = {name = "+&v Energy per day", id = 'underenergy', effect = "energy", mineffect = 6, maxeffect = 12, itemtypes = ['underwear'], type = 'onendday'},
+	enchtox = {name = "-&v Toxicity per day", id = 'undertox', effect = "toxicity", mineffect = 2, maxeffect = 4, itemtypes = ['underwear'], type = 'onendday'},
 }
 
 

@@ -66,13 +66,15 @@ func zoneenter(zone):
 	text = zone.name
 	if deeperregion:
 		text = "+" + text + "+"
-	outside.get_node('locationname').set_text(text)
-	main.nodeunfade(outside.get_node("locationname"), 0.5)
+	if outside.get_node('locationname').get_text() != text:
+		outside.get_node('locationname').set_text(text)
+		main.nodeunfade(outside.get_node("locationname"), 0.5, 0.01)
 	text = ''
 	var progressvalue = (progress/max(zone.length,1))*100
 	var progressbar = globals.get_tree().get_current_scene().get_node("outside/exploreprogress")
 	if progress != 0:
 		get_parent().tween.interpolate_property(progressbar, "value", progressbar.value, progressvalue, 0.7, Tween.TRANS_LINEAR, Tween.EASE_OUT)
+		get_parent().tween.start()
 	else:
 		progressbar.set_value(progressvalue)
 	currentzone = zone
@@ -344,7 +346,7 @@ func buildslave(i):
 	if i.has('gear'):
 
 		for k in ['armor','weapon','costume','underwear','accessory']:
-			if k == 'armor' && rand_range(1, 4) < globals.player.level:
+			if k == 'armor' && rand_range(1, 4) >= globals.player.level:
 				continue
 			if !combatdata.enemyequips[i.gear].has(k):
 				continue
@@ -969,7 +971,7 @@ func enemydefeated():
 		person.xp += round(expearned/(globals.state.playergroup.size()+1))
 		if person.levelupreqs.has('code') && person.levelupreqs.code == 'wincombat':
 			person.levelup()
-			text += person.dictionary("[color=green]Your decisive win inspired $name, and made $him unlock new potential. \n")
+			text += person.dictionary("[color=green]Your decisive win inspired $name, and made $him unlock new potential.[/color] \n")
 		if person.health > person.stats.health_max/1.3:
 			person.cour += rand_range(1,3)
 	
@@ -1345,7 +1347,7 @@ func capturedecide(stage): #1 - no reward, 2 - material, 3 - sex, 4 - join
 		location = 'wimborn'
 	
 	if stage == 1:
-		text = rewardslave.dictionary("$race ").capitalize() + "$child is surprised by your generosity, and after thanking you again, leaves. "
+		text = rewardslave.dictionary("The $race").capitalize() + " $child is surprised by your generosity, and after thanking you again, leaves. "
 		globals.state.reputation[location] += 1
 	elif stage == 2:
 		if randf() >= 0.25:
@@ -1462,6 +1464,8 @@ func gornyris():
 			buttons.append({text = "Accept (200 Gold)", function = "gornyrisaccept", args = 2})
 			if globals.state.getCountStackableItem('deterrentpot','backpack') >= 1:
 				buttons.append({text = "Accept and use Deterrent potion (200 Gold)", function = "gornyrisaccept", args = 3})
+			else:
+				buttons.append({text = "Accept and use potion (200 Gold)", function = "gornyrisaccept", args = 3, disabled = true, tooltip = "You did not bring the appropriate potion."})
 		else:
 			buttons.append({text = "Accept (200 Gold)", function = "gornyrisaccept", args = 2, disabled = true})
 	elif globals.state.sidequests.yris == 3:
@@ -1470,9 +1474,13 @@ func gornyris():
 	elif globals.state.sidequests.yris in [4,5]:
 		text = globals.questtext.GornYrisOffer2Repeat
 		if globals.resources.gold < 1000 || globals.state.getCountStackableItem('deterrentpot','backpack') < 1 || globals.state.sidequests.yris < 5:
-			text += "\n\n[color=yellow]You decide, that you should prepare before putting your money on the table.[/color] "
+			text += "\n\n[color=yellow]You decide that you should prepare before putting your money on the table.[/color] "
 			if globals.state.sidequests.yris < 5:
 				text += "\n\nPerhaps, somebody skilled in alchemy might shine some light upon your previous finding. "
+				if globals.state.getCountStackableItem('deterrentpot','backpack') < 1:
+					text += "\n\nYou will need another Deterrent potion for a fair fight. "
+			elif globals.state.getCountStackableItem('deterrentpot','backpack') < 1:
+				text += "\n\nYou will need another Deterrent potion to ensure your win. "
 			buttons.append({text = "Accept (1000 Gold)", function = "gornyrisaccept", args = 4, disabled = true})
 		else:
 			buttons.append({text = "Accept (1000 Gold)", function = "gornyrisaccept", args = 4})
@@ -1746,6 +1754,7 @@ func undercitylibraryfight():
 	enemyfight()
 
 func undercitylibrarywin():
+	winscreenclear()
 	generateloot(['zoebook', 1], globals.questtext.undercitybookafterabttle)
 	showlootscreen()
 	zoneenter("undercityruins")

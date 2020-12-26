@@ -96,10 +96,8 @@ func show():
 	
 
 
-
-
 #warning-ignore:unused_argument
-func _on_traittext_meta_hover_ended(meta):
+func _on_traittext_meta_hover_ended(meta = null):
 	globals.hidetooltip()
 
 
