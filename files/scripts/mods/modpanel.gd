@@ -89,7 +89,7 @@ func loadfromconfig():
 		handleError("Opening config file " + str(detailsFile), retCode)
 	var record = [] #record of unique entries
 	for i in loadorder.duplicate():
-		if !dir.dir_exists(globals.modDict[i]):
+		if !globals.modDict.has(i) || !dir.dir_exists(globals.modDict[i]):
 			loadorder.erase(i)
 		if i in record:
 			loadorder.erase(i)
