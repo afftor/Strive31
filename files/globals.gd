@@ -3,7 +3,7 @@
 extends Node
 
 var guildslaves = {wimborn = [], gorn = [], frostford = [], umbra = []}
-var gameversion = '1.0b'
+var gameversion = '1.0d'
 var state = progress.new()
 var developmode = false
 var gameloaded = false

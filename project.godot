@@ -8,11 +8,6 @@
 
 config_version=4
 
-_global_script_classes=[  ]
-_global_script_class_icons={
-
-}
-
 [Globlas]
 
 EditorLanguage="en"
@@ -39,6 +34,8 @@ globals="*res://files/globals.gd"
 
 settings/fps/force_fps=30
 gdscript/warnings/enable=false
+gdscript/warnings/unassigned_variable=false
+gdscript/warnings/unassigned_variable_op_assign=false
 gdscript/warnings/unused_variable=false
 gdscript/warnings/unused_argument=false
 gdscript/warnings/return_value_discarded=false
@@ -246,6 +243,10 @@ space={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":32,"unicode":0,"echo":false,"script":null)
  ]
 }
+
+[logging]
+
+file_logging/enable_file_logging=true
 
 [physics]
 

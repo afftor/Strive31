@@ -303,7 +303,6 @@ size_flags_vertical = 2
 text = "Disable adult characters"
 
 [node name="malesslider" type="HSlider" parent="TabContainer/Game"]
-editor/display_folded = true
 margin_left = 18.0
 margin_top = 254.0
 margin_right = 253.0
@@ -324,7 +323,6 @@ size_flags_vertical = 0
 text = "Gender occurrence balance: "
 
 [node name="futaslider" type="HSlider" parent="TabContainer/Game"]
-editor/display_folded = true
 margin_left = 18.0
 margin_top = 300.0
 margin_right = 253.0
@@ -374,7 +372,7 @@ hint_tooltip = "When to show Alise on Day End Popup"
 size_flags_horizontal = 2
 size_flags_vertical = 2
 text = "Always"
-items = [ "Always", null, false, -1, null, "After Daily Event", null, false, -1, null, "Never", null, false, -1, null ]
+items = [ "Always", null, false, 0, null, "After Daily Event", null, false, 1, null, "Never", null, false, 2, null ]
 selected = 0
 
 [node name="Supporter section" type="Tabs" parent="TabContainer"]

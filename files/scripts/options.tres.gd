@@ -96,7 +96,7 @@ func _on_futaslider_value_changed( value ):
 		+ str(round((100-globals.rules['male_chance'])*globals.rules['futa_chance']/10)/10) + '% of people are futa')
 
 func _on_errorLogging_toggled(value):
-	ProjectSettings.set_setting("logging/file_logging/max_log_files", 1)
+	ProjectSettings.set_setting("logging/file_logging/max_log_files", 5)
 	ProjectSettings.set_setting("logging/file_logging/enable_file_logging", value)
 	ProjectSettings.save()
 
