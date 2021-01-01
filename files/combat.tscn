@@ -482,7 +482,6 @@ rect_pivot_offset = Vector2( 54.6864, 72.7106 )
 focus_mode = 0
 size_flags_horizontal = 0
 size_flags_vertical = 0
-enabled_focus_mode = 0
 texture_normal = ExtResource( 26 )
 expand = true
 stretch_mode = 6
