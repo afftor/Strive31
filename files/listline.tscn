@@ -57,7 +57,6 @@ hint_tooltip = "Up"
 focus_mode = 0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-enabled_focus_mode = 0
 texture_normal = ExtResource( 3 )
 expand = true
 
@@ -72,7 +71,6 @@ hint_tooltip = "Down"
 focus_mode = 0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-enabled_focus_mode = 0
 texture_normal = ExtResource( 4 )
 expand = true
 
@@ -87,7 +85,6 @@ hint_tooltip = "To Bottom"
 focus_mode = 0
 size_flags_horizontal = 2
 size_flags_vertical = 2
-enabled_focus_mode = 0
 texture_normal = ExtResource( 5 )
 expand = true
 
